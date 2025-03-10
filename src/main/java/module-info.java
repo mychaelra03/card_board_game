@@ -6,4 +6,6 @@ module it.polimi.galaxy_trucker {
 
     opens it.polimi.galaxy_trucker to javafx.fxml;
     exports it.polimi.galaxy_trucker;
+    exports it.polimi.galaxy_trucker.Controller;
+    opens it.polimi.galaxy_trucker.Controller to javafx.fxml;
 }
