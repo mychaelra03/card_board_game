@@ -1,11 +1,11 @@
 # Galaxy Truckers
 
 
-<p align ="center">
+<p style="text-align: center;">
 <img src=".github/resources/galaxy_trucker_box.png" width="600" alt="galaxy trucker logo"/>
 </p>
 
-<div align="center">
+<div style="text-align: center;">
     <a href="https://github.com/Garolini/IS25-LL14/releases/latest">
         <img src="https://img.shields.io/badge/macOS-333333?style=for-the-badge&logo=apple&logoColor=white"  alt="macOS"/>
     </a>
