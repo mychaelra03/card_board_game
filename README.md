@@ -1,19 +1,19 @@
 # Galaxy Truckers
 
 
-<p align="center">
-<img src=".github/resources/galaxy_trucker_box.png" width="400" alt="galaxy trucker logo"/>
+<p align ="center">
+<img src=".github/resources/galaxy_trucker_box.png" width="600" alt="galaxy trucker logo"/>
 </p>
 
 <div align="center">
     <a href="https://github.com/Garolini/IS25-LL14/releases/latest">
-        <img src="https://img.shields.io/badge/macOS-333333?style=for-the-badge&logo=apple&logoColor=white" />
+        <img src="https://img.shields.io/badge/macOS-333333?style=for-the-badge&logo=apple&logoColor=white"  alt="macOS"/>
     </a>
     <a href="https://github.com/Garolini/IS25-LL14/releases/latest">
-        <img src="https://img.shields.io/badge/Linux-333333?style=for-the-badge&logo=linux&logoColor=white" />
+        <img src="https://img.shields.io/badge/Linux-333333?style=for-the-badge&logo=linux&logoColor=white"  alt="Linux"/>
     </a>
    <a href="https://github.com/Garolini/IS25-LL14/releases/latest">
-        <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" />
+        <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white"  alt="Windows"/>
     </a>
 </div>
 
