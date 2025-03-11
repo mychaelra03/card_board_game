@@ -1,6 +1,5 @@
 # Galaxy Truckers
 
-
 <p style="text-align: center;">
 <img src=".github/resources/galaxy_trucker_box.png" width="600" alt="galaxy trucker logo"/>
 </p>
