@@ -16,6 +16,9 @@ public abstract class Tile {
     public Tile(int ID, int top, int right, int bottom, int left) {
         this(ID, Connector.fromInt(top), Connector.fromInt(right), Connector.fromInt(bottom), Connector.fromInt(left));
     }
+    public Tile() {
+        this.ID = 0;
+    }
 
     public int getID() {
         return ID;

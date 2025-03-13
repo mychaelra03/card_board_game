@@ -1,5 +1,7 @@
 package it.polimi.galaxy_trucker.tiles;
 
+import it.polimi.galaxy_trucker.ShipBoard;
+
 import static it.polimi.galaxy_trucker.tiles.Connector.*;
 import static it.polimi.galaxy_trucker.tiles.AlienSupportTile.AlienColor.*;
 import static it.polimi.galaxy_trucker.tiles.BlockType.*;
@@ -57,6 +59,12 @@ public class MainTiles {
         structuralModule.printConnectors();
         engine.setRotation(0);
 
+        ShipBoard ship = new ShipBoard(2);
+        System.out.println(ship.isInsideShip(0, 0));
+        System.out.println(ship.getTile(2, 2));
+
+        ship.setTile(2, 2, cabin, 0);
+        System.out.println(ship.getTile(2, 2).getType());
 
 
     }
