@@ -4,7 +4,7 @@ import it.polimi.galaxy_trucker.tiles.*;
 
 public class ShipBoard {
 
-    private Tile[][] tiles = new Tile[7][7];
+    private final Tile[][] tiles = new Tile[7][7];
     private final int shipBoardType;
 
     public ShipBoard(int shipBoardType) {
