@@ -31,15 +31,15 @@ The implementation features both a command-line interface (CLI) and a JavaFX gra
 | Functionality     | Status                  | 
 |-------------------|-------------------------|
 | Basic rules       | :construction:      |
-| Complete rules    | :construction:      |
-| Socket connection | :construction:      |
-| RMI connection    | :construction:      |
+| Complete rules    | :ballot_box_with_check:      |
+| Socket connection | :ballot_box_with_check:      |
+| RMI connection    | :ballot_box_with_check:      |
 | CLI               | :construction:      |
 | GUI               | :construction:      |
-| Multiple games    | :construction:      |
+| Multiple games    | :ballot_box_with_check:      |
 | Persistence (*)   | :construction:      |
 | Resilience        | :construction:      |
-| Chat              | :construction:      |
+| Chat              | :ballot_box_with_check:      |
 
 (*) *For testing purposes.*
 
