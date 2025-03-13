@@ -3,7 +3,7 @@ package it.polimi.galaxy_trucker.tiles;
 class CargoTile extends Tile {
 
     public enum CargoType {
-        NORMAL, RED;
+        NORMAL, RED
     }
     private final CargoType type;
     private final int capacity;

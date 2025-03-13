@@ -3,7 +3,7 @@ package it.polimi.galaxy_trucker.tiles;
 class EngineTile extends Tile {
 
     public enum EngineType {
-        SINGLE, DOUBLE;
+        SINGLE, DOUBLE
     }
     private final EngineType type;
 
