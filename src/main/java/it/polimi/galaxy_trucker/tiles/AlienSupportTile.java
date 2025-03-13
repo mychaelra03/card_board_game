@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.tiles;
 
-class AlienSupportTile extends Tile {
+public class AlienSupportTile extends Tile {
 
     public enum AlienColor {
         BROWN, PURPLE

@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.tiles;
 
-abstract class Tile {
+public abstract class Tile {
 
     private final int ID;
     private final Connector[] connectors = new Connector[4];

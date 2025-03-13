@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.tiles;
 
-class ShiedGeneratorTile extends Tile {
+public class ShiedGeneratorTile extends Tile {
 
     public ShiedGeneratorTile(int ID, Connector top, Connector right, Connector bottom, Connector left) {
         super(ID, top, right, bottom, left);

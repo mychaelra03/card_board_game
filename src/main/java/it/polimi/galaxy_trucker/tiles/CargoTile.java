@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.tiles;
 
-class CargoTile extends Tile {
+public class CargoTile extends Tile {
 
     public enum CargoType {
         NORMAL, RED
@@ -62,8 +62,8 @@ class CargoTile extends Tile {
 
     public int getCargoHoldsValue() {
         int total = 0;
-        for (int i = 0; i < containers.length; i++) {
-            total += containers[i].getValue();
+        for (BlockType container : containers) {
+            total += container.getValue();
         }
         return total;
     }
