@@ -1,9 +1,9 @@
 package it.polimi.galaxy_trucker.tiles;
 
-class CannonTile extends Tile {
+public class CannonTile extends Tile {
 
     public enum CannonType {
-        SINGLE, DOUBLE;
+        SINGLE, DOUBLE
     }
     private final CannonType type;
 

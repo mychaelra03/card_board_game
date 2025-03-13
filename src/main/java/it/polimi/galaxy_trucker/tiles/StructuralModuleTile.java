@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.tiles;
 
-class StructuralModuleTile extends Tile {
+public class StructuralModuleTile extends Tile {
 
     public StructuralModuleTile(int ID, Connector top, Connector right, Connector bottom, Connector left) {
         super(ID, top, right, bottom, left);

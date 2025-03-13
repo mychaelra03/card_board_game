@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.tiles;
 
-class BatteryComponentTile extends Tile {
+public class BatteryComponentTile extends Tile {
 
     private final int capacity;
     private int storedBatteries;

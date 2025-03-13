@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.tiles;
 
-class CabinTile extends Tile {
+public class CabinTile extends Tile {
 
     public enum CrewType {
         HUMAN, BROWN_ALIEN, PURPLE_ALIEN
