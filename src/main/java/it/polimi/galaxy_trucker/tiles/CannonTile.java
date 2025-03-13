@@ -7,11 +7,12 @@ class CannonTile extends Tile {
     }
     private final CannonType type;
 
-    public CannonTile(Connector top, Connector right, Connector bottom, Connector left, CannonType type) {
-        super(top, right, bottom, left);
+    public CannonTile(int ID, Connector top, Connector right, Connector bottom, Connector left, CannonType type) {
+        super(ID, top, right, bottom, left);
         this.type = type;
-    }    public CannonTile(int top, int right, int bottom, int left, CannonType type) {
-        super(top, right, bottom, left);
+    }
+    public CannonTile(int ID, int top, int right, int bottom, int left, CannonType type) {
+        super(ID, top, right, bottom, left);
         this.type = type;
     }
 

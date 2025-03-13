@@ -7,12 +7,12 @@ class AlienSupportTile extends Tile {
     }
     private final AlienColor color;
 
-    public AlienSupportTile(Connector top, Connector right, Connector bottom, Connector left, AlienColor color) {
-        super(top, right, bottom, left);
+    public AlienSupportTile(int ID, Connector top, Connector right, Connector bottom, Connector left, AlienColor color) {
+        super(ID, top, right, bottom, left);
         this.color = color;
     }
-    public AlienSupportTile(int top, int right, int bottom, int left, AlienColor color) {
-        super(top, right, bottom, left);
+    public AlienSupportTile(int ID, int top, int right, int bottom, int left, AlienColor color) {
+        super(ID, top, right, bottom, left);
         this.color = color;
     }
 
