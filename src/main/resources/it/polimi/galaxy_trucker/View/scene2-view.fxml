@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="scene2AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Controller.Scene2Controller">
+<AnchorPane fx:id="scene2AnchorPane" prefHeight="939.0" prefWidth="1153.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Controller.Scene2Controller">
    <children>
-      <Label fx:id="labelUsername" layoutX="96.0" layoutY="92.0" />
+      <AnchorPane layoutX="64.0" layoutY="355.0" prefHeight="200.0" prefWidth="200.0" />
    </children>
 </AnchorPane>
