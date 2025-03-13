@@ -44,7 +44,20 @@ public class ShipBoard {
 
     // private boolean IsPlacementValid() {}
 
-    //public int getExposedConnectorsCount() {}
+    public int getExposedConnectorsCount() {
+        int count = 0;
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[i].length; j++) {
+                if(tiles[i][j].getClass() != EmptyTile.class) {
+                    if(tiles[i][j].getConnector(0) != Connector.NONE && tiles[i-1][j].getClass() == EmptyTile.class) count++;
+                    if(tiles[i][j].getConnector(1) != Connector.NONE && tiles[i][j+1].getClass() == EmptyTile.class) count++;
+                    if(tiles[i][j].getConnector(2) != Connector.NONE && tiles[i+1][j].getClass() == EmptyTile.class) count++;
+                    if(tiles[i][j].getConnector(3) != Connector.NONE && tiles[i][j-1].getClass() == EmptyTile.class) count++;
+                }
+            }
+        }
+        return count;
+    }
 
     public boolean isInsideShip(int x, int y) {
         if(shipBoardType == 1) {
