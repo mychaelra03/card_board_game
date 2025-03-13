@@ -9,16 +9,16 @@ class CargoTile extends Tile {
     private final int capacity;
     private final BlockType[] containers;
 
-    public CargoTile(Connector top, Connector right, Connector bottom, Connector left, CargoType type, int capacity) {
-        super(top, right, bottom, left);
+    public CargoTile(int ID, Connector top, Connector right, Connector bottom, Connector left, CargoType type, int capacity) {
+        super(ID, top, right, bottom, left);
         this.type = type;
         this.capacity = capacity;
         if (type == CargoType.NORMAL && (capacity < 2 || capacity > 3)) throw new IllegalArgumentException("Cargo must have 2 or 3 containers.");
         if (type == CargoType.RED && (capacity < 1 || capacity > 2)) throw new IllegalArgumentException("Red cargo must have 1 or 2 containers.");
         this.containers = new BlockType[capacity];
     }
-    public CargoTile(int top, int right, int bottom, int left, CargoType type, int capacity) {
-        super(top, right, bottom, left);
+    public CargoTile(int ID, int top, int right, int bottom, int left, CargoType type, int capacity) {
+        super(ID, top, right, bottom, left);
         this.type = type;
         this.capacity = capacity;
         if (type == CargoType.NORMAL && (capacity < 2 || capacity > 3)) throw new IllegalArgumentException("Cargo must have 2 or 3 containers.");
@@ -60,8 +60,16 @@ class CargoTile extends Tile {
         return removedBlock;
     }
 
+    public int getCargoHoldsValue() {
+        int total = 0;
+        for (int i = 0; i < containers.length; i++) {
+            total += containers[i].getValue();
+        }
+        return total;
+    }
+
     @Override
     public String getType() {
-        return "CargoHold";
+        return "Cargo Hold";
     }
 }
