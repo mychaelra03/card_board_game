@@ -39,10 +39,8 @@ public class ShipBoard {
         tiles[x][y] = tile;
         tiles[x][y].setRotation(rotation);
         // Connectors placement checks...
-        // if(!IsPlacementValid()) throw new IllegalArgumentException("Invalid connectors placement.");
+        if(!wasConnectionValid(x, y)) throw new IllegalArgumentException("Invalid connectors placement.");
     }
-
-    // private boolean IsPlacementValid() {}
 
     public int getBatteriesCount() {
         int count = 0;
@@ -107,10 +105,10 @@ public class ShipBoard {
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
                 if(!(tiles[i][j] instanceof EmptyTile)) {
-                    if(tiles[i][j].getConnector(0) != Connector.NONE && tiles[i-1][j] instanceof EmptyTile) count++ ;
-                    if(tiles[i][j].getConnector(1) != Connector.NONE && tiles[i][j+1] instanceof EmptyTile) count++ ;
-                    if(tiles[i][j].getConnector(2) != Connector.NONE && tiles[i+1][j] instanceof EmptyTile) count++ ;
-                    if(tiles[i][j].getConnector(3) != Connector.NONE && tiles[i][j-1] instanceof EmptyTile) count++ ;
+                    if(tiles[i][j].getConnector(0) != Connector.NONE && tiles[i-1][j] instanceof EmptyTile) count++;
+                    if(tiles[i][j].getConnector(1) != Connector.NONE && tiles[i][j+1] instanceof EmptyTile) count++;
+                    if(tiles[i][j].getConnector(2) != Connector.NONE && tiles[i+1][j] instanceof EmptyTile) count++;
+                    if(tiles[i][j].getConnector(3) != Connector.NONE && tiles[i][j-1] instanceof EmptyTile) count++;
                 } // Could be written in a cleaner way
             }
         }
@@ -127,6 +125,41 @@ public class ShipBoard {
         return count;
     }
 
+    private boolean areConnectorsCompatible(Connector a, Connector b) {
+        if (a == Connector.NONE && b == Connector.NONE) return true;
+        if (a == Connector.NONE || b == Connector.NONE) return false;
+        if (a == b) return true;
+        if (a == Connector.UNIVERSAL || b == Connector.UNIVERSAL) return true;
+        return false;
+    }
+
+    private boolean wasConnectionValid(int x, int y) {
+        Tile tile = getTile(x, y);
+
+        int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
+
+        for (int side = 0; side < 4; side++) {
+            int nx = x + offsets[side][0];
+            int ny = y + offsets[side][1];
+
+            if (!isInsideShip(nx, ny)) {
+                continue;
+            }
+
+            Tile neighbor = getTile(nx, ny);
+            if (neighbor instanceof EmptyTile) {
+                continue;
+            }
+
+            Connector connectorHere = tile.getConnector(side);
+            Connector connectorNeighbor = neighbor.getConnector((side + 2) % 4);
+
+            if (!areConnectorsCompatible(connectorHere, connectorNeighbor)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
     public boolean isInsideShip(int x, int y) {
