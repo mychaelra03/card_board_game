@@ -57,12 +57,10 @@ public class CabinTile extends Tile {
         return count;
     }
     public boolean hasBrownAlien() {
-        if(crew[0] == CrewType.BROWN_ALIEN) return true;
-        return false;
+        return crew[0] == CrewType.BROWN_ALIEN;
     }
     public boolean hasPurpleAlien() {
-        if(crew[0] == CrewType.PURPLE_ALIEN) return true;
-        return false;
+        return crew[0] == CrewType.PURPLE_ALIEN;
     }
 
     public CrewType removeMember(int index) {

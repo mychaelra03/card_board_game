@@ -5,7 +5,6 @@ import it.polimi.galaxy_trucker.ShipBoard;
 import static it.polimi.galaxy_trucker.tiles.Connector.*;
 import static it.polimi.galaxy_trucker.tiles.AlienSupportTile.AlienColor.*;
 import static it.polimi.galaxy_trucker.tiles.BlockType.*;
-import static it.polimi.galaxy_trucker.tiles.EngineTile.*;
 import static it.polimi.galaxy_trucker.tiles.CargoTile.*;
 import static it.polimi.galaxy_trucker.tiles.CabinTile.CrewType.*;
 
@@ -19,7 +18,8 @@ public class MainTiles {
 
         CargoTile blueCargo = new CargoTile(3, UNIVERSAL, DOUBLE, NONE, SINGLE, CargoType.NORMAL, 2);
         CargoTile redCargo = new CargoTile(4, SINGLE, DOUBLE, NONE, SINGLE, CargoType.RED, 2);
-        EngineTile engine = new EngineTile(5, DOUBLE, NONE, SINGLE, SINGLE, EngineType.SINGLE);
+        EngineTile engine = new EngineTile(5, DOUBLE, NONE, SINGLE, SINGLE);
+        EngineTile doubleEngine = new DoubleEngineTile(12, DOUBLE, NONE, SINGLE, SINGLE);
         ShieldTile shield = new ShieldTile(6, NONE, NONE, SINGLE, NONE);
         BatteriesTile battery = new BatteriesTile(7, NONE, NONE, NONE, NONE, 2);
         CabinTile cabin = new CabinTile(8, NONE, NONE, NONE, NONE);
@@ -37,7 +37,7 @@ public class MainTiles {
         redCargo.addOrSwitchBlock(1, RED);
 
         System.out.println(blueCargo.getBlockAt(0).toString() + blueCargo.getBlockAt(1));
-        cabin.setBrownAlienHabitability(true);
+        cabin.allowBrownAlien(true);
         cabin.setCrewType(BROWN_ALIEN);
         System.out.println(cabin.getHumanCount());
         System.out.println(cabin.hasBrownAlien());
