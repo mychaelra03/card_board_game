@@ -60,7 +60,7 @@ public class CargoTile extends Tile {
         return removedBlock;
     }
 
-    public int getCargoHoldsValue() {
+    public int getHoldsValue() {
         int total = 0;
         for (BlockType container : containers) {
             total += container.getValue();

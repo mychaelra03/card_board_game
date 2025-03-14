@@ -5,31 +5,33 @@ public class CabinTile extends Tile {
     public enum CrewType {
         HUMAN, BROWN_ALIEN, PURPLE_ALIEN
     }
-    private boolean isBrownAlienHabitable;
-    private boolean isPurpleAlienHabitable;
+    private boolean canHostBrownAlien = false;
+    private boolean canHostPurpleAlien = false;
     private final CrewType[] crew;
 
     public CabinTile(int ID, Connector top, Connector right, Connector bottom, Connector left) {
         super(ID, top, right, bottom, left);
         this.crew = new CrewType[2];
+        setCrewType(CrewType.HUMAN);
     }
     public CabinTile(int ID, int top, int right, int bottom, int left) {
         super(ID, top, right, bottom, left);
         this.crew = new CrewType[2];
+        setCrewType(CrewType.HUMAN);
     }
 
-    public void setBrownAlienHabitability(boolean alienHabitable) {
-        isBrownAlienHabitable = alienHabitable;
+    public void allowBrownAlien(boolean alienHabitable) {
+        canHostBrownAlien = alienHabitable;
     }
-    public void setPurpleAlienHabitability(boolean alienHabitable) {
-        isPurpleAlienHabitable = alienHabitable;
+    public void allowPurpleAlien(boolean alienHabitable) {
+        canHostPurpleAlien = alienHabitable;
     }
 
-    public boolean isBrownAlienHabitable() {
-        return isBrownAlienHabitable;
+    public boolean canHostBrownAlien() {
+        return canHostBrownAlien;
     }
-    public boolean isPurpleAlienHabitable() {
-        return isPurpleAlienHabitable;
+    public boolean canHostPurpleAlien() {
+        return canHostPurpleAlien;
     }
 
     public CrewType getMemberAt(int index) {
@@ -38,10 +40,10 @@ public class CabinTile extends Tile {
     }
 
     public void setCrewType(CrewType crewType) {
-        if (!isBrownAlienHabitable && crewType == CrewType.BROWN_ALIEN) {
+        if (!canHostBrownAlien && crewType == CrewType.BROWN_ALIEN) {
             throw new IllegalArgumentException("Cabin not habitable by brown aliens");
         }
-        if (!isPurpleAlienHabitable && crewType == CrewType.PURPLE_ALIEN) {
+        if (!canHostPurpleAlien && crewType == CrewType.PURPLE_ALIEN) {
             throw new IllegalArgumentException("Cabin not habitable by purple aliens");
         }
         this.crew[0] = crewType;
@@ -54,13 +56,13 @@ public class CabinTile extends Tile {
         if(crew[1] == CrewType.HUMAN) count++;
         return count;
     }
-    public int getBrownAlienCount() {
-        if(crew[0] == CrewType.BROWN_ALIEN) return 1;
-        return 0;
+    public boolean hasBrownAlien() {
+        if(crew[0] == CrewType.BROWN_ALIEN) return true;
+        return false;
     }
-    public int getPurpleAlienCount() {
-        if(crew[0] == CrewType.PURPLE_ALIEN) return 1;
-        return 0;
+    public boolean hasPurpleAlien() {
+        if(crew[0] == CrewType.PURPLE_ALIEN) return true;
+        return false;
     }
 
     public CrewType removeMember(int index) {

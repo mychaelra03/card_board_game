@@ -20,8 +20,8 @@ public class MainTiles {
         CargoTile blueCargo = new CargoTile(3, UNIVERSAL, DOUBLE, NONE, SINGLE, CargoType.NORMAL, 2);
         CargoTile redCargo = new CargoTile(4, SINGLE, DOUBLE, NONE, SINGLE, CargoType.RED, 2);
         EngineTile engine = new EngineTile(5, DOUBLE, NONE, SINGLE, SINGLE, EngineType.SINGLE);
-        ShiedGeneratorTile shield = new ShiedGeneratorTile(6, NONE, NONE, SINGLE, NONE);
-        BatteryComponentTile battery = new BatteryComponentTile(7, NONE, NONE, NONE, NONE, 2);
+        ShieldTile shield = new ShieldTile(6, NONE, NONE, SINGLE, NONE);
+        BatteriesTile battery = new BatteriesTile(7, NONE, NONE, NONE, NONE, 2);
         CabinTile cabin = new CabinTile(8, NONE, NONE, NONE, NONE);
 
         System.out.println(alienB + "\n" + alienP + "\n" + engine + "\n" + shield);
@@ -40,16 +40,16 @@ public class MainTiles {
         cabin.setBrownAlienHabitability(true);
         cabin.setCrewType(BROWN_ALIEN);
         System.out.println(cabin.getHumanCount());
-        System.out.println(cabin.getBrownAlienCount());
+        System.out.println(cabin.hasBrownAlien());
         cabin.setCrewType(HUMAN);
         System.out.println(cabin.getHumanCount());
         cabin.removeMember(1);
         System.out.println(cabin.getHumanCount());
         System.out.println(cabin.getID());
-        System.out.println("blue cargo value: " + blueCargo.getCargoHoldsValue());
+        System.out.println("blue cargo value: " + blueCargo.getHoldsValue());
 
 
-        StructuralModuleTile structuralModule = new StructuralModuleTile(7, 0, 1, 2, 3);
+        StructuralTile structuralModule = new StructuralTile(7, 0, 1, 2, 3);
         structuralModule.printConnectors();
         structuralModule.setRotation(1);
         structuralModule.printConnectors();
