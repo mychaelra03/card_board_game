@@ -1,0 +1,21 @@
+package it.polimi.galaxy_trucker.tiles;
+
+public class StartingCabinTile extends CabinTile {
+
+    public StartingCabinTile(int ID) {
+        super(ID, Connector.UNIVERSAL, Connector.UNIVERSAL,  Connector.UNIVERSAL,  Connector.UNIVERSAL);
+    }
+
+    @Override
+    public void setCrewType(CrewType crewType) {
+        if (crewType != CrewType.HUMAN) {
+            throw new IllegalArgumentException("Starting cabin cannot host aliens.");
+        }
+        super.setCrewType(crewType);
+    }
+
+    @Override
+    public String getType() {
+        return "Starting Cabin";
+    }
+}
