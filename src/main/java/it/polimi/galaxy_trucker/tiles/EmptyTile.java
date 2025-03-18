@@ -7,7 +7,7 @@ public class EmptyTile extends Tile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Empty";
     }
 }

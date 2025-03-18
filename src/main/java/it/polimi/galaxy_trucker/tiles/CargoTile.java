@@ -37,9 +37,9 @@ public class CargoTile extends Tile {
         return containers[index];
     }
 
-    public BlockType addOrSwitchBlock(int index, BlockType newBlock) {
-        // if the slot is empty, it adds the cube and returns null
-        // if there is already a cube, it switches them and returns the cube that was inside
+    public BlockType loadBlock(int index, BlockType newBlock) {
+        // if the slot is empty, it adds the block and returns null
+        // if there is already a block, it switches them and returns the block that was inside
         if (type == CargoType.NORMAL && newBlock == BlockType.RED) {
             throw new IllegalArgumentException("Blue cargo cannot hold RED blocks.");
         }
@@ -52,24 +52,19 @@ public class CargoTile extends Tile {
     }
 
     public BlockType removeBlock(int index) {
-        if (index < 0 || index >= containers.length) {
-            throw new IllegalArgumentException("Invalid container index");
-        }
-        BlockType removedBlock = containers[index];
-        containers[index] = null;
-        return removedBlock;
+        return loadBlock(index, null);
     }
 
     public int getHoldsValue() {
         int total = 0;
         for (BlockType container : containers) {
-            total += container.getValue();
+            if(container != null) total += container.getValue();
         }
         return total;
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Cargo Hold";
     }
 }

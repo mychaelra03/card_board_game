@@ -43,7 +43,7 @@ public abstract class Tile {
         return connectors[(side - rotation + 4) % 4];
     }
 
-    public abstract String getType();
+    public abstract String getTileType();
 
     // For debugging
     public void printConnectors() {

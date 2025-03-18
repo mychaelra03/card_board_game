@@ -14,7 +14,7 @@ public class CannonTile extends Tile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Cannon";
     }
 }

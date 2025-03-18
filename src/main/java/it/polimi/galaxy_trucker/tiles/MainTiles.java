@@ -3,18 +3,17 @@ package it.polimi.galaxy_trucker.tiles;
 import it.polimi.galaxy_trucker.ShipBoard;
 
 import static it.polimi.galaxy_trucker.tiles.Connector.*;
-import static it.polimi.galaxy_trucker.tiles.AlienSupportTile.AlienColor.*;
 import static it.polimi.galaxy_trucker.tiles.BlockType.*;
 import static it.polimi.galaxy_trucker.tiles.CargoTile.*;
-import static it.polimi.galaxy_trucker.tiles.CabinTile.CrewType.*;
+import static it.polimi.galaxy_trucker.tiles.CrewType.*;
 
 
 public class MainTiles {
     public static void main(String[] args) {
 
-        AlienSupportTile alienB = new AlienSupportTile(0, 0, 1, 2, 3, PURPLE);
-        AlienSupportTile alienB2 = new AlienSupportTile(1, SINGLE, SINGLE, SINGLE, SINGLE, BROWN);
-        AlienSupportTile alienP = new AlienSupportTile(2, SINGLE, SINGLE, SINGLE, SINGLE, PURPLE);
+        AlienSupportTile alienB = new AlienSupportTile(0, 0, 1, 2, 3, PURPLE_ALIEN);
+        AlienSupportTile alienB2 = new AlienSupportTile(1, SINGLE, SINGLE, SINGLE, SINGLE, BROWN_ALIEN);
+        AlienSupportTile alienP = new AlienSupportTile(2, SINGLE, SINGLE, SINGLE, SINGLE, PURPLE_ALIEN);
 
         CargoTile blueCargo = new CargoTile(3, UNIVERSAL, DOUBLE, NONE, SINGLE, CargoType.NORMAL, 2);
         CargoTile redCargo = new CargoTile(4, SINGLE, DOUBLE, NONE, SINGLE, CargoType.RED, 2);
@@ -28,19 +27,18 @@ public class MainTiles {
 
         alienB.printConnectors();
 
-        battery.addBattery();
-        battery.addBattery();
+        System.out.println(battery.removeBattery());
         System.out.println(battery.getStoredBatteries());
 
-        blueCargo.addOrSwitchBlock(0, YELLOW);
-        blueCargo.addOrSwitchBlock(1, GREEN);
-        redCargo.addOrSwitchBlock(1, RED);
+        blueCargo.loadBlock(0, YELLOW);
+        blueCargo.loadBlock(1, GREEN);
+        redCargo.loadBlock(1, RED);
 
         System.out.println(blueCargo.getBlockAt(0).toString() + blueCargo.getBlockAt(1));
-        cabin.allowBrownAlien(true);
+        cabin.allowAlienType(BROWN_ALIEN, true);
         cabin.setCrewType(BROWN_ALIEN);
         System.out.println(cabin.getHumanCount());
-        System.out.println(cabin.hasBrownAlien());
+        System.out.println(cabin.hasAlien(CrewType.BROWN_ALIEN));
         cabin.setCrewType(HUMAN);
         System.out.println(cabin.getHumanCount());
         cabin.removeMember(1);
@@ -64,7 +62,7 @@ public class MainTiles {
         System.out.println(ship.getTile(2, 2));
 
         ship.setTile(2, 2, cabin, 0);
-        System.out.println(ship.getTile(2, 2).getType());
+        System.out.println(ship.getTile(2, 2).getTileType());
 
 
     }

@@ -2,26 +2,25 @@ package it.polimi.galaxy_trucker.tiles;
 
 public class AlienSupportTile extends Tile {
 
-    public enum AlienColor {
-        BROWN, PURPLE
-    }
-    private final AlienColor color;
+    private final CrewType alienType;
 
-    public AlienSupportTile(int ID, Connector top, Connector right, Connector bottom, Connector left, AlienColor color) {
+    public AlienSupportTile(int ID, Connector top, Connector right, Connector bottom, Connector left, CrewType alienType) {
         super(ID, top, right, bottom, left);
-        this.color = color;
+        if(alienType == CrewType.HUMAN) throw new IllegalArgumentException(alienType + " is a not a valid alien type.");
+        this.alienType = alienType;
     }
-    public AlienSupportTile(int ID, int top, int right, int bottom, int left, AlienColor color) {
+    public AlienSupportTile(int ID, int top, int right, int bottom, int left, CrewType alienType) {
         super(ID, top, right, bottom, left);
-        this.color = color;
+        if(alienType == CrewType.HUMAN) throw new IllegalArgumentException(alienType + " is a not a valid alien type.");
+        this.alienType = alienType;
     }
 
-    public AlienColor getAlienColor() {
-        return color;
+    public CrewType getAlienColor() {
+        return alienType;
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Alien Support";
     }
 
