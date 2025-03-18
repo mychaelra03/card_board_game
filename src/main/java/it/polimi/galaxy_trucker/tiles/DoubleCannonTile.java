@@ -28,7 +28,7 @@ public class DoubleCannonTile extends CannonTile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Double Cannon";
     }
 }

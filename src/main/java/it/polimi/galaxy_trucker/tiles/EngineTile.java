@@ -19,7 +19,7 @@ public class EngineTile extends Tile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Engine";
     }
 }

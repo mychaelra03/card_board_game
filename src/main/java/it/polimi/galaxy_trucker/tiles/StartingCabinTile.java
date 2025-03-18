@@ -7,15 +7,18 @@ public class StartingCabinTile extends CabinTile {
     }
 
     @Override
+    public void allowAlienType(CrewType alienType, boolean alienHabitable) {
+        if(alienHabitable) throw new IllegalArgumentException("Starting cabin cannot host aliens.");
+    }
+
+    @Override
     public void setCrewType(CrewType crewType) {
-        if (crewType != CrewType.HUMAN) {
-            throw new IllegalArgumentException("Starting cabin cannot host aliens.");
-        }
+        if(crewType != CrewType.HUMAN) throw new IllegalArgumentException("Starting cabin cannot host aliens.");
         super.setCrewType(crewType);
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Starting Cabin";
     }
 }

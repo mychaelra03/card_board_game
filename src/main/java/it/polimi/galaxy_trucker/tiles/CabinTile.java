@@ -2,9 +2,6 @@ package it.polimi.galaxy_trucker.tiles;
 
 public class CabinTile extends Tile {
 
-    public enum CrewType {
-        HUMAN, BROWN_ALIEN, PURPLE_ALIEN
-    }
     private boolean canHostBrownAlien = false;
     private boolean canHostPurpleAlien = false;
     private final CrewType[] crew;
@@ -12,7 +9,7 @@ public class CabinTile extends Tile {
     public CabinTile(int ID, Connector top, Connector right, Connector bottom, Connector left) {
         super(ID, top, right, bottom, left);
         this.crew = new CrewType[2];
-        setCrewType(CrewType.HUMAN);
+        setCrewType(CrewType.HUMAN); // Not sure if i should set this now or while deciding crew
     }
     public CabinTile(int ID, int top, int right, int bottom, int left) {
         super(ID, top, right, bottom, left);
@@ -20,18 +17,19 @@ public class CabinTile extends Tile {
         setCrewType(CrewType.HUMAN);
     }
 
-    public void allowBrownAlien(boolean alienHabitable) {
-        canHostBrownAlien = alienHabitable;
+    public void allowAlienType(CrewType alienType, boolean alienHabitable) {
+        if(alienType == CrewType.HUMAN) throw new IllegalArgumentException("Alien type can't be HUMAN.");
+        if(alienType == CrewType.BROWN_ALIEN) canHostBrownAlien = alienHabitable;
+        else if(alienType == CrewType.PURPLE_ALIEN) canHostPurpleAlien = alienHabitable;
+        if(!alienHabitable && hasAlien(alienType)) crew[0] = null;
     }
-    public void allowPurpleAlien(boolean alienHabitable) {
-        canHostPurpleAlien = alienHabitable;
+    public boolean hasAlien(CrewType alienType) {
+        if(alienType == CrewType.HUMAN) throw new IllegalArgumentException("Alien type can't be HUMAN.");
+        return crew[0] == alienType;
     }
-
-    public boolean canHostBrownAlien() {
-        return canHostBrownAlien;
-    }
-    public boolean canHostPurpleAlien() {
-        return canHostPurpleAlien;
+    public boolean canHostAlienType(CrewType alienType) {
+        if(alienType == CrewType.HUMAN) throw new IllegalArgumentException("Alien type can't be HUMAN.");
+        return (alienType == CrewType.BROWN_ALIEN)? canHostBrownAlien : canHostPurpleAlien;
     }
 
     public CrewType getMemberAt(int index) {
@@ -56,12 +54,6 @@ public class CabinTile extends Tile {
         if(crew[1] == CrewType.HUMAN) count++;
         return count;
     }
-    public boolean hasBrownAlien() {
-        return crew[0] == CrewType.BROWN_ALIEN;
-    }
-    public boolean hasPurpleAlien() {
-        return crew[0] == CrewType.PURPLE_ALIEN;
-    }
 
     public CrewType removeMember(int index) {
         if (index < 0 || index >= crew.length) {
@@ -73,7 +65,7 @@ public class CabinTile extends Tile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Cabin";
     }
 }

@@ -10,7 +10,7 @@ public class ShieldTile extends Tile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Shield";
     }
 }

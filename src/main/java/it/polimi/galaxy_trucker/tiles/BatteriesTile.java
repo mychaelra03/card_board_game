@@ -7,15 +7,15 @@ public class BatteriesTile extends Tile {
 
     public BatteriesTile(int ID, Connector top, Connector right, Connector bottom, Connector left, int capacity) {
         super(ID, top, right, bottom, left);
-        this.capacity = capacity;
         if (capacity < 2 || capacity > 3) throw new IllegalArgumentException("Battery Component must have capacity of 2 or 3.");
-        this.storedBatteries = 0;
+        this.capacity = capacity;
+        this.storedBatteries = capacity;
     }
     public BatteriesTile(int ID, int top, int right, int bottom, int left, int capacity) {
         super(ID, top, right, bottom, left);
-        this.capacity = capacity;
         if (capacity < 2 || capacity > 3) throw new IllegalArgumentException("Battery Component must have capacity of 2 or 3.");
-        this.storedBatteries = 0;
+        this.capacity = capacity;
+        this.storedBatteries = capacity;
     }
 
     public int getCapacity() {
@@ -26,13 +26,13 @@ public class BatteriesTile extends Tile {
         return storedBatteries;
     }
 
-    public boolean addBattery() {
-        if (storedBatteries < capacity) {
-            storedBatteries++;
-            return true;
-        }
-        return false;
-    }
+//    public boolean addBattery() {
+//        if (storedBatteries < capacity) {
+//            storedBatteries++;
+//            return true;
+//        }
+//        return false;
+//    }
 
     public boolean removeBattery() {
         if (storedBatteries > 0) {
@@ -43,7 +43,7 @@ public class BatteriesTile extends Tile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Battery Container";
     }
 }

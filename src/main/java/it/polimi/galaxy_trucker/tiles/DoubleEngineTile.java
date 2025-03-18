@@ -25,7 +25,7 @@ public class DoubleEngineTile extends EngineTile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Double Engine";
     }
 }
