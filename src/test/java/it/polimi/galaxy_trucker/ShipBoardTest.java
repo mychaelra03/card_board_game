@@ -49,6 +49,15 @@ public class ShipBoardTest {
     }
 
     @Test
+    void testSetTileValidFactory() {
+        ShipBoard board = new ShipBoard(1);
+        board.setTile(3, 2, 40, 1);
+        assertInstanceOf(CabinTile.class, board.getTile(3, 2), "The tile should be a cabin.");
+        assertEquals(Connector.SINGLE, board.getTile(3, 2).getConnector(2), "Given the rotation, the bottom connector should be single.");
+        assertThrows(Exception.class, () -> board.setTile(2, 2, 300, 0), "The factory should throw an exception");
+    }
+
+    @Test
     void testSetTileOccupied() {
         ShipBoard board = new ShipBoard(1);
         CabinTile firstTile = new CabinTile(0, 0, 0, 0, 0);
@@ -64,6 +73,18 @@ public class ShipBoardTest {
         BatteriesTile batteries = new BatteriesTile(0, 0, 0, 0, 0, 3);
         board.setTile(3, 2, batteries, 0);
         assertEquals(3, board.getTotalBatteriesCount(), "Batteries count should be 3.");
+    }
+
+    @Test
+    void testIsSideShielded() {
+        ShipBoard board = new ShipBoard(1);
+        board.setTile(3, 2, new ShieldTile(0, 0, 3, 0, 0), 0);
+        assertFalse(board.isSideShielded(0), "The shield should not have energy to activate.");
+        board.setTile(4, 2, new BatteriesTile(0, 0, 0, 0, 3, 3), 0);
+        assertTrue(board.isSideShielded(0), "The shield should be able to shield from the top of the board.");
+        assertTrue(board.isSideShielded(1), "The shield should be able to shield from the right side of the board.");
+        assertFalse(board.isSideShielded(2), "The shield should not be able to shield from the bottom of the board.");
+        assertFalse(board.isSideShielded(3), "The shield should not be able to shield from the left side of the board.");
     }
 
     @Test
@@ -150,7 +171,6 @@ public class ShipBoardTest {
         assertTrue(exception0.getMessage().contains("connectors don't match"), "Exception message should indicate invalid connection.");
         Exception exception1 = assertThrows(IllegalArgumentException.class, () -> board0.setTile(3, 2, tileUniv, 0));
         assertTrue(exception1.getMessage().contains("connectors don't match"), "Exception message should indicate invalid connection.");
-        // Currently it throws after placing, wrong
         ShipBoard board1 = new ShipBoard(1);
         board1.setTile(1, 2, tileSingle, 0);
         assertDoesNotThrow(() -> board1.setTile(2, 2, tileUniv, 0));
@@ -206,5 +226,26 @@ public class ShipBoardTest {
         assertInstanceOf(EmptyTile.class, board.getTile(3, 1), "The removed tile should have become an EmptyTile.");
         board.removeTile(4, 2);
         assertFalse(board.hasAlienAt(3, 2, CrewType.BROWN_ALIEN), "The alien should have been removed, there are no more brown supporting tiles.");
+    }
+
+    @Test
+    void testAutomaticTileRemoval() {
+        ShipBoard board = new ShipBoard(1);
+        board.setTile(3, 2, new StartingCabinTile(0), 0);
+        board.setCrewTypeAt(3, 2, CrewType.HUMAN);
+        board.setTile(2, 2, new StructuralTile(0, 3,3,3,3), 0);
+        board.setTile(1, 2, new AlienSupportTile(0, 3,3,3,3, CrewType.BROWN_ALIEN), 0);
+        board.setTile(4, 2, new StructuralTile(0, 3,3,3,3), 0);
+        board.setTile(5, 2, new StructuralTile(0, 3,3,3,3), 0);
+        board.setTile(3, 1, new StructuralTile(0, 3,3,3,3), 0);
+        board.setTile(3, 0, new StructuralTile(0, 3,3,3,3), 0);
+        board.setTile(1, 3, new CabinTile(0, 3,3,3,3), 0);
+        board.setCrewTypeAt(1, 3, CrewType.BROWN_ALIEN);
+        board.setTile(5, 3, new CabinTile(0, 3,3,3,3), 0);
+        board.setCrewTypeAt(5, 3, CrewType.HUMAN);
+        assertEquals(4, board.getTotalHumanCount(), "There should be 4 humans.");
+        board.removeTile(3, 2);
+        assertEquals(2, board.getTotalHumanCount(), "There should be 2 humans.");
+        assertInstanceOf(EmptyTile.class, board.getTile(1, 3), "All the tiles on the left of the ship should be empty.");
     }
 }
