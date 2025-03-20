@@ -24,7 +24,7 @@ public class TileManager {
     private GridPane gridPane;
     private AnchorPane scene2AnchorPane;
 
-    //public static Client client;
+    public Client client = new Client();
 
 
 
@@ -128,7 +128,7 @@ public class TileManager {
                 //we remove the rectangle of the gridpane in the position of the imageView placed, not allowing it to be clicked anymore.
                 removeRectFromGridPane(gridPane,col,row);
 
-                //client.sendTileDataWhenFixed(col,row, placedImageView.getId(), (int) ((placedImageView.getRotate()/90)%4));
+                client.sendTileDataWhenFixed(col,row, placedImageView.getId(), (int) (((placedImageView.getRotate()%360+360)%360)/90));
 
             }
         });

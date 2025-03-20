@@ -43,7 +43,7 @@ public class BatteryComponentTile extends Tile {
     }
 
     @Override
-    public String getType() {
+    public String getTileType() {
         return "Battery Container";
     }
 }

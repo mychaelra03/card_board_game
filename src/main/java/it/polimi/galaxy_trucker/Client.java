@@ -10,52 +10,65 @@ import java.net.Socket;
 
 public class Client extends Application {
 
-// private Socket socket;
-// private BufferedReader in;
-// private BufferedWriter out;
-// private String username;
-//
-//
-//
-// public Client(String username, Socket socket) {
-//   try{
-//     this.socket = socket;
-//     this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//     this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-//     this.username = username;
-//   }catch(IOException e){
-//     closeEverything(socket,in,out);
-//   }
-// }
-//
-//
-// public void sendTileDataWhenFixed(Integer col, Integer row, String id, int rot) {
-//     try {
-//         out.write(col+"."+row+"."+id+"."+rot);
-//         out.newLine();
-//         out.flush();
-//     } catch (IOException e) {
-//         throw new RuntimeException(e);
-//     }
-//
-// }
-//
-//  public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
-//    try {
-//      if(bufferedReader != null){
-//        bufferedReader.close();
-//      }
-//      if(bufferedWriter != null){
-//        bufferedWriter.close();
-//      }
-//      if(socket != null){
-//        socket.close();
-//      }
-//    }catch (IOException e){
-//      e.printStackTrace();
-//    }
-//
-//  }
+ private Socket socket;
+ private BufferedReader in;
+ private BufferedWriter out;
+ private String username;
+
+
+  public Client() {
+
+    try{
+      this.socket = new Socket("localhost", 8080);
+      this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+      this.username = username;
+    }catch(IOException e){
+      closeEverything(socket,in,out);
+    }
+    // Default constructor
+  }
+
+ public Client(String username, Socket socket) {
+   try{
+     this.socket = socket;
+     this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+     this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+     this.username = username;
+   }catch(IOException e){
+     closeEverything(socket,in,out);
+   }
+ }
+
+
+ public void sendTileDataWhenFixed(Integer col, Integer row, String id, int rot) {
+     try {
+       System.out.println("INVIATO");
+         out.write(col+" "+row+" "+id+" "+rot);
+         out.newLine();
+         out.flush();
+     } catch (IOException e) {
+         throw new RuntimeException(e);
+     }
+
+ }
+
+  public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
+    try {
+      if(bufferedReader != null){
+        bufferedReader.close();
+      }
+      if(bufferedWriter != null){
+        bufferedWriter.close();
+      }
+      if(socket != null){
+        socket.close();
+      }
+    }catch (IOException e){
+      e.printStackTrace();
+    }
+
+  }
 
 
 
@@ -73,6 +86,7 @@ public class Client extends Application {
   public static void main(String[] args) throws IOException {
     launch();
 
-
+    Socket socket = new Socket("localhost",8080);
+    Client client = new Client("Galaxy",socket);
   }
 }
