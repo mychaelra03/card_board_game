@@ -11,7 +11,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="scene2AnchorPane" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-image: url('file:/Users/seaem/Documents/programming/progettoSw/galaxy_trucker/src/main/resources/textures/backgrounds/wood_14.jpeg'); -fx-background-size: cover; -fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Controller.Scene2Controller">
+<AnchorPane fx:id="scene2AnchorPane" prefHeight="800.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Controller.Scene2Controller">
    <children>
       <Button fx:id="leftButton" layoutX="192.0" layoutY="680.0" mnemonicParsing="false" onAction="#onClickTurnTileLeft" prefWidth="60.0" text="Left" />
       <Button fx:id="rightButton" layoutX="452.0" layoutY="680.0" mnemonicParsing="false" onAction="#onClickTurnTileRight" prefWidth="60.0" text="Right" />
