@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker;
+package it.polimi.galaxy_trucker.ServerCliChat;
 
 import java.io.*;
 import java.net.Socket;
