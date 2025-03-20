@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker.Controller;
+package it.polimi.galaxy_trucker.Controller.Scene1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Model.PlayerUsername;
 import it.polimi.galaxy_trucker.Model.SceneSwitch;
