@@ -38,14 +38,27 @@ public class ShipBoard {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         return tiles[y][x];
     }
-
+    public void setTile(int x, int y, int tileID, int rotation) {
+        // Places one of the 152 default tiles.
+        if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
+        if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
+        tiles[y][x] = TileFactory.createTile(tileID);
+        tiles[y][x].setRotation(rotation);
+        if(!wasConnectionValid(x, y)) {
+            // Should it also check if the tile is not connected to anything?
+            tiles[y][x] = new EmptyTile();
+            throw new IllegalArgumentException("Invalid placement, connectors don't match");
+        }
+        // If a cabin and an alien support are placed adjacent one another, it allows the cabin to host that type of alien.
+        applyAlienSupport(x, y);
+    }
     public void setTile(int x, int y, Tile tile, int rotation) {
+        // Places the passed tile.
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = tile;
         tiles[y][x].setRotation(rotation);
         if(!wasConnectionValid(x, y)) {
-            // Should it also check if the tile is not connected to anything?
             tiles[y][x] = new EmptyTile();
             throw new IllegalArgumentException("Invalid placement, connectors don't match");
         }
@@ -53,11 +66,12 @@ public class ShipBoard {
     }
 
     public void removeTile(int x, int y) {
-        // if AlienSupport, removes alien left without support module
+        // If AlienSupport, removes alien left without support module.
         clearAlienSupport(x, y);
 
         tiles[y][x] = new EmptyTile();
 
+        // Checks if the removal of this tile left other tiles not connected to the ship.
         checkConnectivity();
     }
 
@@ -81,6 +95,18 @@ public class ShipBoard {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof BatteriesTile)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a BatteriesTile.");
         return ((BatteriesTile)tiles[y][x]).removeBattery();
+    }
+
+    public boolean isSideShielded(int side) {
+        if(getTotalBatteriesCount() == 0) return false;
+        for(Tile[] row : tiles) {
+            for(Tile tile : row) {
+                if(tile instanceof ShieldTile shield)
+                    // A non rotated shield can protect the top and right side.
+                    if(shield.getRotation() == side || shield.getRotation() == side-1) return true;
+            }
+        }
+        return false;
     }
 
     // CABIN TILES
@@ -138,6 +164,7 @@ public class ShipBoard {
         double count = 0;
         for(Tile[] row : tiles) {
             for(Tile tile : row) {
+                // Have to decide better how to set up double cannons
                 if(tile instanceof CannonTile cannon) count += cannon.getStrength();
             }
         }
@@ -200,6 +227,7 @@ public class ShipBoard {
     }
 
     private boolean wasConnectionValid(int x, int y) {
+        // Checks the connection in all 4 directions to see if its compatible.
         Tile tile = getTile(x, y);
         int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
         for(int side = 0; side < 4; side++) {
@@ -221,6 +249,7 @@ public class ShipBoard {
     }
 
     public boolean isInsideShip(int x, int y) {
+        // Returns true if (x,y) is inside the usable space of the spaceship.
         if(y < 0 || x < 0 || y >= tiles.length || x >= tiles[0].length) return false;
         if(shipBoardType == 1) {
             int[][] type1 = {
@@ -245,6 +274,8 @@ public class ShipBoard {
     }
 
     private void applyAlienSupport(int x, int y) {
+        // Checks if a cabin and an alien support are placed adjacent one another,
+        // if so, it allows the cabin to host that type of alien.
         if(!isInsideShip(x, y)) return;
 
         Tile tile = getTile(x, y);
@@ -277,6 +308,8 @@ public class ShipBoard {
     }
 
     private void clearAlienSupport(int x, int y) {
+        // Checks if the removed alien support was the only support for an adjacent alien inhabited cabin,
+        // if so, it removes the alien.
         if(getTile(x,y) instanceof AlienSupportTile removedSupport) {
             int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
             for(int i = 0; i < 4; i++) {
@@ -313,6 +346,9 @@ public class ShipBoard {
     }
 
     private void checkConnectivity() {
+        // It uses a flood fill search to divide all the tiles in groups.
+        // If there are more than one groups, it automatically removes the ones without humans
+        // and let the player decide which one with humans to keep.
         boolean[][] visited = new boolean[tiles.length][tiles[0].length];
         List<List<Point>> groups = new ArrayList<>();
 
@@ -327,30 +363,36 @@ public class ShipBoard {
         }
         if(groups.size() <= 1) return;
 
-        List<Integer> groupsWithCrew = new ArrayList<>();
-        List<Integer> groupsWithoutCrew = new ArrayList<>();
+        List<Integer> groupsWithHumans = new ArrayList<>();
+        List<Integer> groupsWithoutHumans = new ArrayList<>();
         for(int i = 0; i < groups.size(); i++) {
-            if(groupHasCrew(groups.get(i))) {
-                groupsWithCrew.add(i);
+            if(groupHasHumans(groups.get(i))) {
+                groupsWithHumans.add(i);
             } else {
-                groupsWithoutCrew.add(i);
+                groupsWithoutHumans.add(i);
             }
         }
 
-        // If there are both groups with crew and without crew, it removes the ones without
-        // This was if all the crew is removed, it doesn't delete the ship.
-        if(!groupsWithoutCrew.isEmpty() && !groupsWithCrew.isEmpty()) {
-            for(Integer index : groupsWithoutCrew) {
+        // If there are both groups with crew and without humans, it removes the ones without.
+        // It doesn't always delete the empty groups because if the last humans are removed, it would delete the ship.
+        if(!groupsWithHumans.isEmpty()) {
+            for (Integer index : groupsWithoutHumans) {
                 removeGroup(groups.get(index));
             }
-        }
-        if(groupsWithCrew.size() > 1) {
-            int groupIndex = chooseGroupToRemove(groupsWithCrew);
-            removeGroup(groups.get(groupIndex));
+
+            if (groupsWithHumans.size() > 1) {
+                int groupToKeep = chooseGroupToKeep(groupsWithHumans);
+                for (int index : groupsWithHumans) {
+                    if (index != groupToKeep) {
+                        removeGroup(groups.get(index));
+                    }
+                }
+            }
         }
     }
     
     private void floodFill(int x, int y, boolean[][] visited, List<Point> group) {
+        // Algorithm to recursively add all connected tiles to the same group.
         if(!isInsideShip(x, y)) return;
         if(visited[y][x] || tiles[y][x] instanceof EmptyTile) return;
 
@@ -365,7 +407,7 @@ public class ShipBoard {
         }
     }
 
-    private boolean groupHasCrew(List<Point> group) {
+    private boolean groupHasHumans(List<Point> group) {
         for(Point p : group) {
             if(tiles[p.y][p.x] instanceof CabinTile cabin) {
                 if(cabin.getHumanCount() >= 1) return true;
@@ -375,14 +417,15 @@ public class ShipBoard {
     }
 
     private void removeGroup(List<Point> group) {
+        // It clears all tiles of a specific group (sets them to EmptyTile).
         for(Point p : group) {
-            // No need to use removeTile to check alien support removal,
-            // if they were connected they are both removed.
+            // I can directly set the removed tile to Empty,
+            // there is no need to check alien support.
             tiles[p.y][p.x] = new EmptyTile();
         }
     }
 
-    private int chooseGroupToRemove(List<Integer> groupsWithCrew) {
+    private int chooseGroupToKeep(List<Integer> groupsWithCrew) {
         // Lets the player choose which group of tiles to remove.
         return groupsWithCrew.getFirst();   // TEMPORARY
     }
