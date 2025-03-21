@@ -6,9 +6,8 @@ import java.util.*;
 
 public class Server {
     private static final int PORT = 8080;
-    // Track used tile IDs globally
     private static Set<Integer> usedIds = new HashSet<>();
-    // Keep track of all connected clients
+    //private static List<Integer> cards = new ArrayList<>();
     private static List<ClientHandler> clients = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -18,6 +17,8 @@ public class Server {
                 Socket socket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(socket, usedIds, clients);
                 synchronized(clients) {
+                    System.out.println("new player connected.");
+                    //if(clients.size() > 4) continue;
                     clients.add(clientHandler);
                 }
                 clientHandler.start();

@@ -14,10 +14,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.scene.effect.InnerShadow;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 
 public class Scene2Controller {
@@ -40,7 +47,6 @@ public class Scene2Controller {
     private int k;
 
 
-
     @FXML
     private Label settingsLabel;
 
@@ -57,6 +63,28 @@ public class Scene2Controller {
     private Settings settings;
     private TileManager tileManager;
     List<ImageView> imageViews = new ArrayList<>();
+
+
+    public void animateShadowEffect(ImageView imageView) {
+        InnerShadow innerShadow = new InnerShadow();
+        innerShadow.setColor(Color.TRANSPARENT);
+        innerShadow.setRadius(127);
+        innerShadow.setBlurType(BlurType.GAUSSIAN);
+        innerShadow.setChoke(1);
+        innerShadow.setWidth(255);
+        innerShadow.setHeight(255);
+        imageView.setEffect(innerShadow);
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(50), event -> {
+                    double time = (System.currentTimeMillis() % 2000) / 2000.0 * Math.PI * 2;
+                    double opacity = 0.2 + 0.1 * Math.sin(time); // Cycles between 0.1 and 0.5
+                    innerShadow.setColor(new Color(1, 1, 1, opacity)); // Set new transparency
+                })
+        );
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
 
     public void initialize() {
 
@@ -118,14 +146,23 @@ public class Scene2Controller {
                                         placedImageView = selectedImageView;
 
 
-                                        InnerShadow inner = new InnerShadow();
-                                        inner.setColor(new Color(1, 1, 1, .3));
-                                        inner.setChoke(0);
-                                        inner.setWidth(94);
-                                        inner.setHeight(115);
-                                        inner.setRadius(52);
+                                        //InnerShadow inner = new InnerShadow();
+                                        //inner.setColor(new Color(1, 1, 1, .3));
+                                        //inner.setChoke(0);
+                                        //inner.setWidth(94);
+                                        //inner.setHeight(115);
+                                        //inner.setRadius(52);
 
-                                        placedImageView.setEffect(inner);
+                                        //InnerShadow inner = new InnerShadow();
+                                        //inner.setColor(new Color(1, 1, 1, .3));
+                                        //inner.setBlurType(BlurType.GAUSSIAN);
+                                        //inner.setChoke(1);
+                                        //inner.setWidth(255);
+                                        //inner.setHeight(255);
+                                        //inner.setRadius(127);
+
+                                        //placedImageView.setEffect(inner);
+                                        animateShadowEffect(placedImageView);
 
 
                                         placedImageView.setMouseTransparent(true);

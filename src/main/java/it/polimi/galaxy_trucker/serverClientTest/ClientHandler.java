@@ -26,9 +26,7 @@ public class ClientHandler extends Thread {
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            //out = new PrintWriter(socket.getOutputStream(), true);
 
-            // Ask the client for a username
             //out.println("Enter your username:");
             //username = in.readLine();
             //if (username == null || username.trim().isEmpty()) {
@@ -36,7 +34,6 @@ public class ClientHandler extends Thread {
             //}
             //out.println("Welcome, " + username + "! You can send tile commands (x y id rot) or chat messages starting with \".\".");
 
-            // Notify everyone that a new client joined.
             //String joinMsg = "🟢 " + username + " has joined the game.";
             //System.out.println(joinMsg);
             //Server.broadcast(joinMsg, null);
@@ -44,56 +41,42 @@ public class ClientHandler extends Thread {
             String input;
             while (socket.isConnected()) {
                 input = in.readLine();
-                System.out.println(input);
                 input = input.trim();
-                // Check if this is a chat message.
-                //if (input.toLowerCase().startsWith(".")) {
-                //    String chatMessage = input.substring(1).trim();
-                //    // Broadcast the chat message to everyone (excluding sender)
-                //    String fullChat = "💬 " + username + ": " + chatMessage;
-                //    Server.broadcast(fullChat, this);
-                //    // Optionally, echo to sender as well:
-                //    //out.println("💬 You: " + chatMessage);
-                //} else {
-                    // Otherwise, assume it's a tile placement command "x y id rot"
+
+                try {
+                    String[] parts = input.split(" ");
+                    if (parts.length != 4) {
+                        throw new IllegalArgumentException("ERROR, client sent Invalid format!");
+                    }
+                    int x = Integer.parseInt(parts[0]);
+                    int y = Integer.parseInt(parts[1]);
+                    int id = Integer.parseInt(parts[2]);
+                    int rot = Integer.parseInt(parts[3]);
+
+                    // Check if id is already used
+                    synchronized (usedIds) {
+                        if (usedIds.contains(id)) {
+                            throw new IllegalArgumentException("ID " + id + " already used!");
+                        }
+                    }
+
+                    // Try to set the tile. Only if setTile succeeds, add the id.
                     try {
-                        System.out.println(input);
-                        String[] parts = input.split(" ");
-                        if (parts.length != 4) {
-                            throw new IllegalArgumentException("Invalid format! Use: x y id rot or \".\" your message");
-                        }
-                        int x = Integer.parseInt(parts[0]);
-                        int y = Integer.parseInt(parts[1]);
-                        int id = Integer.parseInt(parts[2]);
-                        int rot = Integer.parseInt(parts[3]);
-                        System.out.println(x + " " + y + " " + id + " " + rot);
-
-                        // Check if id is already used
+                        board.setTile(x, y, id, rot);
+                        // Mark id as used since placement succeeded.
                         synchronized (usedIds) {
-                            if (usedIds.contains(id)) {
-                                throw new IllegalArgumentException("ID " + id + " already used!");
-                            }
+                            usedIds.add(id);
                         }
-
-                        // Try to set the tile. Only if setTile succeeds, add the id.
-                        try {
-                            board.setTile(x, y, id, rot);
-                            // Mark id as used since placement succeeded.
-                            synchronized (usedIds) {
-                                usedIds.add(id);
-                            }
-                            String successMsg = "SUCCESS: " + username + " placed tile at (" + x + "," + y + ") with ID " + id + " and rotation " + rot;
-                            System.out.println(successMsg);
-                            System.out.println(successMsg);
-                        } catch (IllegalArgumentException e) {
-                            System.out.println("ERROR: " + e.getMessage());
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("ERROR: Coordinates, ID, and rotation must be integers.");
+                        String successMsg = "SUCCESS: " + username + " placed tile at (" + x + "," + y + ") with ID " + id + " and rotation " + rot;
+                        System.out.println(successMsg);
                     } catch (IllegalArgumentException e) {
                         System.out.println("ERROR: " + e.getMessage());
                     }
-                //}
+                } catch (NumberFormatException e) {
+                    System.out.println("ERROR: Coordinates, ID, and rotation must be integers.");
+                } catch (IllegalArgumentException e) {
+                    System.out.println("ERROR: " + e.getMessage());
+                }
             }
         } catch (IOException e) {
             System.out.println("Connection with " + username + " lost.");
@@ -113,6 +96,6 @@ public class ClientHandler extends Thread {
 
     // Used by Server.broadcast to send messages.
     public void sendMessage(String message) {
-        //out.println(message);
+        //t.println(message);
     }
 }

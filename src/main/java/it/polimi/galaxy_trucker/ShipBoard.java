@@ -12,6 +12,11 @@ public class ShipBoard {
     private final Tile[][] tiles = new Tile[5][7];
     private final int shipBoardType;
 
+    // TODO: Cannon and Engine checks.
+    // TODO: IsColumnCannonProtected.
+    // TODO: All checks at the end of the building phase.
+
+
     public ShipBoard(int shipBoardType) {
         this.shipBoardType = shipBoardType;
         if(shipBoardType < 1 || shipBoardType > 2) throw new IllegalArgumentException("Ship Board must be type 1 or 2.");
@@ -19,11 +24,13 @@ public class ShipBoard {
     }
 
     private void initializeShip() {
+        // Empties the ship and places the starting cabin.
         for(int i = 0; i < tiles.length; i++) {
             for(int j = 0; j < tiles[i].length; j++) {
                 tiles[i][j] = new EmptyTile();
             }
         }
+        tiles[2][3] = new StartingCabinTile(-1);
     }
 
     public Tile[][] getTiles() {
@@ -44,16 +51,17 @@ public class ShipBoard {
         if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = TileFactory.createTile(tileID);
         tiles[y][x].setRotation(rotation);
-        if(!wasConnectionValid(x, y)) {
-            // Should it also check if the tile is not connected to anything?
-            tiles[y][x] = new EmptyTile();
-            throw new IllegalArgumentException("Invalid placement, connectors don't match");
-        }
+        //if(!wasConnectionValid(x, y)) {
+        //    // Checks if the tile is not connected or if the connectors are not compatible.
+        //    // TODO: Saves the illegal tiles.
+        //    //tiles[y][x] = new EmptyTile();
+        //    throw new IllegalArgumentException("Invalid placement, connectors don't match");
+        //}
         // If a cabin and an alien support are placed adjacent one another, it allows the cabin to host that type of alien.
         applyAlienSupport(x, y);
     }
     public void setTile(int x, int y, Tile tile, int rotation) {
-        // Places the passed tile.
+        // Places the passed tile (used for testing).
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = tile;
@@ -97,6 +105,7 @@ public class ShipBoard {
         return ((BatteriesTile)tiles[y][x]).removeBattery();
     }
 
+    // SHIELD TILES
     public boolean isSideShielded(int side) {
         if(getTotalBatteriesCount() == 0) return false;
         for(Tile[] row : tiles) {
@@ -133,7 +142,6 @@ public class ShipBoard {
         }
         return false;
     }
-
     public boolean hasAlienAt(int x, int y, CrewType alienType) {
         // For tests, maybe I'll remove it later
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
@@ -160,6 +168,7 @@ public class ShipBoard {
         return cabin.removeMember(index);
     }
 
+    // CANNON TILES
     public double getTotalCannonStrength() {
         double count = 0;
         for(Tile[] row : tiles) {
@@ -172,6 +181,7 @@ public class ShipBoard {
         return count;
     }
 
+    // ENGINE TILES
     public int getTotalEngineStrength() {
         int count = 0;
         for(Tile[] row : tiles) {
@@ -203,6 +213,7 @@ public class ShipBoard {
         return count;
     }
 
+    // CARGO TILES
     public BlockType loadCargoAt(int x, int y, int index, BlockType blockType) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof CargoTile cargo)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cargo.");
@@ -228,24 +239,25 @@ public class ShipBoard {
 
     private boolean wasConnectionValid(int x, int y) {
         // Checks the connection in all 4 directions to see if its compatible.
+        int connectedSides = 0;
         Tile tile = getTile(x, y);
         int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
         for(int side = 0; side < 4; side++) {
             int neighbor_x = x + offsets[side][1];
             int neighbor_y = y + offsets[side][0];
-            if(!isInsideShip(neighbor_x, neighbor_y)) {
-                continue;
-            }
+
+            if(!isInsideShip(neighbor_x, neighbor_y)) continue;
+
             Tile neighbor = getTile(neighbor_x, neighbor_y);
-            if(neighbor instanceof EmptyTile) {
-                continue;
-            }
+            if(neighbor instanceof EmptyTile) continue;
+
             int opposite_side = (side + 2) % 4;
-            if(!areConnectorsCompatible(tile.getConnector(side), neighbor.getConnector(opposite_side))) {
-                return false;
-            }
+            if(!areConnectorsCompatible(tile.getConnector(side), neighbor.getConnector(opposite_side))) return false;
+
+            if(tile.getConnector(side) != Connector.NONE) connectedSides++;
         }
-        return true;
+        // Uses connectedSides to count how many sides are connected to other tiles.
+        return connectedSides != 0;
     }
 
     public boolean isInsideShip(int x, int y) {

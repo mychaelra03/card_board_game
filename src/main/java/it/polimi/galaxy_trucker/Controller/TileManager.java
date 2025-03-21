@@ -6,7 +6,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -116,8 +115,7 @@ public class TileManager {
                 }
 
                 availableSockets();
-                validSpots.stream()
-                        .forEach(rect -> {
+                validSpots.forEach(rect -> {
                             rect.setFill(new Color(1, 1, 1, .2));
                             rect.setCursor(Cursor.HAND);
                         });
@@ -128,7 +126,7 @@ public class TileManager {
                 //we remove the rectangle of the gridpane in the position of the imageView placed, not allowing it to be clicked anymore.
                 removeRectFromGridPane(gridPane,col,row);
 
-                client.sendTileDataWhenFixed(col,row, placedImageView.getId(), (int) (((placedImageView.getRotate()%360+360)%360)/90));
+                client.sendPlacedTileData(col,row, placedImageView.getId(), (int) (((placedImageView.getRotate()%360+360)%360)/90));
 
             }
         });

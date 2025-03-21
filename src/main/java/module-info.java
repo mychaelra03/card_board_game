@@ -5,6 +5,7 @@ module it.polimi.galaxy_trucker {
     requires org.controlsfx.controls;
     requires com.fasterxml.jackson.databind;
     requires java.desktop;
+    requires java.sql;
 
     opens it.polimi.galaxy_trucker to javafx.fxml;
     exports it.polimi.galaxy_trucker;
