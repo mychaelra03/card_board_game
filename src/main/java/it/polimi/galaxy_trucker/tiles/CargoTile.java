@@ -30,6 +30,10 @@ public class CargoTile extends Tile {
         return capacity;
     }
 
+    public CargoType getType() {
+        return type;
+    }
+
     public BlockType getBlockAt(int index) {
         if (index < 0 || index >= containers.length) {
             throw new IllegalArgumentException("Invalid container index");

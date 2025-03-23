@@ -1,177 +1,163 @@
 package it.polimi.galaxy_trucker;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.tiles.*;
 
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.function.Supplier;
-
-import static it.polimi.galaxy_trucker.tiles.CargoTile.CargoType.*;
-import static it.polimi.galaxy_trucker.tiles.CrewType.*;
+import java.util.Set;
 
 public class TileFactory {
-    private static final Map<Integer, Supplier<Tile>> TILE_MAP = new HashMap<>();
+    private static final Map<Integer, Tile> tileTemplates = new HashMap<>();
+    private static final Set<Integer> usedTileIDs = new HashSet<>();
 
     static {
-        TILE_MAP.put(0, () -> new BatteriesTile(0,3,1,2,0,2));
-        TILE_MAP.put(1, () -> new BatteriesTile(1,3,2,0,0,2));
-        TILE_MAP.put(2, () -> new BatteriesTile(2,3,2,1,0,2));
-        TILE_MAP.put(3, () -> new BatteriesTile(3,2,1,2,1,2));
-        TILE_MAP.put(4, () -> new BatteriesTile(4,3,0,0,1,2));
-        TILE_MAP.put(5, () -> new BatteriesTile(5,3,1,1,1,2));
-        TILE_MAP.put(6, () -> new BatteriesTile(6,3,2,2,2,2));
-        TILE_MAP.put(7, () -> new BatteriesTile(7,0,0,0,3,2));
-        TILE_MAP.put(8, () -> new BatteriesTile(8,0,0,0,3,2));
-        TILE_MAP.put(9, () -> new BatteriesTile(9,0,3,0,3,2));
-        TILE_MAP.put(10, () -> new BatteriesTile(10,3,0,0,3,2));
-        TILE_MAP.put(11, () -> new BatteriesTile(11,1,0,2,0,3));
-        TILE_MAP.put(12, () -> new BatteriesTile(12,1,1,2,0,3));
-        TILE_MAP.put(13, () -> new BatteriesTile(13,2,0,0,0,3));
-        TILE_MAP.put(14, () -> new BatteriesTile(14,2,1,0,0,3));
-        TILE_MAP.put(15, () -> new BatteriesTile(15,2,2,1,0,3));
-        TILE_MAP.put(16, () -> new BatteriesTile(16,0,0,0,1,3));
-        TILE_MAP.put(17, () -> new CargoTile(17,2,1,3,0,NORMAL,2));
-        TILE_MAP.put(18, () -> new CargoTile(18,2,1,3,1,NORMAL,2));
-        TILE_MAP.put(19, () -> new CargoTile(19,2,3,0,1,NORMAL,2));
-        TILE_MAP.put(20, () -> new CargoTile(20,0,0,0,3,NORMAL,2));
-        TILE_MAP.put(21, () -> new CargoTile(21,0,0,0,3,NORMAL,2));
-        TILE_MAP.put(22, () -> new CargoTile(22,0,1,0,3,NORMAL,2));
-        TILE_MAP.put(23, () -> new CargoTile(23,0,2,0,3,NORMAL,2));
-        TILE_MAP.put(24, () -> new CargoTile(24,2,1,2,3,NORMAL,2));
-        TILE_MAP.put(25, () -> new CargoTile(25,3,0,0,3,NORMAL,2));
-        TILE_MAP.put(26, () -> new CargoTile(26,0,0,0,1,NORMAL,3));
-        TILE_MAP.put(27, () -> new CargoTile(27,1,0,1,0,NORMAL,3));
-        TILE_MAP.put(28, () -> new CargoTile(28,0,0,0,2,NORMAL,3));
-        TILE_MAP.put(29, () -> new CargoTile(29,2,0,2,0,NORMAL,3));
-        TILE_MAP.put(30, () -> new CargoTile(30,1,0,2,1,NORMAL,3));
-        TILE_MAP.put(31, () -> new CargoTile(31,2,0,1,2,NORMAL,3));
-        TILE_MAP.put(32, () -> new CabinTile(32,0,0,3,1));
-        TILE_MAP.put(33, () -> new CabinTile(33,1,2,1,1));
-        TILE_MAP.put(34, () -> new CabinTile(34,1,2,2,1));
-        TILE_MAP.put(35, () -> new CabinTile(35,2,0,0,1));
-        TILE_MAP.put(36, () -> new CabinTile(36,2,1,0,1));
-        TILE_MAP.put(37, () -> new CabinTile(37,2,1,2,1));
-        TILE_MAP.put(38, () -> new CabinTile(38,0,1,3,2));
-        TILE_MAP.put(39, () -> new CabinTile(39,1,2,0,2));
-        TILE_MAP.put(40, () -> new CabinTile(40,2,1,2,2));
-        TILE_MAP.put(41, () -> new CabinTile(41,3,0,0,2));
-        TILE_MAP.put(42, () -> new CabinTile(42,0,1,0,3));
-        TILE_MAP.put(43, () -> new CabinTile(43,0,1,1,3));
-        TILE_MAP.put(44, () -> new CabinTile(34,0,2,0,3));
-        TILE_MAP.put(45, () -> new CabinTile(45,1,0,1,3));
-        TILE_MAP.put(46, () -> new CabinTile(46,1,0,2,3));
-        TILE_MAP.put(47, () -> new CabinTile(47,2,0,2,3));
-        TILE_MAP.put(48, () -> new CabinTile(48,2,2,0,3));
-        TILE_MAP.put(49, () -> new StructuralTile(49,3,3,0,1));
-        TILE_MAP.put(50, () -> new StructuralTile(50,1,3,0,3));
-        TILE_MAP.put(51, () -> new StructuralTile(51,1,3,1,3));
-        TILE_MAP.put(52, () -> new StructuralTile(52,1,3,2,3));
-        TILE_MAP.put(53, () -> new StructuralTile(53,2,3,0,3));
-        TILE_MAP.put(54, () -> new StructuralTile(54,3,1,2,3));
-        TILE_MAP.put(55, () -> new StructuralTile(55,3,2,0,3));
-        TILE_MAP.put(56, () -> new StructuralTile(56,3,2,2,3));
-        TILE_MAP.put(57, () -> new CargoTile(57,0,2,1,3,RED,1));
-        TILE_MAP.put(58, () -> new CargoTile(58,0,3,0,3,RED,1));
-        TILE_MAP.put(59, () -> new CargoTile(59,1,1,1,3,RED,1));
-        TILE_MAP.put(60, () -> new CargoTile(60,2,1,0,3,RED,1));
-        TILE_MAP.put(61, () -> new CargoTile(61,2,2,2,3,RED,1));
-        TILE_MAP.put(62, () -> new CargoTile(62,3,0,0,3,RED,1));
-        TILE_MAP.put(63, () -> new CargoTile(63,0,0,0,1,RED,2));
-        TILE_MAP.put(64, () -> new CargoTile(64,0,2,0,1,RED,2));
-        TILE_MAP.put(65, () -> new CargoTile(65,0,0,0,2,RED,2));
-        TILE_MAP.put(66, () -> new EngineTile(66,0,3,0,0));
-        TILE_MAP.put(67, () -> new EngineTile(67,0,3,0,0));
-        TILE_MAP.put(68, () -> new EngineTile(68,1,0,0,0));
-        TILE_MAP.put(69, () -> new EngineTile(69,1,0,0,0));
-        TILE_MAP.put(70, () -> new EngineTile(70,1,1,0,0));
-        TILE_MAP.put(71, () -> new EngineTile(71,2,0,0,0));
-        TILE_MAP.put(72, () -> new EngineTile(72,2,0,0,0));
-        TILE_MAP.put(73, () -> new EngineTile(73,2,3,0,0));
-        TILE_MAP.put(74, () -> new EngineTile(74,3,2,0,0));
-        TILE_MAP.put(75, () -> new EngineTile(75,0,3,0,1));
-        TILE_MAP.put(76, () -> new EngineTile(76,2,1,0,1));
-        TILE_MAP.put(77, () -> new EngineTile(77,3,0,0,1));
-        TILE_MAP.put(78, () -> new EngineTile(78,3,2,0,1));
-        TILE_MAP.put(79, () -> new EngineTile(79,0,1,0,2));
-        TILE_MAP.put(80, () -> new EngineTile(80,1,2,0,2));
-        TILE_MAP.put(81, () -> new EngineTile(81,2,0,0,2));
-        TILE_MAP.put(82, () -> new EngineTile(82,3,1,0,2));
-        TILE_MAP.put(83, () -> new EngineTile(83,0,0,0,3));
-        TILE_MAP.put(84, () -> new EngineTile(84,0,0,0,3));
-        TILE_MAP.put(85, () -> new EngineTile(85,0,2,0,3));
-        TILE_MAP.put(86, () -> new EngineTile(86,1,0,0,3));
-        TILE_MAP.put(87, () -> new DoubleEngineTile(87,1,0,0,0));
-        TILE_MAP.put(88, () -> new DoubleEngineTile(88,1,3,0,0));
-        TILE_MAP.put(89, () -> new DoubleEngineTile(89,2,0,0,0));
-        TILE_MAP.put(90, () -> new DoubleEngineTile(90,3,1,0,0));
-        TILE_MAP.put(91, () -> new DoubleEngineTile(91,1,1,0,1));
-        TILE_MAP.put(92, () -> new DoubleEngineTile(92,2,2,0,2));
-        TILE_MAP.put(93, () -> new DoubleEngineTile(93,3,0,0,2));
-        TILE_MAP.put(94, () -> new DoubleEngineTile(94,0,3,0,3));
-        TILE_MAP.put(95, () -> new DoubleEngineTile(95,2,0,0,3));
-        TILE_MAP.put(96, () -> new CannonTile(96,0,0,1,0));
-        TILE_MAP.put(97, () -> new CannonTile(97,0,0,1,0));
-        TILE_MAP.put(98, () -> new CannonTile(98,0,0,2,0));
-        TILE_MAP.put(99, () -> new CannonTile(99,0,0,2,0));
-        TILE_MAP.put(100, () -> new CannonTile(100,0,1,0,0));
-        TILE_MAP.put(101, () -> new CannonTile(101,0,1,2,0));
-        TILE_MAP.put(102, () -> new CannonTile(102,0,1,3,0));
-        TILE_MAP.put(103, () -> new CannonTile(103,0,2,0,0));
-        TILE_MAP.put(104, () -> new CannonTile(104,0,2,1,0));
-        TILE_MAP.put(105, () -> new CannonTile(105,0,2,3,0));
-        TILE_MAP.put(106, () -> new CannonTile(106,0,3,1,0));
-        TILE_MAP.put(107, () -> new CannonTile(107,0,0,0,1));
-        TILE_MAP.put(108, () -> new CannonTile(108,0,0,2,1));
-        TILE_MAP.put(109, () -> new CannonTile(109,0,0,3,1));
-        TILE_MAP.put(110, () -> new CannonTile(110,0,1,1,1));
-        TILE_MAP.put(111, () -> new CannonTile(111,0,2,3,1));
-        TILE_MAP.put(112, () -> new CannonTile(112,0,3,0,1));
-        TILE_MAP.put(113, () -> new CannonTile(113,0,0,0,2));
-        TILE_MAP.put(114, () -> new CannonTile(114,0,0,1,2));
-        TILE_MAP.put(115, () -> new CannonTile(115,0,0,3,2));
-        TILE_MAP.put(116, () -> new CannonTile(116,0,1,0,2));
-        TILE_MAP.put(117, () -> new CannonTile(117,0,1,3,2));
-        TILE_MAP.put(118, () -> new CannonTile(118,0,2,2,2));
-        TILE_MAP.put(119, () -> new CannonTile(119,0,0,2,3));
-        TILE_MAP.put(120, () -> new CannonTile(120,0,2,0,3));
-        TILE_MAP.put(121, () -> new DoubleCannonTile(121,0,0,1,0));
-        TILE_MAP.put(122, () -> new DoubleCannonTile(122,0,0,2,0));
-        TILE_MAP.put(123, () -> new DoubleCannonTile(123,0,1,3,0));
-        TILE_MAP.put(124, () -> new DoubleCannonTile(124,0,3,0,0));
-        TILE_MAP.put(125, () -> new DoubleCannonTile(125,0,3,2,0));
-        TILE_MAP.put(126, () -> new DoubleCannonTile(126,0,1,2,1));
-        TILE_MAP.put(127, () -> new DoubleCannonTile(127,0,2,0,1));
-        TILE_MAP.put(128, () -> new DoubleCannonTile(128,0,0,3,2));
-        TILE_MAP.put(129, () -> new DoubleCannonTile(129,0,2,1,2));
-        TILE_MAP.put(130, () -> new DoubleCannonTile(130,0,0,0,3));
-        TILE_MAP.put(131, () -> new DoubleCannonTile(131,0,0,1,3));
-        TILE_MAP.put(132, () -> new AlienSupportTile(132,1,1,0,1,BROWN_ALIEN));
-        TILE_MAP.put(133, () -> new AlienSupportTile(133,2,1,0,1,BROWN_ALIEN));
-        TILE_MAP.put(134, () -> new AlienSupportTile(134,0,0,0,3,BROWN_ALIEN));
-        TILE_MAP.put(135, () -> new AlienSupportTile(135,0,0,1,3,BROWN_ALIEN));
-        TILE_MAP.put(136, () -> new AlienSupportTile(136,0,2,0,3,BROWN_ALIEN));
-        TILE_MAP.put(137, () -> new AlienSupportTile(137,1,0,0,3,BROWN_ALIEN));
-        TILE_MAP.put(138, () -> new AlienSupportTile(138,1,2,0,2,PURPLE_ALIEN));
-        TILE_MAP.put(139, () -> new AlienSupportTile(139,2,2,0,2,PURPLE_ALIEN));
-        TILE_MAP.put(140, () -> new AlienSupportTile(140,0,0,0,3,PURPLE_ALIEN));
-        TILE_MAP.put(141, () -> new AlienSupportTile(141,0,0,2,3,PURPLE_ALIEN));
-        TILE_MAP.put(142, () -> new AlienSupportTile(142,0,1,0,3,PURPLE_ALIEN));
-        TILE_MAP.put(143, () -> new AlienSupportTile(143,2,0,0,3,PURPLE_ALIEN));
-        TILE_MAP.put(144, () -> new ShieldTile(144,0,1,3,1));
-        TILE_MAP.put(145, () -> new ShieldTile(145,1,0,1,1));
-        TILE_MAP.put(146, () -> new ShieldTile(146,2,1,2,1));
-        TILE_MAP.put(147, () -> new ShieldTile(147,0,0,3,2));
-        TILE_MAP.put(148, () -> new ShieldTile(148,0,2,2,2));
-        TILE_MAP.put(149, () -> new ShieldTile(149,1,2,1,2));
-        TILE_MAP.put(150, () -> new ShieldTile(150,0,0,1,3));
-        TILE_MAP.put(151, () -> new ShieldTile(151,0,2,2,3));
+        loadTilesFromJson();
     }
 
-    public static Tile createTile(int id) {
-        Supplier<Tile> tileSupplier = TILE_MAP.get(id);
-        if (tileSupplier == null) {
-            throw new IllegalArgumentException("Invalid tile ID: " + id);
+    private static void loadTilesFromJson() {
+        try {
+            // Read JSON from resources
+            InputStream inputStream = TileFactory.class.getResourceAsStream("public/tiles.json");
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(inputStream);
+
+            // Loop through each tile entry in the JSON
+            for (JsonNode node : rootNode) {
+                int id = node.get("id").asInt();
+                String tileType = node.get("tileType").asText();
+                int[] connectors = new int[]{
+                        node.get("connectors").get(0).asInt(),
+                        node.get("connectors").get(1).asInt(),
+                        node.get("connectors").get(2).asInt(),
+                        node.get("connectors").get(3).asInt()
+                };
+
+                Tile tile = createTile(id, tileType, connectors, node);
+                tileTemplates.put(id, tile);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load tile data from JSON", e);
         }
-        return tileSupplier.get();
     }
+
+    private static Tile createTile(int id, String tileType, int[] connectors, JsonNode node) {
+        return switch (tileType) {
+            case "alienSupport" ->
+                    new AlienSupportTile(id, connectors[0], connectors[1], connectors[2], connectors[3], CrewType.valueOf(node.get("alienType").asText()));
+            case "cabin" -> new CabinTile(id, connectors[0], connectors[1], connectors[2], connectors[3]);
+            case "cargo" -> new CargoTile(id, connectors[0], connectors[1], connectors[2], connectors[3],
+                    CargoTile.CargoType.valueOf(node.get("cargoType").asText()), node.get("capacity").asInt());
+            case "batteries" ->
+                    new BatteriesTile(id, connectors[0], connectors[1], connectors[2], connectors[3], node.get("capacity").asInt());
+            case "cannon" -> new CannonTile(id, connectors[0], connectors[1], connectors[2], connectors[3], node.get("isDouble").asBoolean());
+            case "engine" -> new EngineTile(id, connectors[0], connectors[1], connectors[2], connectors[3], node.get("isDouble").asBoolean());
+            case "shield" -> new ShieldTile(id, connectors[0], connectors[1], connectors[2], connectors[3]);
+            case "structural" -> new StructuralTile(id, connectors[0], connectors[1], connectors[2], connectors[3]);
+
+            default -> throw new IllegalArgumentException("Unknown tile type: " + tileType);
+        };
+    }
+
+
+    public static Tile getTile(int id) {
+        if (!tileTemplates.containsKey(id)) {
+            throw new IllegalArgumentException("Tile ID not found: " + id);
+        }
+        if (usedTileIDs.contains(id)) {
+            throw new IllegalStateException("Tile ID " + id + " has already been used.");
+        }
+
+        usedTileIDs.add(id); // Mark the tile as used
+        //Tile prototype = tileTemplates.get(id);
+        //return createNewInstance(prototype);
+        return tileTemplates.get(id);
+    }
+
+    public static void resetTiles() {
+        tileTemplates.clear();
+        usedTileIDs.clear();
+        loadTilesFromJson();
+    }
+
+//    private static Tile createNewInstance(Tile prototype) {
+//        if (prototype instanceof AlienSupportTile alienSupport) {
+//            return new AlienSupportTile(alienSupport.getID(),
+//                    alienSupport.getConnector(0),
+//                    alienSupport.getConnector(1),
+//                    alienSupport.getConnector(2),
+//                    alienSupport.getConnector(3),
+//                    alienSupport.getAlienColor());
+//        }
+//        if (prototype instanceof CabinTile) {
+//            return new CabinTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3));
+//        }
+//        if (prototype instanceof CargoTile cargo) {
+//            return new CargoTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3),
+//                    cargo.getType(),
+//                    cargo.getCapacity());
+//        }
+//        if (prototype instanceof BatteriesTile batteries) {
+//            return new BatteriesTile(batteries.getID(),
+//                    batteries.getConnector(0),
+//                    batteries.getConnector(1),
+//                    batteries.getConnector(2),
+//                    batteries.getConnector(3),
+//                    batteries.getCapacity());
+//        }
+//        if (prototype instanceof DoubleCannonTile) {
+//            return new DoubleCannonTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3));
+//        }
+//        if (prototype instanceof CannonTile) {
+//            return new CannonTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3));
+//        }
+//        if (prototype instanceof DoubleEngineTile) {
+//            return new DoubleEngineTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3));
+//        }
+//        if (prototype instanceof EngineTile) {
+//            return new EngineTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3));
+//        }
+//        if (prototype instanceof ShieldTile) {
+//            return new ShieldTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3));
+//        }
+//        if (prototype instanceof StructuralTile) {
+//            return new StructuralTile(prototype.getID(),
+//                    prototype.getConnector(0),
+//                    prototype.getConnector(1),
+//                    prototype.getConnector(2),
+//                    prototype.getConnector(3));
+//        }
+//        throw new IllegalArgumentException("Unsupported tile type: " + prototype.getClass().getSimpleName());
+//    }
 }

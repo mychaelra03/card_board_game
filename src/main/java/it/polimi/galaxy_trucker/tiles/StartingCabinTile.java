@@ -1,9 +1,19 @@
 package it.polimi.galaxy_trucker.tiles;
 
+import it.polimi.galaxy_trucker.Player;
+
 public class StartingCabinTile extends CabinTile {
 
-    public StartingCabinTile(int ID) {
+    private static final int ID = 0;
+    private final Player.Color color;
+
+    public StartingCabinTile(Player.Color color) {
         super(ID, Connector.UNIVERSAL, Connector.UNIVERSAL,  Connector.UNIVERSAL,  Connector.UNIVERSAL);
+        this.color = color;
+    }
+
+    public Player.Color getColor() {
+        return color;
     }
 
     @Override

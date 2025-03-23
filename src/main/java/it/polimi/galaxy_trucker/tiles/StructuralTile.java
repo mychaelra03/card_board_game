@@ -11,6 +11,6 @@ public class StructuralTile extends Tile {
 
     @Override
     public String getTileType() {
-        return "Shield";
+        return "Structural Module";
     }
 }

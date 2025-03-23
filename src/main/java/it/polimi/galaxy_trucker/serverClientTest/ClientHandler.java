@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.serverClientTest;
 
+import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.ShipBoard;
 import java.io.*;
 import java.net.*;
@@ -19,7 +20,7 @@ public class ClientHandler extends Thread {
         this.socket = socket;
         this.usedIds = usedIds;
         this.clients = clients;
-        this.board = new ShipBoard(2);
+        this.board = new ShipBoard(2, Player.Color.BLUE);
     }
 
     public void run() {

@@ -9,12 +9,26 @@ public class CabinTile extends Tile {
     public CabinTile(int ID, Connector top, Connector right, Connector bottom, Connector left) {
         super(ID, top, right, bottom, left);
         this.crew = new CrewType[2];
-        setCrewType(CrewType.HUMAN); // Not sure if i should set this now or while deciding crew
+        setCrewType(CrewType.HUMAN);
     }
     public CabinTile(int ID, int top, int right, int bottom, int left) {
         super(ID, top, right, bottom, left);
         this.crew = new CrewType[2];
         setCrewType(CrewType.HUMAN);
+    }
+
+    public CrewType[] getCrew() {
+        return crew;
+    }
+    public void setCrewType(CrewType crewType) {
+        if (!canHostBrownAlien && crewType == CrewType.BROWN_ALIEN) {
+            throw new IllegalArgumentException("Cabin not habitable by brown aliens");
+        }
+        if (!canHostPurpleAlien && crewType == CrewType.PURPLE_ALIEN) {
+            throw new IllegalArgumentException("Cabin not habitable by purple aliens");
+        }
+        this.crew[0] = crewType;
+        this.crew[1] = (crewType == CrewType.HUMAN) ? crewType : null;
     }
 
     public void allowAlienType(CrewType alienType, boolean alienHabitable) {
@@ -32,20 +46,8 @@ public class CabinTile extends Tile {
         return (alienType == CrewType.BROWN_ALIEN)? canHostBrownAlien : canHostPurpleAlien;
     }
 
-    public CrewType getMemberAt(int index) {
-        if (index < 0 || index >= crew.length) throw new IllegalArgumentException("Invalid cabin index");
-        return crew[index];
-    }
-
-    public void setCrewType(CrewType crewType) {
-        if (!canHostBrownAlien && crewType == CrewType.BROWN_ALIEN) {
-            throw new IllegalArgumentException("Cabin not habitable by brown aliens");
-        }
-        if (!canHostPurpleAlien && crewType == CrewType.PURPLE_ALIEN) {
-            throw new IllegalArgumentException("Cabin not habitable by purple aliens");
-        }
-        this.crew[0] = crewType;
-        this.crew[1] = (crewType == CrewType.HUMAN) ? crewType : null;
+    public boolean hasCrew() {
+        return crew[0] != null || crew[1] != null;
     }
 
     public int getHumanCount() {
@@ -62,6 +64,10 @@ public class CabinTile extends Tile {
         CrewType removedMember = crew[index];
         crew[index] = null;
         return removedMember;
+    }
+    public CrewType removeOneMember() {
+        // Removes the first member starting from slot 1.
+        return removeMember((crew[1] != null)? 1 : 0);
     }
 
     @Override
