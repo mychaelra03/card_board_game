@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameBoard {
-    private int boardType;
-    private List<Player> players;
-    private List<Card> deck;
-    private int flightTrackLength;
+    private final int boardType;
+    private final List<Player> players;
+    private final List<Card> deck;
+    private final int flightTrackLength;
 
-    public GameBoard(int boardType, List<Player> players) throws Exception {
+    public GameBoard(int boardType, List<Player> players) {
         if (boardType < 1 || boardType > 2) throw new IllegalArgumentException("boardType must be between 1 and 2.");
         this.boardType = boardType;
         if (players.size() < 2 || players.size() > 4) throw new IllegalArgumentException("Invalid number of players.");
@@ -23,9 +23,21 @@ public class GameBoard {
         this.deck = (boardType == 1) ? cardFactory.getLearningDeck() : cardFactory.getLevelTwoDeck();
         this.flightTrackLength = (boardType == 1)? 18 : 24;
     }
+    public GameBoard(int boardType) {
+        if (boardType < 1 || boardType > 2) throw new IllegalArgumentException("boardType must be between 1 and 2.");
+        this.boardType = boardType;
+        this.players = new ArrayList<>();
+        CardFactory cardFactory = CardFactory.getInstance();
+        this.deck = (boardType == 1) ? cardFactory.getLearningDeck() : cardFactory.getLevelTwoDeck();
+        this.flightTrackLength = (boardType == 1)? 18 : 24;
+    }
 
-    public void addPlayer(Player player){
-        players.add(player);
+    public boolean addPlayer(Player player){
+        if(players.size() < 4) {
+            players.add(player);
+            return true;
+        }
+        return false;
     }
 
     public List<Player> getSortedPlayers() {

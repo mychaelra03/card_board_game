@@ -60,6 +60,20 @@ public class ShipBoardTest {
     }
 
     @Test
+    void testTileFactory() {
+        // Checks if it generates all 152 cards
+        TileFactory tileFactory = TileFactory.getInstance();
+        for (int id = 0; id < 152; id++) {
+            try {
+                Tile tile = tileFactory.getTile(id);
+                assertNotNull(tile, "Tile with ID " + id + " should not be null.");
+            } catch (Exception e) {
+                fail("TileFactory threw an exception for ID " + id + ": " + e.getMessage());
+            }
+        }
+    }
+
+    @Test
     void testSetTileOccupied() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
         board.setTile(2, 2, new CabinTile(0, 3, 3, 3, 3), 0);
@@ -106,10 +120,9 @@ public class ShipBoardTest {
     void testHasAlien() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
         assertFalse(board.hasAlien(CrewType.BROWN_ALIEN), "Should not have a brown alien initially.");
-        CabinTile cabin = new CabinTile(0,3,3,3,3);
-        cabin.allowAlienType(CrewType.BROWN_ALIEN,true);
-        cabin.setCrewType(CrewType.BROWN_ALIEN);
-        board.setTile(2, 2, cabin, 0);
+        board.setTile(2, 2, new CabinTile(0,3,3,3,3), 0);
+        board.setTile(1, 2, new AlienSupportTile(0,3,3,3,3, CrewType.BROWN_ALIEN), 0);
+        board.setCrewTypeAt(2,2, CrewType.BROWN_ALIEN);
         assertTrue(board.hasAlien(CrewType.BROWN_ALIEN), "Should have a brown alien after setting one.");
         board.setCrewTypeAt(2, 2, CrewType.HUMAN);
         assertFalse(board.hasAlien(CrewType.BROWN_ALIEN), "The alien should have been removed.");
@@ -240,7 +253,7 @@ public class ShipBoardTest {
         board.setTile(3, 1, new StructuralTile(0, 3,3,3,3), 0);
         board.setTile(3, 0, new StructuralTile(0, 3,3,3,3), 0);
         board.setTile(1, 3, new CabinTile(0, 3,3,3,3), 0);
-        if(board.getTile(1, 3) instanceof CabinTile cabin) cabin.allowAlienType(CrewType.BROWN_ALIEN, true); //TEMPORARY
+
         board.setCrewTypeAt(1, 3, CrewType.BROWN_ALIEN);
         board.setTile(5, 3, new CabinTile(0, 3,3,3,3), 0);
         assertEquals(4, board.getTotalHumanCount(), "There should be 4 humans.");

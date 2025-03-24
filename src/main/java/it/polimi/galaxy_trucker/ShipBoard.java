@@ -55,7 +55,7 @@ public class ShipBoard {
         // Places one of the 152 default tiles.
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
-        tiles[y][x] = TileFactory.getTile(tileID);
+        tiles[y][x] = TileFactory.getInstance().getTile(tileID);
         //tiles[y][x] = TileFactory.createTile(tileID);
         tiles[y][x].setRotation(rotation);
         //if(!areTileConnectionsValid(x, y)) {
@@ -78,6 +78,7 @@ public class ShipBoard {
 //            throw new IllegalArgumentException("Invalid placement, connectors don't match");
 //        }
 //        applyAlienSupport(x, y);
+        updateAlienSupport();
     }
 
     public void removeTile(int x, int y) {
@@ -380,7 +381,7 @@ public class ShipBoard {
                         int ny = y + offsets[i][0];
                         if (!isInsideShip(nx, ny)) continue;
 
-                        if (tiles[nx][ny] instanceof AlienSupportTile support) {
+                        if (tiles[ny][nx] instanceof AlienSupportTile support) {
                             if(support.getAlienColor() == CrewType.BROWN_ALIEN) canHostBrown = true;
                             if(support.getAlienColor() == CrewType.PURPLE_ALIEN) canHostPurple = true;
                         }
