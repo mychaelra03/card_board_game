@@ -16,7 +16,7 @@ public class EpidemicCard extends Card {
     public void applyEffects(GameBoard board) {
         List<Player> players = board.getSortedPlayers();
         for(Player player : players) {
-            player.getShipBoard().applyEpidemicCard();
+            player.applyEpidemicCard();
         }
     }
 

@@ -1,7 +1,12 @@
 package it.polimi.galaxy_trucker.cards;
 
 import it.polimi.galaxy_trucker.GameBoard;
+import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.tiles.BlockType;
+
+import java.util.List;
+
+import static it.polimi.galaxy_trucker.GameBoard.Direction.BACKWARD;
 
 public class AbandonedStationCard extends Card {
     // Collect goods if you have enough crew.
@@ -21,7 +26,18 @@ public class AbandonedStationCard extends Card {
 
     @Override
     public void applyEffects(GameBoard board) {
+        List<Player> players = board.getSortedPlayers();
+        for(Player player : players) {
+            if(player.getCrewCount() < requiredCrew) continue;
 
+            boolean accepted = player.acceptsCardEffect();
+
+            if(accepted) {
+                player.giveCargoReward(rewardCargo);
+                board.movePlayer(player, positionCost, BACKWARD);
+                break;
+            }
+        }
     }
 
     @Override

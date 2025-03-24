@@ -1,6 +1,11 @@
 package it.polimi.galaxy_trucker.cards;
 
 import it.polimi.galaxy_trucker.GameBoard;
+import it.polimi.galaxy_trucker.Player;
+
+import java.util.List;
+
+import static it.polimi.galaxy_trucker.GameBoard.Direction.*;
 
 public class AbandonedShipCard extends Card {
     // Exchange crew members for credits.
@@ -21,7 +26,19 @@ public class AbandonedShipCard extends Card {
 
     @Override
     public void applyEffects(GameBoard board) {
+        List<Player> players = board.getSortedPlayers();
+        for(Player player : players) {
+            if(player.getCrewCount() < crewToGiveUp) continue;
 
+            boolean accepted = player.acceptsCardEffect();
+
+            if(accepted) {
+                player.removeCrew(crewToGiveUp);
+                player.addCredits(rewardCredits);
+                board.movePlayer(player, positionCost, BACKWARD);
+                break;
+            }
+        }
     }
 
     @Override

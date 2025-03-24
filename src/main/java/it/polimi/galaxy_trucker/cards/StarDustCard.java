@@ -5,6 +5,8 @@ import it.polimi.galaxy_trucker.Player;
 
 import java.util.List;
 
+import static it.polimi.galaxy_trucker.GameBoard.Direction.*;
+
 public class StarDustCard extends Card {
     // Players lose flight days based on exposed connectors.
 
@@ -16,8 +18,8 @@ public class StarDustCard extends Card {
     public void applyEffects(GameBoard board) {
         List<Player> playersReversed = board.getSortedPlayers().reversed();
         for(Player player : playersReversed) {
-            int exposedConnectors = player.getShipBoard().getExposedConnectorsCount();
-            board.movePlayer(player, exposedConnectors, GameBoard.Direction.BACKWARD);
+            int exposedConnectors = player.getExposedConnectorsCount();
+            board.movePlayer(player, exposedConnectors, BACKWARD);
         }
     }
 
