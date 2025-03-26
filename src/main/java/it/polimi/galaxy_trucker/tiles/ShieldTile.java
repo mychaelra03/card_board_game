@@ -1,12 +1,15 @@
 package it.polimi.galaxy_trucker.tiles;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ShieldTile extends Tile {
 
-    public ShieldTile(int ID, Connector top, Connector right, Connector bottom, Connector left) {
-        super(ID, top, right, bottom, left);
-    }
-    public ShieldTile(int ID, int top, int right, int bottom, int left) {
-        super(ID, top, right, bottom, left);
+    @JsonCreator
+    public ShieldTile(@JsonProperty("id") int id,@JsonProperty("connectors") Connector[] connectors) {
+        super(id, connectors);
     }
 
     @Override

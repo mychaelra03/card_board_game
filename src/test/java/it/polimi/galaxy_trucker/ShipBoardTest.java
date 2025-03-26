@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ShipBoardTest {
+    
+    private static final Connector[] FULL_UNIVERSAL_CONNECTORS = {Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL};
+    private static final Connector[] FULL_SINGLE_CONNECTORS = {Connector.SINGLE,Connector.SINGLE,Connector.SINGLE,Connector.SINGLE};
 
     @Test
     void testInitializationBoard1() {
@@ -44,7 +47,7 @@ public class ShipBoardTest {
     @Test
     void testSetTileValid() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        CabinTile cabin = new CabinTile(0, 3, 3, 3, 3);
+        CabinTile cabin = new CabinTile(0, FULL_UNIVERSAL_CONNECTORS);
         board.setTile(2, 2, cabin, 1);
         assertEquals(cabin, board.getTile(2, 2), "The tile should be the cabin.");
         assertEquals(1, cabin.getRotation(), "The tile rotation should be 1.");
@@ -76,15 +79,15 @@ public class ShipBoardTest {
     @Test
     void testSetTileOccupied() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        board.setTile(2, 2, new CabinTile(0, 3, 3, 3, 3), 0);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> board.setTile(2, 2, new CabinTile(0, 3, 3, 3, 3), 0));
+        board.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> board.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0));
         assertTrue(exception.getMessage().contains("Tile occupied"), "Exception message should indicate tile occupation.");
     }
 
     @Test
     void testGetBatteriesCount() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        BatteriesTile batteries = new BatteriesTile(0, 3, 3, 3, 3, 3);
+        BatteriesTile batteries = new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3);
         board.setTile(2, 2, batteries, 0);
         assertEquals(3, board.getTotalBatteriesCount(), "Batteries count should be 3.");
     }
@@ -92,9 +95,9 @@ public class ShipBoardTest {
     @Test
     void testIsSideShielded() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        board.setTile(2, 2, new ShieldTile(0, 0, 3, 0, 0), 0);
+        board.setTile(2, 2, new ShieldTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         assertFalse(board.isSideShielded(0), "The shield should not have energy to activate.");
-        board.setTile(4, 2, new BatteriesTile(0, 0, 0, 0, 3, 3), 0);
+        board.setTile(4, 2, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
         assertTrue(board.isSideShielded(0), "The shield should be able to shield from the top of the board.");
         assertTrue(board.isSideShielded(1), "The shield should be able to shield from the right side of the board.");
         assertFalse(board.isSideShielded(2), "The shield should not be able to shield from the bottom of the board.");
@@ -104,7 +107,7 @@ public class ShipBoardTest {
     @Test
     void testRemoveCrewMemberAt() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        CabinTile cabin = new CabinTile(0, 3, 3, 3, 3);
+        CabinTile cabin = new CabinTile(0, FULL_UNIVERSAL_CONNECTORS);
         board.setTile(2, 2, cabin, 0);
         assertEquals(4, board.getTotalHumanCount(), "Human count should be 4.");
         board.removeCrewMember(2, 2, 0);
@@ -120,8 +123,8 @@ public class ShipBoardTest {
     void testHasAlien() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
         assertFalse(board.hasAlien(CrewType.BROWN_ALIEN), "Should not have a brown alien initially.");
-        board.setTile(2, 2, new CabinTile(0,3,3,3,3), 0);
-        board.setTile(1, 2, new AlienSupportTile(0,3,3,3,3, CrewType.BROWN_ALIEN), 0);
+        board.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        board.setTile(1, 2, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
         board.setCrewTypeAt(2,2, CrewType.BROWN_ALIEN);
         assertTrue(board.hasAlien(CrewType.BROWN_ALIEN), "Should have a brown alien after setting one.");
         board.setCrewTypeAt(2, 2, CrewType.HUMAN);
@@ -132,10 +135,10 @@ public class ShipBoardTest {
     void testGetTotalCannonStrength() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
         assertEquals(0, board.getTotalCannonStrength(), "Total cannon strength should be 0.");
-        CannonTile cannon = new CannonTile(0,3, 3, 3, 3, false);
+        CannonTile cannon = new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false);
         board.setTile(2, 2, cannon, 0);
         assertEquals(1, board.getTotalCannonStrength(), "Total cannon strength should be 1.");
-        CannonTile rotatedCannon = new CannonTile(0,3, 3, 3, 3, false);
+        CannonTile rotatedCannon = new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false);
         board.setTile(4, 2, rotatedCannon, 1);
         assertEquals(1.5, board.getTotalCannonStrength(), "Total cannon strength should be 1.5.");
     }
@@ -144,7 +147,7 @@ public class ShipBoardTest {
     void testGetTotalEngineStrength() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
         assertEquals(0, board.getTotalEngineStrength(), "Total engine strength should be 0.");
-        EngineTile engine = new EngineTile(0,3, 3, 3, 3, false);
+        EngineTile engine = new EngineTile(0, FULL_UNIVERSAL_CONNECTORS, false);
         board.setTile(2, 2, engine, 0);
         assertEquals(1, board.getTotalEngineStrength(), "Total engine strength should be 1.");
     }
@@ -152,7 +155,7 @@ public class ShipBoardTest {
     @Test
     void testCalculateCargoValue() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        CargoTile cargo = new CargoTile(0,3, 3, 3, 3, CargoTile.CargoType.NORMAL, 3);
+        CargoTile cargo = new CargoTile(0, FULL_UNIVERSAL_CONNECTORS, CargoTile.CargoType.NORMAL, 3);
         board.setTile(2, 2, cargo, 0);
         board.loadCargoAt(2, 2, 0, BlockType.YELLOW);
         board.loadCargoAt(2, 2, 2, BlockType.BLUE);
@@ -163,8 +166,8 @@ public class ShipBoardTest {
     @Test
     void testGetExposedConnectorsCount() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        CannonTile cannon = new CannonTile(0,Connector.SINGLE,Connector.SINGLE,Connector.SINGLE,Connector.SINGLE, false);
-        CabinTile cabin = new CabinTile(1,Connector.SINGLE,Connector.SINGLE,Connector.SINGLE,Connector.SINGLE);
+        CannonTile cannon = new CannonTile(0,FULL_SINGLE_CONNECTORS, false);
+        CabinTile cabin = new CabinTile(1,FULL_SINGLE_CONNECTORS);
         assertEquals(4, board.getExposedConnectorsCount(), "Exposed connectors should be 4.");
         board.setTile(2, 2, cannon, 0);
         assertEquals(6, board.getExposedConnectorsCount(), "Exposed connectors should be 6.");
@@ -177,7 +180,7 @@ public class ShipBoardTest {
 //        StructuralTile tileNone = new StructuralTile(0, 0,0,0,0);
 //        StructuralTile tileSingle = new StructuralTile(0, 1,1,1,1);
 //        StructuralTile tileDouble = new StructuralTile(0, 2,2,2,2);
-//        StructuralTile tileUniv = new StructuralTile(0, 3,3,3,3);
+//        StructuralTile tileUniv = new StructuralTile(0, FULL_CONNECTORS);
 //        ShipBoard board0 = new ShipBoard(1, Player.Color.BLUE);
 //        board0.setTile(1, 2, tileNone, 0);
 //        assertDoesNotThrow(() -> board0.setTile(2, 2, tileNone, 0));
@@ -206,9 +209,9 @@ public class ShipBoardTest {
 //        ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
 //        CabinTile cabin = new CabinTile(0,3,3,3,0);
 //        AlienSupportTile alienSuppNotConnected = new AlienSupportTile(0, 0, 0, 0, 0, CrewType.BROWN_ALIEN);
-//        AlienSupportTile alienSuppDifferentType = new AlienSupportTile(0, 3, 3, 3, 3, CrewType.PURPLE_ALIEN);
-//        AlienSupportTile alienSupp = new AlienSupportTile(0, 3, 3, 3, 3, CrewType.BROWN_ALIEN);
-//        AlienSupportTile alienSupp2 = new AlienSupportTile(0, 3, 3, 3, 3, CrewType.BROWN_ALIEN);
+//        AlienSupportTile alienSuppDifferentType = new AlienSupportTile(0, FULL_CONNECTORS, CrewType.PURPLE_ALIEN);
+//        AlienSupportTile alienSupp = new AlienSupportTile(0, FULL_CONNECTORS, CrewType.BROWN_ALIEN);
+//        AlienSupportTile alienSupp2 = new AlienSupportTile(0, FULL_CONNECTORS, CrewType.BROWN_ALIEN);
 //        board.setTile(3, 2, cabin, 0);
 //        assertFalse(((CabinTile)board.getTile(3,2)).canHostAlienType(CrewType.BROWN_ALIEN), "The cabin should not be able to support aliens yet.");
 //        board.setTile(2, 2, alienSuppNotConnected, 0);
@@ -225,10 +228,10 @@ public class ShipBoardTest {
 //    void testTileRemoveAlienSupport() {
 //        ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
 //        CabinTile cabin = new CabinTile(0,3,3,3,0);
-//        AlienSupportTile alienSuppToRemove = new AlienSupportTile(0, 3, 3, 3, 3, CrewType.BROWN_ALIEN);
+//        AlienSupportTile alienSuppToRemove = new AlienSupportTile(0, FULL_CONNECTORS, CrewType.BROWN_ALIEN);
 //        AlienSupportTile alienSuppNotConnected = new AlienSupportTile(0, 0, 0, 0, 0, CrewType.BROWN_ALIEN);
-//        AlienSupportTile alienSuppStillConnected = new AlienSupportTile(0, 3, 3, 3, 3, CrewType.BROWN_ALIEN);
-//        AlienSupportTile alienSuppDifferentType = new AlienSupportTile(0, 3, 3, 3, 3, CrewType.PURPLE_ALIEN);
+//        AlienSupportTile alienSuppStillConnected = new AlienSupportTile(0, FULL_CONNECTORS, CrewType.BROWN_ALIEN);
+//        AlienSupportTile alienSuppDifferentType = new AlienSupportTile(0, FULL_CONNECTORS, CrewType.PURPLE_ALIEN);
 //        board.setTile(3, 2, cabin, 0);
 //        board.setTile(3, 1, alienSuppToRemove, 0);
 //        board.setTile(2, 2, alienSuppNotConnected, 0);
@@ -246,16 +249,16 @@ public class ShipBoardTest {
     @Test
     void testAutomaticTileRemoval() {
         ShipBoard board = new ShipBoard(1, Player.Color.BLUE);
-        board.setTile(2, 2, new StructuralTile(0, 3,3,3,3), 0);
-        board.setTile(1, 2, new AlienSupportTile(0, 3,3,3,3, CrewType.BROWN_ALIEN), 0);
-        board.setTile(4, 2, new StructuralTile(0, 3,3,3,3), 0);
-        board.setTile(5, 2, new StructuralTile(0, 3,3,3,3), 0);
-        board.setTile(3, 1, new StructuralTile(0, 3,3,3,3), 0);
-        board.setTile(3, 0, new StructuralTile(0, 3,3,3,3), 0);
-        board.setTile(1, 3, new CabinTile(0, 3,3,3,3), 0);
+        board.setTile(2, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        board.setTile(1, 2, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
+        board.setTile(4, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        board.setTile(5, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        board.setTile(3, 1, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        board.setTile(3, 0, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        board.setTile(1, 3, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
 
         board.setCrewTypeAt(1, 3, CrewType.BROWN_ALIEN);
-        board.setTile(5, 3, new CabinTile(0, 3,3,3,3), 0);
+        board.setTile(5, 3, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         assertEquals(4, board.getTotalHumanCount(), "There should be 4 humans.");
         board.removeTile(3, 2);
         assertEquals(2, board.getTotalHumanCount(), "There should be 2 humans.");

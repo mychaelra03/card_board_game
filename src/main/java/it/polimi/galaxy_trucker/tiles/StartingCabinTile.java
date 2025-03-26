@@ -4,11 +4,11 @@ import it.polimi.galaxy_trucker.Player;
 
 public class StartingCabinTile extends CabinTile {
 
-    private static final int ID = 0;
+    private static final int id = 0;
     private final Player.Color color;
 
     public StartingCabinTile(Player.Color color) {
-        super(ID, Connector.UNIVERSAL, Connector.UNIVERSAL,  Connector.UNIVERSAL,  Connector.UNIVERSAL);
+        super(id, new Connector[]{Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL});
         this.color = color;
     }
 

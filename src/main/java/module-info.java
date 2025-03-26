@@ -20,6 +20,7 @@ module it.polimi.galaxy_trucker {
     exports it.polimi.galaxy_trucker.ServerCliChat;
     opens it.polimi.galaxy_trucker.ServerCliChat to javafx.fxml;
     opens it.polimi.galaxy_trucker.cards to com.fasterxml.jackson.databind;
+    opens it.polimi.galaxy_trucker.tiles to com.fasterxml.jackson.databind;
 
 
 

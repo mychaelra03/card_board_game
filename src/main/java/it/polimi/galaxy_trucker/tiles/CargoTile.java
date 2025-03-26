@@ -1,5 +1,11 @@
 package it.polimi.galaxy_trucker.tiles;
 
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CargoTile extends Tile {
 
     public enum CargoType {
@@ -9,22 +15,16 @@ public class CargoTile extends Tile {
     private final int capacity;
     private final BlockType[] containers;
 
-    public CargoTile(int ID, Connector top, Connector right, Connector bottom, Connector left, CargoType type, int capacity) {
-        super(ID, top, right, bottom, left);
+    @JsonCreator
+    public CargoTile(@JsonProperty("id") int id,@JsonProperty("connectors") Connector[] connectors ,@JsonProperty("cargoType") CargoType type,@JsonProperty("capacity") int capacity) {
+        super(id, connectors);
         this.type = type;
         this.capacity = capacity;
         if (type == CargoType.NORMAL && (capacity < 2 || capacity > 3)) throw new IllegalArgumentException("Cargo must have 2 or 3 containers.");
         if (type == CargoType.RED && (capacity < 1 || capacity > 2)) throw new IllegalArgumentException("Red cargo must have 1 or 2 containers.");
         this.containers = new BlockType[capacity];
     }
-    public CargoTile(int ID, int top, int right, int bottom, int left, CargoType type, int capacity) {
-        super(ID, top, right, bottom, left);
-        this.type = type;
-        this.capacity = capacity;
-        if (type == CargoType.NORMAL && (capacity < 2 || capacity > 3)) throw new IllegalArgumentException("Cargo must have 2 or 3 containers.");
-        if (type == CargoType.RED && (capacity < 1 || capacity > 2)) throw new IllegalArgumentException("Red cargo must have 1 or 2 containers.");
-        this.containers = new BlockType[capacity];
-    }
+
 
     public int getCapacity() {
         return capacity;

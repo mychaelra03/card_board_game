@@ -25,8 +25,8 @@ public class ShipBoard {
     public ShipBoard(int shipBoardType, Player.Color playerColor) {
         this.shipBoardType = shipBoardType;
         if(shipBoardType < 1 || shipBoardType > 2) throw new IllegalArgumentException("Ship Board must be type 1 or 2.");
-        initializeShip();
         this.playerColor = playerColor;
+        initializeShip();
     }
 
     private void initializeShip() {

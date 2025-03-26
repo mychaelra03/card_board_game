@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.cards.AbandonedShipCard;
@@ -67,73 +68,71 @@ public class TileFactory {
         // Instantiates a Tile from its JSON definition.
         int id = tileNode.get("id").asInt();
         String tileType = tileNode.get("tileType").asText();
-        int[] connectors = new int[]{
-                tileNode.get("connectors").get(0).asInt(),
-                tileNode.get("connectors").get(1).asInt(),
-                tileNode.get("connectors").get(2).asInt(),
-                tileNode.get("connectors").get(3).asInt()
-        };
 
         switch (tileType) {
-            case "alienSupport": {
-                if (!tileNode.has("alienType")) {
-                    throw new IllegalArgumentException("Missing alienType for alienSupport tile id " + id);
-                }
-                CrewType alienType = CrewType.valueOf(tileNode.get("alienType").asText());
 
-                return new AlienSupportTile(id, connectors[0], connectors[1], connectors[2], connectors[3], alienType);
+            case "alienSupport": {
+                try {
+                    return mapper.readValue(tileNode.toString(), AlienSupportTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             case "cabin": {
-                return new CabinTile(id, connectors[0], connectors[1], connectors[2], connectors[3]);
+                try {
+                    return mapper.readValue(tileNode.toString(), CabinTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             case "cargo": {
-                if (!tileNode.has("cargoType")) {
-                    throw new IllegalArgumentException("Missing cargoType for cargo tile id " + id);
+                try {
+                    return mapper.readValue(tileNode.toString(), CargoTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
-                CargoTile.CargoType cargoType = CargoTile.CargoType.valueOf(tileNode.get("cargoType").asText());
-                if (!tileNode.has("capacity")) {
-                    throw new IllegalArgumentException("Missing capacity for cargo tile id " + id);
-                }
-                int capacity = tileNode.get("capacity").asInt();
-
-                return new CargoTile(id, connectors[0], connectors[1], connectors[2], connectors[3], cargoType, capacity);
             }
 
             case "batteries": {
-                if (!tileNode.has("capacity")) {
-                    throw new IllegalArgumentException("Missing capacity for batteries tile id " + id);
+                try {
+                    return mapper.readValue(tileNode.toString(), BatteriesTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
-                int capacity = tileNode.get("capacity").asInt();
-
-                return new BatteriesTile(id, connectors[0], connectors[1], connectors[2], connectors[3], capacity);
             }
 
             case "cannon": {
-                if (!tileNode.has("isDouble")) {
-                    throw new IllegalArgumentException("Missing isDouble for cannon tile id " + id);
+                try {
+                    return mapper.readValue(tileNode.toString(), CannonTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
-                boolean isDouble = tileNode.get("isDouble").asBoolean();
-
-                return new CannonTile(id, connectors[0], connectors[1], connectors[2], connectors[3], isDouble);
             }
 
             case "engine": {
-                if (!tileNode.has("isDouble")) {
-                    throw new IllegalArgumentException("Missing isDouble for engine tile id " + id);
+                try {
+                    return mapper.readValue(tileNode.toString(), EngineTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
-                boolean isDouble = tileNode.get("isDouble").asBoolean();
-
-                return new EngineTile(id, connectors[0], connectors[1], connectors[2], connectors[3], isDouble);
             }
 
             case "shield": {
-                return new ShieldTile(id, connectors[0], connectors[1], connectors[2], connectors[3]);
+                try {
+                    return mapper.readValue(tileNode.toString(), ShieldTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             case "structural": {
-                return new StructuralTile(id, connectors[0], connectors[1], connectors[2], connectors[3]);
+                try {
+                    return mapper.readValue(tileNode.toString(), StructuralTile.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             default:

@@ -13,10 +13,5 @@ public enum BlockType {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return "BlockType{" +
-                "value=" + value +
-                '}';
-    }
+
 }

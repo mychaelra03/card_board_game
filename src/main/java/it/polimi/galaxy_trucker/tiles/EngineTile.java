@@ -1,21 +1,23 @@
 package it.polimi.galaxy_trucker.tiles;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EngineTile extends Tile {
 
     private final boolean isDouble;
     private boolean isPowered;
 
-    public EngineTile(int ID, Connector top, Connector right, Connector bottom, Connector left, boolean isDouble) {
-        super(ID, top, right, bottom, left);
+    @JsonCreator
+    public EngineTile(@JsonProperty("id") int id,@JsonProperty("connectors") Connector[] connectors ,@JsonProperty("isDouble") boolean isDouble) {
+        super(id,connectors);
         this.isDouble = isDouble;
         this.isPowered = false;
 
     }
-    public EngineTile(int ID, int top, int right, int bottom, int left, boolean isDouble) {
-        super(ID, top, right, bottom, left);
-        this.isDouble = isDouble;
-        this.isPowered = false;
-    }
+
 
     @Override
     public void setRotation(int rotation) {

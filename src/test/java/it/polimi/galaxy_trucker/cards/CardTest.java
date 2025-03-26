@@ -3,18 +3,18 @@ package it.polimi.galaxy_trucker.cards;
 import it.polimi.galaxy_trucker.GameBoard;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.ShipBoard;
-import it.polimi.galaxy_trucker.tiles.BatteriesTile;
-import it.polimi.galaxy_trucker.tiles.CabinTile;
-import it.polimi.galaxy_trucker.tiles.CargoTile;
-import it.polimi.galaxy_trucker.tiles.StructuralTile;
+import it.polimi.galaxy_trucker.tiles.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.polimi.galaxy_trucker.tiles.Connector.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardTest {
+
+    public static final Connector[] FULL_UNIVERSAL_CONNECTORS = {UNIVERSAL, UNIVERSAL, UNIVERSAL, UNIVERSAL};
 
     @Test
     void testEpidemicCard() throws Exception {
@@ -23,24 +23,24 @@ class CardTest {
         Player player3 = new Player("TestPlayer3", Player.Color.RED,2);
         Player player4 = new Player("TestPlayer4", Player.Color.GREEN,2);
         // 1st case
-        player1.getShipBoard().setTile(2,2, new CabinTile(0,3,3,3,3),0);
+        player1.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
 
         // 2nd case
-        player2.getShipBoard().setTile(2,2, new CabinTile(0,3,3,3,3),0);
-        player2.getShipBoard().setTile(1,2, new CabinTile(0,3,3,3,3),0);
+        player2.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player2.getShipBoard().setTile(1,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
 
         // 3rd  case
-        player3.getShipBoard().setTile(3,3, new CabinTile(0,3,3,3,0),0);
-        player3.getShipBoard().setTile(2,2, new StructuralTile(0,3,3,3,0),0);
-        player3.getShipBoard().setTile(2,3, new CabinTile(0,3,0,3,3),0);
+        player3.getShipBoard().setTile(3,3, new CabinTile(0,new Connector[]{UNIVERSAL, UNIVERSAL, UNIVERSAL,Connector.NONE}),0);
+        player3.getShipBoard().setTile(2,2, new StructuralTile(0,new Connector[]{UNIVERSAL, UNIVERSAL, UNIVERSAL,Connector.NONE}),0);
+        player3.getShipBoard().setTile(2,3, new CabinTile(0,new Connector[]{UNIVERSAL,Connector.NONE, UNIVERSAL, UNIVERSAL}),0);
 
         // 4th case
-        player4.getShipBoard().setTile(3,1, new BatteriesTile(0,3,3,3,3,3),0);
-        player4.getShipBoard().setTile(4,1, new CabinTile(0,3,3,3,3),0);
-        player4.getShipBoard().setTile(4,2, new CabinTile(0,3,3,3,3),0);
-        player4.getShipBoard().setTile(4,3, new CabinTile(0,3,3,3,3),0);
-        player4.getShipBoard().setTile(5,3, new CargoTile(0,3,3,3,3, CargoTile.CargoType.RED,1),0);
-        player4.getShipBoard().setTile(6,3, new CabinTile(0,3,3,3,3),0);
+        player4.getShipBoard().setTile(3,1, new BatteriesTile(0,FULL_UNIVERSAL_CONNECTORS,3),0);
+        player4.getShipBoard().setTile(4,1, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player4.getShipBoard().setTile(4,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player4.getShipBoard().setTile(4,3, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player4.getShipBoard().setTile(5,3, new CargoTile(0,FULL_UNIVERSAL_CONNECTORS, CargoTile.CargoType.RED,1),0);
+        player4.getShipBoard().setTile(6,3, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
 
 
         List<Player> players = new ArrayList<>();
@@ -71,24 +71,24 @@ class CardTest {
         Player player4 = new Player("TestPlayer4", Player.Color.GREEN,2);
 
         // 1st case
-         player1.getShipBoard().setTile(2,2, new CabinTile(0,3,3,3,3),0);
+         player1.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
 
         // 2nd case
-        player2.getShipBoard().setTile(2,2, new CabinTile(0,3,3,3,3),0);
-        player2.getShipBoard().setTile(1,2, new CabinTile(0,3,3,3,3),0);
+        player2.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player2.getShipBoard().setTile(1,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
 
         // 3rd  case
-        player3.getShipBoard().setTile(3,3, new CabinTile(0,3,0,3,0),0);
-        player3.getShipBoard().setTile(2,2, new StructuralTile(0,3,3,3,0),0);
-        player3.getShipBoard().setTile(2,3, new CabinTile(0,3,0,3,3),0);
+        player3.getShipBoard().setTile(3,3, new CabinTile(0,new Connector[]{UNIVERSAL,Connector.NONE, UNIVERSAL,Connector.NONE}),0);
+        player3.getShipBoard().setTile(2,2, new StructuralTile(0,new Connector[]{UNIVERSAL, UNIVERSAL, UNIVERSAL,Connector.NONE}),0);
+        player3.getShipBoard().setTile(2,3, new CabinTile(0,new Connector[]{UNIVERSAL,Connector.NONE, UNIVERSAL, UNIVERSAL}),0);
 
         // 4th case
-        player4.getShipBoard().setTile(3,1, new BatteriesTile(0,3,3,3,3,3),0);
-        player4.getShipBoard().setTile(4,1, new CabinTile(0,3,3,3,3),0);
-        player4.getShipBoard().setTile(4,2, new CabinTile(0,3,3,3,3),0);
-        player4.getShipBoard().setTile(4,3, new CabinTile(0,3,3,3,3),0);
-        player4.getShipBoard().setTile(5,3, new CargoTile(0,3,3,3,3, CargoTile.CargoType.RED,1),0);
-        player4.getShipBoard().setTile(6,3, new CabinTile(0,3,3,0,3),0);
+        player4.getShipBoard().setTile(3,1, new BatteriesTile(0,FULL_UNIVERSAL_CONNECTORS,3),0);
+        player4.getShipBoard().setTile(4,1, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player4.getShipBoard().setTile(4,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player4.getShipBoard().setTile(4,3, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
+        player4.getShipBoard().setTile(5,3, new CargoTile(0,FULL_UNIVERSAL_CONNECTORS, CargoTile.CargoType.RED,1),0);
+        player4.getShipBoard().setTile(6,3, new CabinTile(0,new Connector[]{UNIVERSAL, UNIVERSAL,Connector.NONE, UNIVERSAL}),0);
 
         List<Player> players = new ArrayList<>();
         players.add(player1);
@@ -112,4 +112,7 @@ class CardTest {
         assertEquals(-2,player3.getPosition(),"Player3 (2nd) should lose 6 position and be therefore be in position -2");
         assertEquals(-11,player4.getPosition(),"Player4 (3rd) should lose 14 position and be therefore be in position -12");
     }
+
+
+
 }

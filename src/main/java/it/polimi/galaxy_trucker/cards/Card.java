@@ -6,8 +6,8 @@ import it.polimi.galaxy_trucker.GameBoard;
 public abstract class Card {
 
     @JsonProperty
-    public final int id;
-    public final int level;
+    private final int id;
+    private final int level;
 
     public Card(int id, int level) {
         this.id = id;

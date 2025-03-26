@@ -1,20 +1,20 @@
 package it.polimi.galaxy_trucker.tiles;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CannonTile extends Tile {
 
     private final boolean isDouble;
     private boolean isPowered;
 
-    public CannonTile(int ID, Connector top, Connector right, Connector bottom, Connector left, boolean isDouble) {
-        super(ID, top, right, bottom, left);
+    public CannonTile(@JsonProperty("id")int ID,@JsonProperty("connectors") Connector[] connectors ,@JsonProperty("isDouble") boolean isDouble) {
+        super(ID, connectors);
         this.isDouble = isDouble;
         this.isPowered = false;
     }
-    public CannonTile(int ID, int top, int right, int bottom, int left, boolean isDouble) {
-        super(ID, top, right, bottom, left);
-        this.isDouble = isDouble;
-        this.isPowered = false;
-    }
+
 
     public boolean isDouble() {
         return isDouble;

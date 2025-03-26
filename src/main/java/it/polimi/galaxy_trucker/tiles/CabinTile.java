@@ -1,21 +1,23 @@
 package it.polimi.galaxy_trucker.tiles;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CabinTile extends Tile {
 
     private boolean canHostBrownAlien = false;
     private boolean canHostPurpleAlien = false;
     private final CrewType[] crew;
 
-    public CabinTile(int ID, Connector top, Connector right, Connector bottom, Connector left) {
-        super(ID, top, right, bottom, left);
+    @JsonCreator
+    public CabinTile(@JsonProperty("id") int id,@JsonProperty("connectors") Connector[] connectors) {
+        super(id, connectors);
         this.crew = new CrewType[2];
         setCrewType(CrewType.HUMAN);
     }
-    public CabinTile(int ID, int top, int right, int bottom, int left) {
-        super(ID, top, right, bottom, left);
-        this.crew = new CrewType[2];
-        setCrewType(CrewType.HUMAN);
-    }
+
 
     public CrewType[] getCrew() {
         return crew;
