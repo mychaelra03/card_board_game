@@ -16,7 +16,7 @@ public class GameBoard {
     public GameBoard(int boardType, List<Player> players) {
         if (boardType < 1 || boardType > 2) throw new IllegalArgumentException("boardType must be between 1 and 2.");
         this.boardType = boardType;
-        if (players.size() < 2 || players.size() > 4) throw new IllegalArgumentException("Invalid number of players.");
+      //  if (players.size() < 2 || players.size() > 4) throw new IllegalArgumentException("Invalid number of players.");
         this.players = players;
 
         CardFactory cardFactory = CardFactory.getInstance();

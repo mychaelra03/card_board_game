@@ -1,7 +1,13 @@
 package it.polimi.galaxy_trucker.cards;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.GameBoard;
 
+import java.util.Arrays;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CombatZoneCard extends Card {
     // Compare crew, engine strength, and cannons to avoid penalties.
 
@@ -12,31 +18,37 @@ public class CombatZoneCard extends Card {
         private final Punishment punishment;
         private final int punishmentValue;
         private final CannonShot[] cannonShots;
-        public CombatRule(Condition condition, Punishment punishment, int punishmentValue) {
+
+
+
+        @JsonCreator
+        public CombatRule(@JsonProperty("condition") Condition condition, @JsonProperty("punishment")Punishment punishment,@JsonProperty("punishmentValue") int punishmentValue,@JsonProperty("cannonShots") CannonShot[] cannonShots) {
             this.condition = condition;
-            if(punishment == Punishment.CANNON_SHOTS) throw new IllegalArgumentException("Wrong use of the constructor");
             this.punishment = punishment;
-            this.punishmentValue = punishmentValue;
-            this.cannonShots = null;
+            if(punishment != Punishment.CANNON_SHOTS) {
+                if(punishmentValue < 0) throw new IllegalArgumentException("punishment value must be >= 0");
+                this.punishmentValue = punishmentValue;
+            }
+            else this.punishmentValue = 0;
+            if (punishment==Punishment.CANNON_SHOTS) this.cannonShots = cannonShots;
+            else this.cannonShots = null;
+
+
         }
-        public CombatRule(Condition condition, Punishment punishment, CannonShot[] cannonShots) {
-            this.condition = condition;
-            if(punishment != Punishment.CANNON_SHOTS) throw new IllegalArgumentException("Wrong use of the constructor");
-            this.punishment = punishment;
-            this.punishmentValue = 0;
-            this.cannonShots = cannonShots;
-        }
+
         public Condition getCondition() { return condition; }
         public Punishment getPunishment() { return punishment; }
         public int getPunishmentValue() { return punishmentValue; }
         public CannonShot[] getCannonShots() { return cannonShots; }
 
+
     }
 
     private final CombatRule[] combatRules;
 
-    public CombatZoneCard(int ID, int level, CombatRule[] combatRules) {
-        super(ID, level);
+    @JsonCreator
+    public CombatZoneCard(@JsonProperty("id")int id, @JsonProperty("level")int level, @JsonProperty("combatRule")CombatRule[] combatRules) {
+        super(id, level);
         this.combatRules = combatRules;
     }
 
@@ -49,4 +61,6 @@ public class CombatZoneCard extends Card {
     public String getCardType() {
         return "Combat Zone";
     }
+
+
 }

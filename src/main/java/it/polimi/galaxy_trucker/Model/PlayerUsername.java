@@ -2,7 +2,7 @@ package it.polimi.galaxy_trucker.Model;
 
 public class PlayerUsername {
 
-    private static PlayerUsername instance;
+    public static PlayerUsername instance;
     private  String username;
     private  int playerID;
     private  String colorP;
@@ -22,7 +22,7 @@ public class PlayerUsername {
     }
 
 
-     private PlayerUsername() {}
+     public PlayerUsername() {}
 
     public String getUsername() {
         return username;
@@ -54,5 +54,16 @@ public class PlayerUsername {
 
     public void setPlayerPic(int playerPic) {
         this.playerPic = playerPic;
+    }
+
+
+    @Override
+    public String toString() {
+        return "PlayerUsername{" +
+                "username='" + username + '\'' +
+                ", playerID=" + playerID +
+                ", colorP='" + colorP + '\'' +
+                ", playerPic=" + playerPic +
+                '}';
     }
 }

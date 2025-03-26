@@ -69,7 +69,7 @@ public class CardFactory {
         }
         Collections.shuffle(learningFlightNodes, random);
         for(int i = 0; i < 8; i++) {
-            result.add(createCard(learningFlightNodes.get(i), 1));
+            result.add(createCard(learningFlightNodes.get(i)));
         }
         return result;
     }
@@ -87,7 +87,7 @@ public class CardFactory {
         List<JsonNode> levelTwoCopy = new ArrayList<>(levelTwoNodes);
         Collections.shuffle(levelTwoCopy, random);
         for(int i = 0; i < 8; i++) {
-            result.add(createCard(levelTwoCopy.get(i), 2));
+            result.add(createCard(levelTwoCopy.get(i)));
         }
 
         // Combine level1 cards from "level1" and "learningFlight".
@@ -103,228 +103,128 @@ public class CardFactory {
         }
         Collections.shuffle(levelOneNodes, random);
         for(int i = 0; i < 4; i++) {
-            result.add(createCard(levelOneNodes.get(i), 1));
+            result.add(createCard(levelOneNodes.get(i)));
         }
 
         return result;
     }
 
-    private Card createCard(JsonNode cardNode, int level) {
+    private Card createCard(JsonNode cardNode) {
         // Instantiates a Card from its JSON definition.
-        int id = cardNode.get("id").asInt();
+       int id = cardNode.get("id").asInt();
         String cardType = cardNode.get("cardType").asText();
         //int level = cardNode.get("level").asInt();
 
         switch (cardType) {
             case "abandonedShip": {
-                if(!cardNode.has("crewToGiveUp")) {
-                    throw new IllegalArgumentException("Missing crewToGiveUp for AbandonedShip card id " + id);
-                }
-                int crewToGiveUp = cardNode.get("crewToGiveUp").asInt();
-                if(!cardNode.has("rewardCredits")) {
-                    throw new IllegalArgumentException("Missing rewardCredits for AbandonedShip card id " + id);
-                }
-                int rewardCredits = cardNode.get("rewardCredits").asInt();
-                if(!cardNode.has("positionCost")) {
-                    throw new IllegalArgumentException("Missing positionCost for AbandonedShip card id " + id);
-                }
-                int positionCost = cardNode.get("positionCost").asInt();
 
-                return new AbandonedShipCard(id, level, crewToGiveUp, rewardCredits, positionCost);
+                try {
+                   return mapper.readValue(cardNode.toString(),AbandonedShipCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
-            case "abandonedStation": {
-                if(!cardNode.has("requiredCrew")) {
-                    throw new IllegalArgumentException("Missing requiredCrew for AbandonedStatuib card id " + id);
-                }
-                int requiredCrew = cardNode.get("requiredCrew").asInt();
-                JsonNode rewardCargoNode = cardNode.get("rewardCargo");
-                if(rewardCargoNode == null || !rewardCargoNode.isArray()) {
-                    throw new IllegalArgumentException("rewardCargo is not an array for card id " + id);
-                }
-                List<BlockType> rewardCargoList = new ArrayList<>();
-                for(JsonNode cargoNode : rewardCargoNode) {
-                    BlockType block = BlockType.valueOf(cargoNode.asText());
-                    rewardCargoList.add(block);
-                }
-                BlockType[] rewardCargo = rewardCargoList.toArray(new BlockType[0]);
-                if(!cardNode.has("positionCost")) {
-                    throw new IllegalArgumentException("Missing positionCost for AbandonedShip card id " + id);
-                }
-                int positionCost = cardNode.get("positionCost").asInt();
 
-                return new AbandonedStationCard(id, level, requiredCrew, rewardCargo, positionCost);
+            case "abandonedStation": {
+
+
+                try {
+                    return mapper.readValue(cardNode.toString(),AbandonedStationCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             case "combatZone": {
-                // Expect a combatRules array.
-                JsonNode combatRulesNode = cardNode.get("combatRules");
-                if(combatRulesNode == null || !combatRulesNode.isArray()) {
-                    throw new IllegalArgumentException("Missing or invalid combatRules for Combat Zone card id " + id);
-                }
-                List<CombatZoneCard.CombatRule> combatRulesList = new ArrayList<>();
-                for(JsonNode ruleNode : combatRulesNode) {
-                    Condition condition = Condition.valueOf(ruleNode.get("condition").asText());
-                    Punishment punishment = Punishment.valueOf(ruleNode.get("punishment").asText());
-                    if(punishment == Punishment.CANNON_SHOTS) {
-                        // For CANNON_SHOTS, expect a cannonShot array.
-                        JsonNode cannonShotsNode = ruleNode.get("cannonShots");
-                        if(cannonShotsNode == null || !cannonShotsNode.isArray()) {
-                            throw new IllegalArgumentException("Missing cannonShots for CANNON_SHOTS rule in card id " + id);
-                        }
-                        List<CannonShot> cannonShotsList = new ArrayList<>();
-                        for(JsonNode shotNode : cannonShotsNode) {
-                            ProjectileSize size = ProjectileSize.valueOf(shotNode.get("size").asText());
-                            ProjectileDirection direction = ProjectileDirection.valueOf(shotNode.get("direction").asText());
-                            cannonShotsList.add(new CannonShot(size, direction));
-                        }
-                        CannonShot[] cannonShots = cannonShotsList.toArray(new CannonShot[0]);
-                        CombatZoneCard.CombatRule rule = new CombatZoneCard.CombatRule(condition, punishment, cannonShots);
-                        combatRulesList.add(rule);
-                    } else {
-                        if(!ruleNode.has("punishmentValue")) {
-                            throw new IllegalArgumentException("Missing punishmentValue for rule in card id " + id);
-                        }
-                        int punishmentValue = ruleNode.get("punishmentValue").asInt();
-                        CombatZoneCard.CombatRule rule = new CombatZoneCard.CombatRule(
-                                condition, punishment, punishmentValue
-                        );
-                        combatRulesList.add(rule);
-                    }
-                }
-                CombatZoneCard.CombatRule[] combatRules = combatRulesList.toArray(new CombatZoneCard.CombatRule[0]);
 
-                return new CombatZoneCard(id, level, combatRules);
+
+                try {
+                    return mapper.readValue(cardNode.toString(),CombatZoneCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             case "epidemic": {
-                return new EpidemicCard(id, level);
+
+                try {
+                    return mapper.readValue(cardNode.toString(),EpidemicCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+               // return new EpidemicCard(id, level);
             }
 
             case "meteorSwarm": {
-                JsonNode meteorsNode = cardNode.get("meteors");
-                if(meteorsNode == null || !meteorsNode.isArray()) {
-                    throw new IllegalArgumentException("meteors is not an array for card id " + id);
-                }
-                List<MeteorSwarmCard.Meteor> meteorsList = new ArrayList<>();
-                for(JsonNode meteorNode : meteorsNode) {
-                    ProjectileSize size = ProjectileSize.valueOf(meteorNode.get("size").asText());
-                    ProjectileDirection direction = ProjectileDirection.valueOf(meteorNode.get("direction").asText());
-                    meteorsList.add(new MeteorSwarmCard.Meteor(size, direction));
-                }
-                MeteorSwarmCard.Meteor[] meteors = meteorsList.toArray(new MeteorSwarmCard.Meteor[0]);
 
-                return new MeteorSwarmCard(id, level, meteors);
+                try {
+                    return mapper.readValue(cardNode.toString(),MeteorSwarmCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             case "openSpace": {
-                return new OpenSpaceCard(id, level);
+                try {
+                    return mapper.readValue(cardNode.toString(),OpenSpaceCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                //return new OpenSpaceCard(id, level);
             }
 
             case "pirates": {
-                if(!cardNode.has("requiredCannonPower")) {
-                    throw new IllegalArgumentException("Missing requiredCannonPower for Pirates card id " + id);
-                }
-                int requiredCannonPower = cardNode.get("requiredCannonPower").asInt();
-                if(!cardNode.has("rewardCredits")) {
-                    throw new IllegalArgumentException("Missing rewardCredits for Pirates card id " + id);
-                }
-                int rewardCredits = cardNode.get("rewardCredits").asInt();
-                JsonNode cannonShotsNode = cardNode.get("cannonShots");
-                if(cannonShotsNode == null || !cannonShotsNode.isArray()) {
-                    throw new IllegalArgumentException("cannonShots is not an array for card id " + id);
-                }
-                if(!cardNode.has("positionCost")) {
-                    throw new IllegalArgumentException("Missing positionCost for Pirates card id " + id);
-                }
-                int positionCost = cardNode.get("positionCost").asInt();
-                List<CannonShot> cannonShotsList = new ArrayList<>();
-                for(JsonNode shotNode : cannonShotsNode) {
-                    ProjectileSize size = ProjectileSize.valueOf(shotNode.get("size").asText());
-                    ProjectileDirection direction = ProjectileDirection.valueOf(shotNode.get("direction").asText());
-                    cannonShotsList.add(new CannonShot(size, direction));
-                }
-                CannonShot[] cannonShots = cannonShotsList.toArray(new CannonShot[0]);
 
-                return new PiratesCard(id, level, requiredCannonPower, rewardCredits, positionCost, cannonShots);
+                try {
+                    return mapper.readValue(cardNode.toString(),PiratesCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             case "planets": {
-                JsonNode planetsNode = cardNode.get("planets");
-                if(planetsNode == null || !planetsNode.isArray()) {
-                    throw new IllegalArgumentException("Missing or invalid planets for Planets card id " + id);
-                }
-                List<BlockType[]> planetsList = new ArrayList<>();
-                for(JsonNode rowNode : planetsNode) {
-                    if(!rowNode.isArray()) {
-                        throw new IllegalArgumentException("Planets row is not an array for card id " + id);
-                    }
-                    List<BlockType> row = new ArrayList<>();
-                    for(JsonNode planetNode : rowNode) {
-                        BlockType block = BlockType.valueOf(planetNode.asText());
-                        row.add(block);
-                    }
-                    planetsList.add(row.toArray(new BlockType[0]));
-                }
-                BlockType[][] planets = planetsList.toArray(new BlockType[0][]);
-                if(!cardNode.has("positionCost")) {
-                    throw new IllegalArgumentException("Missing positionCost for Planets card id " + id);
-                }
-                int positionCost = cardNode.get("positionCost").asInt();
 
-                return new PlanetsCard(id, level, planets, positionCost);
+                try {
+                    return mapper.readValue(cardNode.toString(),PlanetsCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             case "slavers": {
-                if(!cardNode.has("requiredCannonPower")) {
-                    throw new IllegalArgumentException("Missing requiredCannonPower for Slavers card id " + id);
-                }
-                int requiredCannonPower = cardNode.get("requiredCannonPower").asInt();
-                if(!cardNode.has("rewardCredits")) {
-                    throw new IllegalArgumentException("Missing rewardCredits for Slavers card id " + id);
-                }
-                int rewardCredits = cardNode.get("rewardCredits").asInt();
-                if(!cardNode.has("positionCost")) {
-                    throw new IllegalArgumentException("Missing positionCost for Slavers card id " + id);
-                }
-                int positionCost = cardNode.get("positionCost").asInt();
-                if(!cardNode.has("crewLossOnDefeat")) {
-                    throw new IllegalArgumentException("Missing crewLossOnDefeat for Slavers card id " + id);
-                }
-                int crewLossOnDefeat = cardNode.get("crewLossOnDefeat").asInt();
 
-                return new SlaversCard(id, level, requiredCannonPower, rewardCredits, positionCost, crewLossOnDefeat);
+                try {
+                    return mapper.readValue(cardNode.toString(),SlaversCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             case "smugglers": {
-                if(!cardNode.has("requiredCannonPower")) {
-                    throw new IllegalArgumentException("Missing requiredCannonPower for Slavers card id " + id);
-                }
-                int requiredCannonPower = cardNode.get("requiredCannonPower").asInt();
-                JsonNode rewardCargoNode = cardNode.get("rewardCargo");
-                if(rewardCargoNode == null || !rewardCargoNode.isArray()) {
-                    throw new IllegalArgumentException("rewardCargo is not an array for card id " + id);
-                }
-                List<BlockType> rewardCargoList = new ArrayList<>();
-                for(JsonNode cargoNode : rewardCargoNode) {
-                    BlockType block = BlockType.valueOf(cargoNode.asText());
-                    rewardCargoList.add(block);
-                }
-                BlockType[] rewardCargo = rewardCargoList.toArray(new BlockType[0]);
-                if(!cardNode.has("positionCost")) {
-                    throw new IllegalArgumentException("Missing positionCost for Slavers card id " + id);
-                }
-                int positionCost = cardNode.get("positionCost").asInt();
-                if(!cardNode.has("cargoLossOnDefeat")) {
-                    throw new IllegalArgumentException("Missing cargoLossOnDefeat for Slavers card id " + id);
-                }
-                int cargoLossOnDefeat = cardNode.get("cargoLossOnDefeat").asInt();
 
-                return new SmugglersCard(id, level, requiredCannonPower, rewardCargo, positionCost, cargoLossOnDefeat);
+                try {
+                    return mapper.readValue(cardNode.toString(),SmugglersCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             case "starDust": {
-                return new StarDustCard(id, level);
+                try {
+                    return mapper.readValue(cardNode.toString(),StarDustCard.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                //return new StarDustCard(id, level);
             }
 
             default:

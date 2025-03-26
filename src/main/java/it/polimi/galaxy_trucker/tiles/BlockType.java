@@ -12,4 +12,11 @@ public enum BlockType {
     public int getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "BlockType{" +
+                "value=" + value +
+                '}';
+    }
 }

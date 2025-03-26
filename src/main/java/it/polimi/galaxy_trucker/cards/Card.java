@@ -1,21 +1,22 @@
 package it.polimi.galaxy_trucker.cards;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.GameBoard;
-import it.polimi.galaxy_trucker.Player;
 
 public abstract class Card {
 
-    private final int ID;
-    private final int level;
+    @JsonProperty
+    public final int id;
+    public final int level;
 
-    public Card(int ID, int level) {
-        this.ID = ID;
+    public Card(int id, int level) {
+        this.id = id;
         if (level < 1 || level > 2) throw new IllegalArgumentException("Card level must be between 1 and 2.");
         this.level = level;
     }
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
     public int getLevel() {
         return level;

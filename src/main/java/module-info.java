@@ -19,6 +19,8 @@ module it.polimi.galaxy_trucker {
     opens it.polimi.galaxy_trucker.Controller.Scene1 to javafx.fxml;
     exports it.polimi.galaxy_trucker.ServerCliChat;
     opens it.polimi.galaxy_trucker.ServerCliChat to javafx.fxml;
+    opens it.polimi.galaxy_trucker.cards to com.fasterxml.jackson.databind;
+
 
 
 }
