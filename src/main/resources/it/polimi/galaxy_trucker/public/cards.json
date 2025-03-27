@@ -29,15 +29,15 @@
             "cardType": "meteorSwarm",
             "meteors": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "RIGHT",
+                    "source": "LEFT",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "LEFT",
+                    "source": "RIGHT",
                     "size": "SMALL"
                 }
             ]
@@ -85,11 +85,11 @@
                     "punishmentValue": 0,
                     "cannonShots": [
                         {
-                            "direction": "UP",
+                            "source": "DOWN",
                             "size": "SMALL"
                         },
                         {
-                            "direction": "UP",
+                            "source": "DOWN",
                             "size": "LARGE"
                         }
                     ]
@@ -133,15 +133,15 @@
             "rewardCredits": 4,
             "cannonShots": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 }
             ],
@@ -169,23 +169,23 @@
             "cardType": "meteorSwarm",
             "meteors": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "RIGHT",
+                    "source": "LEFT",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "LEFT",
+                    "source": "RIGHT",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "UP",
+                    "source": "DOWN",
                     "size": "SMALL"
                 }
             ]
@@ -196,15 +196,15 @@
             "cardType": "meteorSwarm",
             "meteors": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 }
             ]
@@ -327,15 +327,15 @@
             "rewardCredits": 7,
             "cannonShots": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 }
             ],
@@ -373,23 +373,23 @@
             "cardType": "meteorSwarm",
             "meteors": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "RIGHT",
+                    "source": "LEFT",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "RIGHT",
+                    "source": "LEFT",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "RIGHT",
+                    "source": "LEFT",
                     "size": "SMALL"
                 }
             ]
@@ -400,19 +400,19 @@
             "cardType": "meteorSwarm",
             "meteors": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "UP",
+                    "source": "DOWN",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "UP",
+                    "source": "DOWN",
                     "size": "SMALL"
                 }
             ]
@@ -423,23 +423,23 @@
             "cardType": "meteorSwarm",
             "meteors": [
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "DOWN",
+                    "source": "UP",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "LEFT",
+                    "source": "RIGHT",
                     "size": "LARGE"
                 },
                 {
-                    "direction": "LEFT",
+                    "source": "RIGHT",
                     "size": "SMALL"
                 },
                 {
-                    "direction": "LEFT",
+                    "source": "RIGHT",
                     "size": "SMALL"
                 }
             ]
@@ -560,19 +560,19 @@
                     "punishmentValue": 0,
                     "cannonShots": [
                         {
-                            "direction": "DOWN",
+                            "source": "UP",
                             "size": "SMALL"
                         },
                         {
-                            "direction": "RIGHT",
+                            "source": "LEFT",
                             "size": "SMALL"
                         },
                         {
-                            "direction": "LEFT",
+                            "source": "RIGHT",
                             "size": "SMALL"
                         },
                         {
-                            "direction": "UP",
+                            "source": "DOWN",
                             "size": "LARGE"
                         }
                     ]

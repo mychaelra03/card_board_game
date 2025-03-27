@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class CargoTile extends Tile {
 
     public enum CargoType {
@@ -15,8 +16,11 @@ public class CargoTile extends Tile {
     private final int capacity;
     private final BlockType[] containers;
 
-    @JsonCreator
-    public CargoTile(@JsonProperty("id") int id,@JsonProperty("connectors") Connector[] connectors ,@JsonProperty("cargoType") CargoType type,@JsonProperty("capacity") int capacity) {
+    public CargoTile(
+            @JsonProperty("id") int id,
+            @JsonProperty("connectors") Connector[] connectors,
+            @JsonProperty("cargoType") CargoType type,
+            @JsonProperty("capacity") int capacity) {
         super(id, connectors);
         this.type = type;
         this.capacity = capacity;

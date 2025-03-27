@@ -17,12 +17,10 @@ public class TileFactory {
     private static TileFactory instance;
     private final List<JsonNode> tilesJson;
     private final ObjectMapper mapper;
-    private final Random random;
 
     private TileFactory(String jsonFilePath) {
         // Private constructor for the singleton. Loads the JSON file.
         this.mapper = new ObjectMapper();
-        this.random = new Random();
         this.tilesJson = loadJson(jsonFilePath);
     }
 
@@ -66,11 +64,10 @@ public class TileFactory {
 
     private Tile createTile(JsonNode tileNode) {
         // Instantiates a Tile from its JSON definition.
-        int id = tileNode.get("id").asInt();
+
         String tileType = tileNode.get("tileType").asText();
 
         switch (tileType) {
-
             case "alienSupport": {
                 try {
                     return mapper.readValue(tileNode.toString(), AlienSupportTile.class);
@@ -136,7 +133,7 @@ public class TileFactory {
             }
 
             default:
-                throw new IllegalArgumentException("Unknown tileType: " + tileType + " for tile id " + id);
+                throw new IllegalArgumentException("Unknown tileType: " + tileType + " for tile id " + tileNode.get("id").asInt());
         }
     }
 }

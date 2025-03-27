@@ -11,11 +11,11 @@ import java.util.List;
 import static it.polimi.galaxy_trucker.GameBoard.Direction.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class StarDustCard extends Card {
     // Players lose flight days based on exposed connectors.
 
-    @JsonCreator
-    public StarDustCard(@JsonProperty("id")int id,@JsonProperty("level") int level) {
+    public StarDustCard(@JsonProperty("id")int id, @JsonProperty("level")int level) {
         super(id, level);
     }
 
@@ -25,7 +25,6 @@ public class StarDustCard extends Card {
         for(Player player : playersReversed) {
             int exposedConnectors = player.getExposedConnectorsCount();
             board.movePlayer(player, exposedConnectors, BACKWARD);
-
         }
     }
 

@@ -42,6 +42,7 @@ public class GameBoard {
 
     public List<Player> getSortedPlayers() {
         return players.stream()
+                .filter(player -> !player.isEliminated())
                 .sorted(Comparator.comparingInt(Player::getPosition))
                 .collect(Collectors.toList());
     }
@@ -61,4 +62,7 @@ public class GameBoard {
         player.setPosition(newPosition);
     }
 
+    public static int rollTwoDice() {
+        return (1 + (int)(Math.random() * 6)) + (1 + (int)(Math.random() * 6));
+    }
 }

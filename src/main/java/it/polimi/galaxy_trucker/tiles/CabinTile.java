@@ -5,23 +5,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class CabinTile extends Tile {
 
     private boolean canHostBrownAlien = false;
     private boolean canHostPurpleAlien = false;
     private final CrewType[] crew;
 
-    @JsonCreator
-    public CabinTile(@JsonProperty("id") int id,@JsonProperty("connectors") Connector[] connectors) {
+    public CabinTile(@JsonProperty("id") int id, @JsonProperty("connectors") Connector[] connectors) {
         super(id, connectors);
         this.crew = new CrewType[2];
         setCrewType(CrewType.HUMAN);
     }
 
-
     public CrewType[] getCrew() {
         return crew;
     }
+
     public void setCrewType(CrewType crewType) {
         if (!canHostBrownAlien && crewType == CrewType.BROWN_ALIEN) {
             throw new IllegalArgumentException("Cabin not habitable by brown aliens");

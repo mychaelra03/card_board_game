@@ -12,6 +12,4 @@ public enum BlockType {
     public int getValue() {
         return value;
     }
-
-
 }

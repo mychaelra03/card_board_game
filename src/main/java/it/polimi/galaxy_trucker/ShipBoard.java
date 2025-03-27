@@ -1,5 +1,7 @@
 package it.polimi.galaxy_trucker;
 
+import it.polimi.galaxy_trucker.cards.projectile.CannonShot;
+import it.polimi.galaxy_trucker.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.tiles.*;
 import it.polimi.galaxy_trucker.tiles.Tile;
 
@@ -8,12 +10,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class ShipBoard {
 
     private final Tile[][] tiles = new Tile[5][7];
     private final int shipBoardType;
-    private final Player.Color playerColor;
+    private int lostTiles;
 
     // TODO: Cannon and Engine checks.
     // TODO: IsColumnCannonProtected.
@@ -22,11 +25,11 @@ public class ShipBoard {
     // TODO: isDirectionCannonProtected()
 
 
-    public ShipBoard(int shipBoardType, Player.Color playerColor) {
+    public ShipBoard(int shipBoardType) {
         this.shipBoardType = shipBoardType;
         if(shipBoardType < 1 || shipBoardType > 2) throw new IllegalArgumentException("Ship Board must be type 1 or 2.");
-        this.playerColor = playerColor;
         initializeShip();
+        lostTiles = 0;
     }
 
     private void initializeShip() {
@@ -36,7 +39,7 @@ public class ShipBoard {
                 tiles[i][j] = new EmptyTile();
             }
         }
-        tiles[2][3] = new StartingCabinTile(playerColor);
+        tiles[2][3] = new StartingCabinTile();
     }
 
     public Tile[][] getTiles() {
@@ -56,7 +59,6 @@ public class ShipBoard {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = TileFactory.getInstance().getTile(tileID);
-        //tiles[y][x] = TileFactory.createTile(tileID);
         tiles[y][x].setRotation(rotation);
         //if(!areTileConnectionsValid(x, y)) {
         //    // Checks if the tile is not connected or if the connectors are not compatible.
@@ -66,6 +68,7 @@ public class ShipBoard {
         //}
         // If a cabin and an alien support are placed adjacent one another, it allows the cabin to host that type of alien.
         //applyAlienSupport(x, y);
+        updateAlienSupport();
     }
     public void setTile(int x, int y, Tile tile, int rotation) {
         // Places the passed tile (used for testing).
@@ -73,21 +76,24 @@ public class ShipBoard {
         if(tiles[y][x].getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = tile;
         tiles[y][x].setRotation(rotation);
-//        if(!areTileConnectionsValid(x, y)) {
-//            tiles[y][x] = new EmptyTile();
-//            throw new IllegalArgumentException("Invalid placement, connectors don't match");
-//        }
-//        applyAlienSupport(x, y);
         updateAlienSupport();
     }
 
     public void removeTile(int x, int y) {
-
         tiles[y][x] = new EmptyTile();
 
         updateAlienSupport();
         // Checks if the removal of this tile left other tiles not connected to the ship.
         checkConnectivity();
+        lostTiles++;
+    }
+    public void removeTile(Tile tile) {
+        tile = new EmptyTile();
+
+        updateAlienSupport();
+        // Checks if the removal of this tile left other tiles not connected to the ship.
+        checkConnectivity();
+        lostTiles++;
     }
 
 
@@ -102,6 +108,7 @@ public class ShipBoard {
         return count;
     }
     public int getBatteriesOf(int x, int y) {
+        // for debugging.
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof BatteriesTile)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a BatteriesTile.");
         return ((BatteriesTile)tiles[y][x]).getStoredBatteries();
@@ -123,6 +130,11 @@ public class ShipBoard {
             }
         }
         return false;
+    }
+    public void applyCannonShot(CannonShot shot, int row) {
+        if(shot.getSize() == Projectile.Size.SMALL && isSideShielded(shot.getSource().toInt())) {
+            // TODO:
+        }
     }
 
     // CABIN TILES
@@ -169,10 +181,15 @@ public class ShipBoard {
         }
         ((CabinTile)tiles[y][x]).setCrewType(crewType);
     }
-    public CrewType removeCrewMember(int x, int y, int index) {
+    public CrewType removeCrewMemberAt(int x, int y, int index) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof CabinTile cabin)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
         return cabin.removeMember(index);
+    }
+    public CrewType removeOneCrewMemberAt(int x, int y) {
+        if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
+        if(!(tiles[y][x] instanceof CabinTile cabin)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
+        return cabin.removeOneMember();
     }
     public void applyEpidemicCard() {
         Set<CabinTile> infectedCabins = new HashSet<>();
@@ -195,24 +212,25 @@ public class ShipBoard {
                 }
             }
         }
-        for (CabinTile infected : infectedCabins) {
+        for(CabinTile infected : infectedCabins) {
             infected.removeOneMember();
         }
     }
 
     // CANNON TILES
-    public double getTotalCannonStrength() {
+    public double getCurrentStrength(Class<? extends ActivatableTile> tileClass) {
         double count = 0;
         for(Tile[] row : tiles) {
             for(Tile tile : row) {
-                // Have to decide better how to set up double cannons
-                if(tile instanceof CannonTile cannon) count += cannon.getStrength();
+                if(tileClass.isInstance(tile)) count += ((ActivatableTile)tile).getStrength();
             }
         }
-        if(hasAlien(CrewType.PURPLE_ALIEN) && count != 0) count += 2;
+        if((tileClass == EngineTile.class && hasAlien(CrewType.BROWN_ALIEN))
+                || (tileClass == CannonTile.class && hasAlien(CrewType.PURPLE_ALIEN)) && count != 0) count += 2;
         return count;
     }
     public double getMinCannonStrength() {
+        // TODO: should the game let the player decide if they want to activate more cannons even when the single ones are enough?
         double count = 0;
         for(Tile[] row : tiles) {
             for(Tile tile : row) {
@@ -253,24 +271,24 @@ public class ShipBoard {
         if(hasAlien(CrewType.PURPLE_ALIEN) && count != 0) count += 2;
         return count;
     }
-
-    // ENGINE TILES
-    public int getTotalEngineStrength() {
-        int count = 0;
+    public void deactivateAllTiles(Class<? extends ActivatableTile> tileClass) {
         for(Tile[] row : tiles) {
             for(Tile tile : row) {
-                if(tile instanceof EngineTile engine) count += engine.getStrength();
+                if(tileClass.isInstance(tile) && ((ActivatableTile)tile).isDouble()) {
+                    ((ActivatableTile)tile).setPowered(false);
+                }
             }
         }
-        if(hasAlien(CrewType.BROWN_ALIEN) && count != 0) count += 2;
-        return count;
     }
+
+    // ENGINE TILES
+
 
     public int getExposedConnectorsCount() {
         int count = 0;
         int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
         for(int y = 0; y < tiles.length; y++) {
-            for(int x = 0; x < tiles[y].length; x++) {
+            for(int x = 0; x < tiles[0].length; x++) {
                 if(!(tiles[y][x] instanceof EmptyTile)) {
                     for(int i = 0; i < 4; i++) {
                         int nx = x + offsets[i][1];
@@ -306,7 +324,138 @@ public class ShipBoard {
         }
         return count;
     }
+    public void removeMostValuableCargo(int quantity) {
+        class BlockInfo {
+            CargoTile tile;
+            int index;
+            int value;
+            BlockInfo(CargoTile tile, int index, int value) {
+                this.tile = tile;
+                this.index = index;
+                this.value = value;
+            }
+        }
+        List<BlockInfo> cargoBlocks = new ArrayList<>();
+        for(Tile[] row : tiles) {
+            for(Tile tile : row) {
+                if(tile instanceof CargoTile cargo) {
+                    for(int index = 0; index < cargo.getCapacity(); index++) {
+                        BlockType block = cargo.getBlockAt(index);
+                        if(block != null) {
+                            cargoBlocks.add(new BlockInfo(cargo, index, block.getValue()));
+                        }
+                    }
+                }
+            }
+        }
+        cargoBlocks.sort((a, b) -> Integer.compare(b.value, a.value));
+        int remainingToRemove = quantity;
+        for(BlockInfo cargo: cargoBlocks) {
+            if(!(remainingToRemove > 0)) break;
+            cargo.tile.removeBlock(cargo.index);
+            remainingToRemove--;
+        }
+        if(remainingToRemove > 0) {
+            for(Tile[] row : tiles) {
+                for(Tile tile : row) {
+                    if(tile instanceof BatteriesTile batteryTile) {
+                        while(remainingToRemove > 0 && batteryTile.getStoredBatteries() > 0) {
+                            batteryTile.removeBattery();
+                            remainingToRemove--;
+                        }
+                    }
+                    if(remainingToRemove == 0) return;
+                }
+            }
+        }
+    }
 
+    public List<Point> getTilesPositions(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
+        // CabinTiles: checks if it has crew.
+        // BatteriesTiles: checks if it has batteries.
+        List<Point> positions = new ArrayList<>();
+        for(int y = 0; y < tiles.length; y++) {
+            for(int x = 0; x < tiles[0].length; x++) {
+                Tile tile = tiles[y][x];
+                if(tileClass.isInstance(tile) && filter.test(tile)) {
+                    positions.add(new Point(x, y));
+                }
+            }
+        }
+        return positions;
+    }
+
+    public boolean hasTileOnPath(Projectile.Source source, int index, Class<? extends Tile> tileClass, Predicate<Tile> filter) {
+        if(source == Projectile.Source.UP || source == Projectile.Source.DOWN) {
+            if(index < 0 || index >= tiles[0].length) return false;
+            for(Tile[] row : tiles) {
+                if(tileClass.isInstance(row[index]) && filter.test(row[index])) return true;
+            }
+        }
+        else if(source == Projectile.Source.LEFT || source == Projectile.Source.RIGHT) {
+            if(index < 0 || index >= tiles.length) return false;
+            for(Tile tile : tiles[index]) {
+                if(tileClass.isInstance(tile) && filter.test(tile)) return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isRowOrColumnEmpty(Projectile.Source source, int index) {
+        return !hasTileOnPath(source, index, Tile.class, tile -> !(tile instanceof EmptyTile));
+    }
+    public enum DefendingCannonType {
+        NO_CANNON, SINGLE, DOUBLE;
+    }
+    public DefendingCannonType getDefendingCannonType(Projectile.Source source, int index) {
+        if(source == Projectile.Source.UP) {
+            if(hasTileOnPath(source, index, CannonTile.class, tile -> tile.getRotation() == source.toInt() && !((CannonTile)tile).isDouble())) return DefendingCannonType.SINGLE;
+            if(hasTileOnPath(source, index, CannonTile.class, tile -> tile.getRotation() == source.toInt() && ((CannonTile)tile).isDouble())) return DefendingCannonType.DOUBLE;
+        }
+        else {
+            for(int i = -1; i <= 1; i++) {
+                if(hasTileOnPath(source, index + i, CannonTile.class, tile -> tile.getRotation() == source.toInt() && !((CannonTile)tile).isDouble()))
+                    return DefendingCannonType.SINGLE;
+            }
+            for(int i = -1; i <= 1; i++) {
+                if(hasTileOnPath(source, index + i, CannonTile.class, tile -> tile.getRotation() == source.toInt() && ((CannonTile)tile).isDouble()))
+                    return DefendingCannonType.DOUBLE;
+            }
+        }
+        return DefendingCannonType.NO_CANNON;
+    }
+    public void removeFirstTileInPath(Projectile.Source source, int index) {
+        Point pos = getFirstNonEmptyTilePosition(source, index);
+        if(pos != null) removeTile(pos.x, pos.y);
+    }
+    public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
+        Point pos = getFirstNonEmptyTilePosition(source, index);
+        if(pos == null) return false;
+        return getTile(pos.x, pos.y).getConnector(source.toInt()) != Connector.NONE;
+    }
+    private Point getFirstNonEmptyTilePosition(Projectile.Source source, int index) {
+        if(isRowOrColumnEmpty(source, index)) return null;
+
+        if(source == Projectile.Source.UP) {
+            for(int y = 0; y < tiles.length; y++) {
+                if(!(tiles[y][index] instanceof EmptyTile)) return new Point(index, y);
+            }
+        } else if(source == Projectile.Source.LEFT) {
+            for(int x = 0; x < tiles[0].length; x++) {
+                if(!(tiles[index][x] instanceof EmptyTile)) return new Point(x, index);
+            }
+        } else if(source == Projectile.Source.DOWN) {
+            for(int y = tiles.length - 1; y >= 0; y--) {
+                if(!(tiles[y][index] instanceof EmptyTile)) return new Point(index, y);
+            }
+        } else if(source == Projectile.Source.RIGHT) {
+            for(int x = tiles[0].length - 1; x >= 0; x--) {
+                if(!(tiles[index][x] instanceof EmptyTile)) return new Point(x, index);
+            }
+        }
+        // Should not be able to reach here.
+        throw new RuntimeException("Error while getting first non-empty tile position");
+    }
 
     private boolean areConnectorsCompatible(Connector a, Connector b) {
         if(a == Connector.NONE && b == Connector.NONE) return true;
@@ -317,7 +466,7 @@ public class ShipBoard {
 
     private boolean hasValidConnections(int x, int y) {
         // Checks the connection in all 4 directions to see if its compatible.
-        int connectedSides = 0;
+        boolean isConnected = false;
         Tile tile = getTile(x, y);
         int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
         for(int side = 0; side < 4; side++) {
@@ -332,10 +481,9 @@ public class ShipBoard {
             int opposite_side = (side + 2) % 4;
             if(!areConnectorsCompatible(tile.getConnector(side), neighbor.getConnector(opposite_side))) return false;
 
-            if(tile.getConnector(side) != Connector.NONE) connectedSides++;
+            if(tile.getConnector(side) != Connector.NONE) isConnected = true;
         }
-        // Uses connectedSides to count how many sides are connected to other tiles.
-        return connectedSides != 0;
+        return isConnected;
     }
 
     public boolean isInsideShip(int x, int y) {
@@ -375,13 +523,13 @@ public class ShipBoard {
                     boolean canHostPurple = false;
                     int[][] offsets = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
-                    for (int i = 0; i < 4; i++) {
-                        if (cabin.getConnector(i) == Connector.NONE) continue;
+                    for(int i = 0; i < 4; i++) {
+                        if(cabin.getConnector(i) == Connector.NONE) continue;
                         int nx = x + offsets[i][1];
                         int ny = y + offsets[i][0];
-                        if (!isInsideShip(nx, ny)) continue;
+                        if(!isInsideShip(nx, ny)) continue;
 
-                        if (tiles[ny][nx] instanceof AlienSupportTile support) {
+                        if(tiles[ny][nx] instanceof AlienSupportTile support) {
                             if(support.getAlienColor() == CrewType.BROWN_ALIEN) canHostBrown = true;
                             if(support.getAlienColor() == CrewType.PURPLE_ALIEN) canHostPurple = true;
                         }
@@ -393,9 +541,8 @@ public class ShipBoard {
         }
     }
 
-    public HashSet<Point> checkShipLayout() {
-        // FIXME
-        // Adds all invalid tile's coordinates to invalidTiles
+    public HashSet<Point> getInvalidTiles() {
+        // Adds all invalid tile's coordinates to invalidTiles.
         HashSet<Point> invalidTiles = new HashSet<>();
 
         for(int y = 0; y < tiles.length; y++) {
@@ -421,33 +568,29 @@ public class ShipBoard {
                 }
                 if(!hasValidConnections(x,y)) {
                     invalidTiles.add(new Point(x, y));
-                    continue;
                 }
-                // TODO: should I apply alien support here or in a different method?
-                // TODO: check tile before applyAlienSupport
             }
         }
-        checkConnectivity();
-        updateAlienSupport();
+        //checkConnectivity();
         return invalidTiles;
     }
 
-    private boolean isConnectedToType(int x, int y, Class<? extends Tile> type) {
-        if(!isInsideShip(x, y)) return false;
-
-        Tile tile = getTile(x, y);
-        int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
-
-        for(int i = 0; i < 4; i++) {
-            if(tile.getConnector(i) == Connector.NONE) continue;
-            int nx = x + offsets[i][1];
-            int ny = y + offsets[i][0];
-            if(!isInsideShip(nx, ny)) continue;
-
-            if(type.isInstance(getTile(nx, ny))) return true;
-        }
-        return false;
-    }
+//    private boolean isConnectedToType(int x, int y, Class<? extends Tile> type) {
+//        if(!isInsideShip(x, y)) return false;
+//
+//        Tile tile = getTile(x, y);
+//        int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
+//
+//        for(int i = 0; i < 4; i++) {
+//            if(tile.getConnector(i) == Connector.NONE) continue;
+//            int nx = x + offsets[i][1];
+//            int ny = y + offsets[i][0];
+//            if(!isInsideShip(nx, ny)) continue;
+//
+//            if(type.isInstance(getTile(nx, ny))) return true;
+//        }
+//        return false;
+//    }
 
     private void checkConnectivity() {
         // It uses a flood fill search to divide all the tiles in groups.
@@ -457,7 +600,7 @@ public class ShipBoard {
         List<List<Point>> groups = new ArrayList<>();
 
         for(int y = 0; y < tiles.length; y++) {
-            for(int x = 0; x < tiles[y].length; x++) {
+            for(int x = 0; x < tiles[0].length; x++) {
                 if(!visited[y][x] && !(tiles[y][x] instanceof EmptyTile)) {
                     List<Point> group = new ArrayList<>();
                     floodFill(x, y, visited, group);
@@ -465,7 +608,7 @@ public class ShipBoard {
                 }
             }
         }
-        if(groups.size() <= 1) return;
+        if(groups.size() < 2) return;
 
         List<Integer> groupsWithHumans = new ArrayList<>();
         List<Integer> groupsWithoutHumans = new ArrayList<>();
@@ -476,14 +619,12 @@ public class ShipBoard {
                 groupsWithoutHumans.add(i);
             }
         }
-
         // If there are both groups with crew and without humans, it removes the ones without.
         // It doesn't always delete the empty groups because if the last humans are removed, it would delete the ship.
         if(!groupsWithHumans.isEmpty()) {
             for(Integer index : groupsWithoutHumans) {
                 removeGroup(groups.get(index));
             }
-
             if(groupsWithHumans.size() > 1) {
                 int groupToKeep = chooseGroupToKeep(groupsWithHumans);
                 for(int index : groupsWithHumans) {
@@ -526,11 +667,12 @@ public class ShipBoard {
             // I can directly set the removed tile to Empty,
             // there is no need to check alien support.
             tiles[p.y][p.x] = new EmptyTile();
+            lostTiles++;
         }
     }
 
     private int chooseGroupToKeep(List<Integer> groupsWithCrew) {
         // Lets the player choose which group of tiles to remove.
-        return groupsWithCrew.getFirst();   // TEMPORARY
+        return groupsWithCrew.getFirst();   // TODO
     }
 }

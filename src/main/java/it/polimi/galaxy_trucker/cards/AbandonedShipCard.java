@@ -11,6 +11,7 @@ import java.util.List;
 import static it.polimi.galaxy_trucker.GameBoard.Direction.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class AbandonedShipCard extends Card {
     // Exchange crew members for credits.
 
@@ -18,10 +19,7 @@ public class AbandonedShipCard extends Card {
     private final int rewardCredits;
     private final int positionCost;
 
-
-
-    @JsonCreator
-    public AbandonedShipCard(@JsonProperty("id") int id,@JsonProperty("level") int level,@JsonProperty("crewToGiveUp") int crewToGiveUp,@JsonProperty("rewardCredits") int rewardCredits,@JsonProperty("positionCost") int positionCost) {
+    public AbandonedShipCard(@JsonProperty("id")int id, @JsonProperty("level")int level, @JsonProperty("crewToGiveUp")int crewToGiveUp, @JsonProperty("rewardCredits")int rewardCredits, @JsonProperty("positionCost")int positionCost) {
         super(id, level);
         if (crewToGiveUp < 0) throw new IllegalArgumentException("crewToGiveUp must be a positive number.");
         this.crewToGiveUp = crewToGiveUp;
@@ -30,9 +28,6 @@ public class AbandonedShipCard extends Card {
         if (positionCost < 0) throw new IllegalArgumentException("travelCost must be a positive number.");
         this.positionCost = positionCost;
     }
-
-
-
 
     @Override
     public void applyEffects(GameBoard board) {
@@ -44,7 +39,7 @@ public class AbandonedShipCard extends Card {
 
             if(accepted) {
                 player.removeCrew(crewToGiveUp);
-                player.addCredits(rewardCredits);
+                player.giveCredits(rewardCredits);
                 board.movePlayer(player, positionCost, BACKWARD);
                 break;
             }
@@ -55,6 +50,4 @@ public class AbandonedShipCard extends Card {
     public String getCardType() {
         return "Abandoned Ship";
     }
-
-
 }
