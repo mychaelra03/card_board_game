@@ -10,15 +10,15 @@
 
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane prefHeight="600.0" prefWidth="500.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.TestLogin"
-            fx:id="scene1AnchorPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1">
+            fx:id="scene1AnchorPane" xmlns="http://javafx.com/javafx/23.0.1">
 
-    <ImageView fx:id="gameTitle" fitWidth="300" preserveRatio="true" />
+    <!--<ImageView fx:id="gameTitle" fitWidth="300" preserveRatio="true" />-->
 
     <HBox alignment="CENTER" spacing="20">
         <VBox alignment="CENTER" spacing="20" translateY="0">
             <Button fx:id="randomize" text="randomize" />
-            <ImageView />
-            <ImageView />
+            <!--<ImageView />
+            <ImageView />-->
             <Button fx:id="leftBodyBtn" text="&lt;" />
             <Button fx:id="leftAccessoryBtn" text="&lt;" />
         </VBox>
