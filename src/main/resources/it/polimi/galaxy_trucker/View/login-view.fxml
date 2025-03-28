@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="20" prefHeight="600" prefWidth="500"
-      xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1"
-      fx:controller="it.polimi.galaxy_trucker.TestLogin">
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="600.0" prefWidth="500.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.TestLogin"
+            fx:id="scene1AnchorPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1">
 
     <ImageView fx:id="gameTitle" fitWidth="300" preserveRatio="true" />
 
@@ -44,4 +44,4 @@
 
     <Button fx:id="playButton" text="Play" />
 
-</VBox>
+</AnchorPane>
