@@ -48,11 +48,7 @@ class CardTest {
         players.add(player2);
         players.add(player3);
         players.add(player4);
-//        GameBoard gameBoard = new GameBoard(2,new ArrayList<>());
         GameBoard gameBoard = new GameBoard(2, players); //TODO: check for addPlayer if arraylist has already players in it
-//        gameBoard.addPlayer(player1);
-//        gameBoard.addPlayer(player2);
-//        gameBoard.addPlayer(player3);
 
         gameBoard.getSortedPlayers().forEach(player -> player.getShipBoard().applyEpidemicCard());
 

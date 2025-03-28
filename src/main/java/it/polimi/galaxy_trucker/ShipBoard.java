@@ -76,7 +76,7 @@ public class ShipBoard {
         if(tiles[y][x].getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = tile;
         tiles[y][x].setRotation(rotation);
-        updateAlienSupport();
+        if(tile.getClass() == CabinTile.class || tile.getClass() == AlienSupportTile.class) updateAlienSupport();
     }
 
     public void removeTile(int x, int y) {
@@ -87,14 +87,14 @@ public class ShipBoard {
         checkConnectivity();
         lostTiles++;
     }
-    public void removeTile(Tile tile) {
-        tile = new EmptyTile();
-
-        updateAlienSupport();
-        // Checks if the removal of this tile left other tiles not connected to the ship.
-        checkConnectivity();
-        lostTiles++;
-    }
+//    public void removeTile(Tile tile) {
+//        tile = new EmptyTile();
+//
+//        updateAlienSupport();
+//        // Checks if the removal of this tile left other tiles not connected to the ship.
+//        checkConnectivity();
+//        lostTiles++;
+//    }
 
 
     // BATTERY TILES
@@ -102,7 +102,7 @@ public class ShipBoard {
         int count = 0;
         for(Tile[] row : tiles) {
             for(Tile tile : row) {
-                if(tile instanceof BatteriesTile batteries) count+= batteries.getStoredBatteries();
+                if(tile instanceof BatteriesTile batteries) count += batteries.getStoredBatteries();
             }
         }
         return count;
@@ -241,13 +241,16 @@ public class ShipBoard {
         return count;
     }
     public double getMaxCannonStrength() {
+        deactivateAllTiles(CannonTile.class);
         double count = 0;
         int batteries = getTotalBatteriesCount();
+        System.out.println(batteries);
         for(Tile[] row : tiles) {
             for(Tile tile : row) {
                 if(tile instanceof CannonTile cannon) {
                     if(cannon.isDouble()) {
                         if(cannon.getRotation() == 0 && batteries > 0) {
+                            cannon.setPowered(true);
                             count += cannon.getStrength();
                             batteries--;
                         }
@@ -262,6 +265,7 @@ public class ShipBoard {
                 if(batteries == 0) break;
                 if(tile instanceof CannonTile cannon && cannon.isDouble()) {
                     if(cannon.getRotation() != 0 && batteries > 0) {
+                        cannon.setPowered(true);
                         count += cannon.getStrength();
                         batteries--;
                     }
