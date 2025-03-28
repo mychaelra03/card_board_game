@@ -18,6 +18,7 @@ class GameModelTest {
         List<Card> learningDeck = cardFactory.getLearningDeck();
         List<Card> learningDeck2 = cardFactory.getLearningDeck();
         System.out.println();
+
     }
 
     @Test

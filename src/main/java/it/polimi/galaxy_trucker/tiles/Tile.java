@@ -6,16 +6,13 @@ import java.util.Arrays;
 
 public abstract class Tile {
 
-
     private final int id;
-    @JsonProperty
     private final Connector[] connectors;
     private int rotation = 0; // Clockwise
 
     public Tile(int id, Connector[] connectors) {
         this.id = id;
         this.connectors = connectors;
-      //  if(connectors.length != 4) throw new IllegalArgumentException("Invalid number of connectors");
     }
 
     public int getId() {

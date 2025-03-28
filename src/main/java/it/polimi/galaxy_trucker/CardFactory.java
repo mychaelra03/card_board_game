@@ -117,7 +117,6 @@ public class CardFactory {
 
         switch (cardType) {
             case "abandonedShip": {
-
                 try {
                    return mapper.readValue(cardNode.toString(),AbandonedShipCard.class);
                 } catch (IOException e) {
@@ -125,47 +124,36 @@ public class CardFactory {
                 }
             }
 
-
             case "abandonedStation": {
-
-
                 try {
                     return mapper.readValue(cardNode.toString(),AbandonedStationCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
             case "combatZone": {
-
-
                 try {
                     return mapper.readValue(cardNode.toString(),CombatZoneCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
             case "epidemic": {
-
                 try {
                     return mapper.readValue(cardNode.toString(),EpidemicCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-               // return new EpidemicCard(id, level);
             }
 
             case "meteorSwarm": {
-
                 try {
                     return mapper.readValue(cardNode.toString(),MeteorSwarmCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
             case "openSpace": {
@@ -174,47 +162,38 @@ public class CardFactory {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                //return new OpenSpaceCard(id, level);
             }
 
             case "pirates": {
-
                 try {
                     return mapper.readValue(cardNode.toString(),PiratesCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
             case "planets": {
-
                 try {
                     return mapper.readValue(cardNode.toString(),PlanetsCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
             case "slavers": {
-
                 try {
                     return mapper.readValue(cardNode.toString(),SlaversCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
             case "smugglers": {
-
                 try {
                     return mapper.readValue(cardNode.toString(),SmugglersCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
             case "starDust": {
@@ -223,8 +202,6 @@ public class CardFactory {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
-                //return new StarDustCard(id, level);
             }
 
             default:

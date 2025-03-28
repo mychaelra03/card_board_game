@@ -6,14 +6,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.Player;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class SlaversCard extends AbstractEnemy {
     // Lose crew members if defeated.
 
     private final int rewardCredits;
     private final int crewLossOnDefeat;
 
-    @JsonCreator
-    public SlaversCard(@JsonProperty("id")int id, @JsonProperty("level")int level,@JsonProperty("requiredCannonPower") int requiredCannonPower,@JsonProperty("rewardCredits") int rewardCredits,@JsonProperty("positionCost") int positionCost,@JsonProperty("crewLossOnDefeat") int crewLossOnDefeat) {
+    public SlaversCard(
+            @JsonProperty("id") int id,
+            @JsonProperty("level") int level,
+            @JsonProperty("requiredCannonPower") int requiredCannonPower,
+            @JsonProperty("rewardCredits") int rewardCredits,
+            @JsonProperty("positionCost") int positionCost,
+            @JsonProperty("crewLossOnDefeat") int crewLossOnDefeat) {
         super(id, level, requiredCannonPower, positionCost);
         if (rewardCredits < 0) throw new IllegalArgumentException("rewardCredits must be a positive number.");
         this.rewardCredits = rewardCredits;
@@ -23,12 +29,12 @@ public class SlaversCard extends AbstractEnemy {
 
     @Override
     public void giveReward(Player player) {
-
+        player.giveCredits(rewardCredits);
     }
 
     @Override
     public void applyPunishment(Player player) {
-
+        player.removeCrew(crewLossOnDefeat);
     }
 
     @Override

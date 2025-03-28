@@ -20,7 +20,7 @@ public class ClientHandler extends Thread {
         this.socket = socket;
         this.usedIds = usedIds;
         this.clients = clients;
-        this.board = new ShipBoard(2, Player.Color.BLUE);
+        this.board = new ShipBoard(2);
     }
 
     public void run() {

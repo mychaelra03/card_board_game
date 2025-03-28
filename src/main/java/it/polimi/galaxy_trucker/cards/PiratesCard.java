@@ -3,19 +3,25 @@ package it.polimi.galaxy_trucker.cards;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.GameBoard;
 import it.polimi.galaxy_trucker.Player;
-
-import java.util.Arrays;
+import it.polimi.galaxy_trucker.cards.projectile.CannonShot;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class PiratesCard extends AbstractEnemy {
     // Combat encounter, win to gain credits, lose to lose crew.
 
     private final int rewardCredits;
     private final CannonShot[] cannonShots;
 
-    @JsonCreator
-    public PiratesCard(@JsonProperty("id") int id,@JsonProperty("level") int level,@JsonProperty("requiredCannonPower") int requiredCannonPower,@JsonProperty("rewardCredits") int rewardCredits,@JsonProperty("positionCost") int positionCost,@JsonProperty("cannonShots") CannonShot[] cannonShots) {
+    public PiratesCard(
+            @JsonProperty("id") int id,
+            @JsonProperty("level") int level,
+            @JsonProperty("requiredCannonPower") int requiredCannonPower,
+            @JsonProperty("rewardCredits") int rewardCredits,
+            @JsonProperty("positionCost") int positionCost,
+            @JsonProperty("cannonShots") CannonShot[] cannonShots) {
         super(id, level, requiredCannonPower, positionCost);
         if (rewardCredits < 0) throw new IllegalArgumentException("rewardCredits must be a positive number.");
         this.rewardCredits = rewardCredits;
@@ -24,18 +30,19 @@ public class PiratesCard extends AbstractEnemy {
 
     @Override
     public void giveReward(Player player) {
-
+        player.giveCredits(rewardCredits);
     }
 
     @Override
     public void applyPunishment(Player player) {
-
+        for(CannonShot shot : cannonShots) {
+            int diceSum = GameBoard.rollTwoDice();
+            player.applyProjectile(shot, diceSum);
+        }
     }
 
     @Override
     public String getCardType() {
         return "Pirates";
     }
-
-
 }

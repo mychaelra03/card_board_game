@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class StructuralTile extends Tile {
 
-    @JsonCreator
-    public StructuralTile(@JsonProperty("id") int ID,@JsonProperty("connectors") Connector[] connectors) {
-        super(ID, connectors);
+    public StructuralTile(@JsonProperty("id") int id, @JsonProperty("connectors") Connector[] connectors) {
+        super(id, connectors);
     }
 
     @Override

@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class BatteriesTile extends Tile {
 
     private final int capacity;
     private int storedBatteries;
 
-    @JsonCreator
-    public BatteriesTile(@JsonProperty("id") int id, @JsonProperty("connectors") Connector[] connectors,@JsonProperty("capacity") int capacity) {
+    public BatteriesTile(@JsonProperty("id") int id, @JsonProperty("connectors") Connector[] connectors, @JsonProperty("capacity") int capacity) {
         super(id,connectors);
         if (capacity < 2 || capacity > 3) throw new IllegalArgumentException("Battery Component must have capacity of 2 or 3.");
         this.capacity = capacity;
@@ -27,20 +27,19 @@ public class BatteriesTile extends Tile {
         return storedBatteries;
     }
 
-//    public boolean addBattery() {
-//        if (storedBatteries < capacity) {
-//            storedBatteries++;
-//            return true;
-//        }
-//        return false;
-//    }
+    public boolean isFull() {
+        return storedBatteries == capacity;
+    }
 
     public boolean removeBattery() {
-        if (storedBatteries > 0) {
-            storedBatteries--;
-            return true;
-        }
-        return false;
+        if(storedBatteries <= 0) return false;
+        storedBatteries--;
+        return true;
+    }
+    public boolean addBattery() {
+        if (storedBatteries >= capacity) return false;
+        storedBatteries++;
+        return true;
     }
 
     @Override

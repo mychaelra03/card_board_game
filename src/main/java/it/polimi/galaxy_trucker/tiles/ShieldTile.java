@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class ShieldTile extends Tile {
 
-    @JsonCreator
-    public ShieldTile(@JsonProperty("id") int id,@JsonProperty("connectors") Connector[] connectors) {
+    public ShieldTile(@JsonProperty("id") int id, @JsonProperty("connectors") Connector[] connectors) {
         super(id, connectors);
     }
 

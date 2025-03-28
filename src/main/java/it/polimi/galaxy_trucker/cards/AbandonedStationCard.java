@@ -12,6 +12,7 @@ import java.util.List;
 import static it.polimi.galaxy_trucker.GameModel.Direction.BACKWARD;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class AbandonedStationCard extends Card {
     // Collect goods if you have enough crew.
 
@@ -19,9 +20,12 @@ public class AbandonedStationCard extends Card {
     private final BlockType[] rewardCargo;
     private final int positionCost;
 
-    @JsonCreator
-    public AbandonedStationCard(@JsonProperty("id")int id,@JsonProperty("level") int level, @JsonProperty("requiredCrew")int requiredCrew, @JsonProperty("rewardCargo")BlockType[] rewardCargo, @JsonProperty("positionCost")int positionCost) {
-
+    public AbandonedStationCard(
+            @JsonProperty("id") int id,
+            @JsonProperty("level") int level,
+            @JsonProperty("requiredCrew") int requiredCrew,
+            @JsonProperty("rewardCargo") BlockType[] rewardCargo,
+            @JsonProperty("positionCost") int positionCost) {
         super(id, level);
         if (requiredCrew < 0) throw new IllegalArgumentException("positionCost must be a positive number.");
         this.requiredCrew = requiredCrew;
@@ -50,7 +54,4 @@ public class AbandonedStationCard extends Card {
     public String getCardType() {
         return "Abandoned Station";
     }
-
-
-
 }

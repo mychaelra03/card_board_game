@@ -9,11 +9,11 @@ import it.polimi.galaxy_trucker.Player;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class EpidemicCard extends Card {
     // Lose crew from connected cabins.
 
-    @JsonCreator
-    public EpidemicCard(@JsonProperty("id") int id,@JsonProperty("level") int level) {
+    public EpidemicCard(@JsonProperty("id") int id, @JsonProperty("level") int level) {
         super(id, level);
     }
 

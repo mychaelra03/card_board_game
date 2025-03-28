@@ -46,6 +46,7 @@ public class GameModel {
 
     public List<Player> getSortedPlayers() {
         return players.stream()
+                .filter(player -> !player.isEliminated())
                 .sorted(Comparator.comparingInt(Player::getPosition))
                 .collect(Collectors.toList());
     }
@@ -65,6 +66,9 @@ public class GameModel {
         player.setPosition(newPosition);
     }
 
+    public static int rollTwoDice() {
+        return (1 + (int)(Math.random() * 6)) + (1 + (int)(Math.random() * 6));
+    }
     private void tellToListener(Integer from, Integer to) {
         PropertyChangeEvent evt = new PropertyChangeEvent(this,"Player added",from,to );
         listener.propertyChange(evt);

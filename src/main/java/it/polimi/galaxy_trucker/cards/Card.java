@@ -5,7 +5,6 @@ import it.polimi.galaxy_trucker.GameModel;
 
 public abstract class Card {
 
-    @JsonProperty
     private final int id;
     private final int level;
 

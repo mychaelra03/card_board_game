@@ -2,6 +2,7 @@ package it.polimi.galaxy_trucker.cards;
 
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.ShipBoard;
 import it.polimi.galaxy_trucker.tiles.*;
 import org.junit.jupiter.api.Test;
 
@@ -47,11 +48,8 @@ class CardTest {
         players.add(player2);
         players.add(player3);
         players.add(player4);
-//        GameBoard gameBoard = new GameBoard(2,new ArrayList<>());
         GameModel gameModel = new GameModel(2, players); //TODO: check for addPlayer if arraylist has already players in it
-//        gameBoard.addPlayer(player1);
-//        gameBoard.addPlayer(player2);
-//        gameBoard.addPlayer(player3);
+
 
         gameModel.getSortedPlayers().forEach(player -> player.getShipBoard().applyEpidemicCard());
 
