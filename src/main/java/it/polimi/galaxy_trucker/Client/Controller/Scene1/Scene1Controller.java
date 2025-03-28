@@ -4,11 +4,13 @@ import it.polimi.galaxy_trucker.Client.VirtualServer;
 import it.polimi.galaxy_trucker.GameLogic;
 import it.polimi.galaxy_trucker.Model.PlayerUsername;
 import it.polimi.galaxy_trucker.Model.SceneSwitch;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -23,13 +25,25 @@ public class Scene1Controller {
     @FXML
     private TextField usernameTextField;
 
+   // @FXML
+    //private MenuButton colorMenuButton,pilotMenuButton;
+
     @FXML
-    private MenuButton colorMenuButton,pilotMenuButton;
+    private ImageView myImageView;
 
 
     @FXML
     public void initialize() {
-        for(MenuItem mi : colorMenuButton.getItems()) {
+
+        Platform.runLater(() -> {
+            myImageView.fitWidthProperty().bind(myImageView.getScene().widthProperty().subtract(205));
+            myImageView.fitHeightProperty().bind(myImageView.getScene().heightProperty().subtract(290));
+            AnchorPane parent = (AnchorPane) myImageView.getParent();
+            myImageView.layoutXProperty().bind(
+                    parent.widthProperty().subtract(myImageView.fitWidthProperty()).divide(2)
+            );
+        });
+        /*for(MenuItem mi : colorMenuButton.getItems()) {
             mi.setOnAction(event -> {
                 colorMenuButton.setText(mi.getText());
             });
@@ -38,14 +52,14 @@ public class Scene1Controller {
             mi.setOnAction(event -> {
                 pilotMenuButton.setText(mi.getText());
             });
-        }
+        }*/
     }
     @FXML
     void onClickStart(ActionEvent event) throws IOException {
 
         String username = usernameTextField.getText();
         this.virtualServer.sendCmd(username);
-        String color = colorMenuButton.getText();
+        String color = "Rosso";
         this.virtualServer.sendCmd(color.toUpperCase());
 
 //        PlayerUsername.getInstance().setUsername(usernameTextField.getText());
@@ -66,7 +80,7 @@ public class Scene1Controller {
 
 
         SceneSwitch sceneSwitch = new SceneSwitch();
-        sceneSwitch.switchScene(scene1AnchorPane,"/it/polimi/galaxy_trucker/View/scene2-view.fxml");
+        sceneSwitch.switchScene(scene1AnchorPane,"/it/polimi/galaxy_trucker/View/login-view.fxml");
     }
 
     private Stage stage;
