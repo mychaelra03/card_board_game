@@ -12,7 +12,6 @@
 <?import javafx.scene.control.MenuItem?>
 <AnchorPane prefHeight="398.0" prefWidth="500.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.Scene1.Scene1Controller"
  fx:id="scene1AnchorPane">
-
     <!-- TextField per inserire il nome -->
     <TextField fx:id="usernameTextField" promptText="Insert your username" style="-fx-background-color: #560bad; -fx-text-fill: white; -fx-font-size: 16px;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
 
