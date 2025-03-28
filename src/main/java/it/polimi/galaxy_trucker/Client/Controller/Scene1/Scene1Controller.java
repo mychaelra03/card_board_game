@@ -7,6 +7,9 @@ import it.polimi.galaxy_trucker.Model.SceneSwitch;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -42,6 +45,7 @@ public class Scene1Controller {
             myImageView.layoutXProperty().bind(
                     parent.widthProperty().subtract(myImageView.fitWidthProperty()).divide(2)
             );
+
         });
         /*for(MenuItem mi : colorMenuButton.getItems()) {
             mi.setOnAction(event -> {
@@ -53,6 +57,9 @@ public class Scene1Controller {
                 pilotMenuButton.setText(mi.getText());
             });
         }*/
+        // Imposta le dimensioni esplicitamente nel codice (puoi usare il valore che desideri)
+        scene1AnchorPane.setPrefWidth(100);
+        scene1AnchorPane.setPrefHeight(100);
     }
     @FXML
     void onClickStart(ActionEvent event) throws IOException {
@@ -61,6 +68,7 @@ public class Scene1Controller {
         this.virtualServer.sendCmd(username);
         String color = "Rosso";
         this.virtualServer.sendCmd(color.toUpperCase());
+
 
 //        PlayerUsername.getInstance().setUsername(usernameTextField.getText());
 //        PlayerUsername.getInstance().setPlayerID(1);
@@ -77,10 +85,20 @@ public class Scene1Controller {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
+        String fxmlFile = "/it/polimi/galaxy_trucker/View/login-view.fxml";
+        Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
+
+        // Crea una nuova scena con il root caricato
+        Scene scene = new Scene(root);
 
 
+
+        // Imposta la scena nella finestra principale (Stage)
+        stage.setScene(scene);
+        stage.show();
+/*
         SceneSwitch sceneSwitch = new SceneSwitch();
-        sceneSwitch.switchScene(scene1AnchorPane,"/it/polimi/galaxy_trucker/View/login-view.fxml");
+        sceneSwitch.switchScene(scene1AnchorPane,"/it/polimi/galaxy_trucker/View/login-view.fxml");*/
     }
 
     private Stage stage;
