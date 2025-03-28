@@ -1,12 +1,12 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.cards.projectile.Projectile;
-import it.polimi.galaxy_trucker.tiles.*;
+import it.polimi.galaxy_trucker.Model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.Model.tiles.*;
 import org.junit.jupiter.api.Test;
 
-import static it.polimi.galaxy_trucker.cards.projectile.Projectile.*;
-import static it.polimi.galaxy_trucker.tiles.CargoTile.CargoType.*;
-import static it.polimi.galaxy_trucker.tiles.Connector.*;
+import static it.polimi.galaxy_trucker.Model.cards.projectile.Projectile.*;
+import static it.polimi.galaxy_trucker.Model.tiles.CargoTile.CargoType.*;
+import static it.polimi.galaxy_trucker.Model.tiles.Connector.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ShipBoardTest {
@@ -193,7 +193,7 @@ public class ShipBoardTest {
     @Test
     void calculateCargoValue() {
         ShipBoard board = new ShipBoard(1);
-        CargoTile cargo = new CargoTile(0, FULL_UNIVERSAL_CONNECTORS, CargoTile.CargoType.NORMAL, 3);
+        CargoTile cargo = new CargoTile(0, FULL_UNIVERSAL_CONNECTORS, NORMAL, 3);
         board.setTile(2, 2, cargo, 0);
         board.loadCargoAt(2, 2, 0, BlockType.YELLOW);
         board.loadCargoAt(2, 2, 2, BlockType.BLUE);

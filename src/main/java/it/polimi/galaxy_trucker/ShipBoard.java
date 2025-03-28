@@ -1,9 +1,8 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.cards.projectile.CannonShot;
-import it.polimi.galaxy_trucker.cards.projectile.Projectile;
-import it.polimi.galaxy_trucker.tiles.*;
-import it.polimi.galaxy_trucker.tiles.Tile;
+import it.polimi.galaxy_trucker.Model.cards.projectile.CannonShot;
+import it.polimi.galaxy_trucker.Model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.Model.tiles.*;
 
 import java.awt.Point;
 import java.util.ArrayList;

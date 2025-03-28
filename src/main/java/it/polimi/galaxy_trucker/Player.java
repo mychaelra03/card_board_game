@@ -1,13 +1,14 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.cards.projectile.*;
-import it.polimi.galaxy_trucker.tiles.*;
+import it.polimi.galaxy_trucker.Model.cards.projectile.Meteor;
+import it.polimi.galaxy_trucker.Model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.Model.tiles.*;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.cards.projectile.Projectile.Size.*;
+import static it.polimi.galaxy_trucker.Model.cards.projectile.Projectile.Size.*;
 
 public class Player {
 

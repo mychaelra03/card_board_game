@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.cards.Card;
+import it.polimi.galaxy_trucker.Model.cards.Card;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

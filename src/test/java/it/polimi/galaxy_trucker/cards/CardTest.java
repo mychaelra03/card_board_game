@@ -1,15 +1,15 @@
 package it.polimi.galaxy_trucker.cards;
 
 import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.Model.cards.StarDustCard;
+import it.polimi.galaxy_trucker.Model.tiles.*;
 import it.polimi.galaxy_trucker.Player;
-import it.polimi.galaxy_trucker.ShipBoard;
-import it.polimi.galaxy_trucker.tiles.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.tiles.Connector.*;
+import static it.polimi.galaxy_trucker.Model.tiles.Connector.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardTest {

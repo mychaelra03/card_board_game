@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.cards.Card;
+import it.polimi.galaxy_trucker.Model.cards.Card;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

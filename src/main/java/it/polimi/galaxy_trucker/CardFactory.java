@@ -2,9 +2,7 @@ package it.polimi.galaxy_trucker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.cards.*;
-import it.polimi.galaxy_trucker.tiles.BlockType;
-import it.polimi.galaxy_trucker.cards.CombatZoneCard.CombatRule.*;
+import it.polimi.galaxy_trucker.Model.cards.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,7 +116,7 @@ public class CardFactory {
         switch (cardType) {
             case "abandonedShip": {
                 try {
-                   return mapper.readValue(cardNode.toString(),AbandonedShipCard.class);
+                   return mapper.readValue(cardNode.toString(), AbandonedShipCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -126,7 +124,7 @@ public class CardFactory {
 
             case "abandonedStation": {
                 try {
-                    return mapper.readValue(cardNode.toString(),AbandonedStationCard.class);
+                    return mapper.readValue(cardNode.toString(), AbandonedStationCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -182,7 +180,7 @@ public class CardFactory {
 
             case "slavers": {
                 try {
-                    return mapper.readValue(cardNode.toString(),SlaversCard.class);
+                    return mapper.readValue(cardNode.toString(), SlaversCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -198,7 +196,7 @@ public class CardFactory {
 
             case "starDust": {
                 try {
-                    return mapper.readValue(cardNode.toString(),StarDustCard.class);
+                    return mapper.readValue(cardNode.toString(), StarDustCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

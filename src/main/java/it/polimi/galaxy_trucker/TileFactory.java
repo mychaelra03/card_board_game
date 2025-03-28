@@ -3,8 +3,7 @@ package it.polimi.galaxy_trucker;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.cards.AbandonedShipCard;
-import it.polimi.galaxy_trucker.tiles.*;
+import it.polimi.galaxy_trucker.Model.tiles.*;
 
 import java.io.File;
 import java.io.IOException;
