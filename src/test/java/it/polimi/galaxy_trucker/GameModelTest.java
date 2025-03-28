@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Model.cards.Card;
+import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -31,10 +31,10 @@ class GameModelTest {
 
     @Test
     void movePlayerBackward() throws Exception {
-        Player player1 = new Player("TestPlayer1", Player.Color.BLUE,2);
-        Player player2 = new Player("TestPlayer2", Player.Color.YELLOW,2);
-        Player player3 = new Player("TestPlayer3", Player.Color.RED,2);
-        Player player4 = new Player("TestPlayer4", Player.Color.GREEN,2);
+        Player player1 = new Player("TestPlayer1");
+        Player player2 = new Player("TestPlayer2");
+        Player player3 = new Player("TestPlayer3");
+        Player player4 = new Player("TestPlayer4");
 
         List<Player> players = new ArrayList<>();
         players.add(player1);

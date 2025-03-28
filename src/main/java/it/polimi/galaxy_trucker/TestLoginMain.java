@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 public class TestLoginMain extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(ClientMain.class.getResource("View/login-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(TestLoginMain.class.getResource("View/login-view.fxml"));
         primaryStage.setTitle("Welcome to the Game");
         primaryStage.setScene(new Scene(fxmlLoader.load(), 500, 600));
         primaryStage.show();

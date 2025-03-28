@@ -1,16 +1,16 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Model.cards.projectile.Projectile;
-import it.polimi.galaxy_trucker.Model.tiles.*;
+import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 import org.junit.jupiter.api.Test;
 
-import static it.polimi.galaxy_trucker.Model.cards.projectile.Projectile.*;
-import static it.polimi.galaxy_trucker.Model.tiles.CargoTile.CargoType.*;
-import static it.polimi.galaxy_trucker.Model.tiles.Connector.*;
+import static it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile.*;
+import static it.polimi.galaxy_trucker.Server.Model.tiles.CargoTile.CargoType.*;
+import static it.polimi.galaxy_trucker.Server.Model.tiles.Connector.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ShipBoardTest {
-    
+
     private static final Connector[] FULL_UNIVERSAL_CONNECTORS = {UNIVERSAL, UNIVERSAL, UNIVERSAL, UNIVERSAL};
     private static final Connector[] FULL_SINGLE_CONNECTORS = {SINGLE, SINGLE, SINGLE, SINGLE};
     private static final Connector[] FULL_NONE_CONNECTORS = {NONE, NONE, NONE, NONE};
@@ -373,13 +373,13 @@ public class ShipBoardTest {
         assertTrue(board.hasTileOnPath(Source.RIGHT, 2, CannonTile.class, tile -> true));
         assertFalse(board.hasTileOnPath(Source.LEFT, 2, CannonTile.class, tile -> ((CannonTile)tile).isDouble()));
         assertFalse(board.hasTileOnPath(Source.RIGHT, 2, CannonTile.class, tile -> ((CannonTile)tile).isDouble()));
-        assertFalse(board.hasTileOnPath(Source.LEFT, 3, CargoTile.class, tile -> ((CargoTile)tile).getHoldsValue() == 3));
+        assertFalse(board.hasTileOnPath(Projectile.Source.LEFT, 3, CargoTile.class, tile -> ((CargoTile)tile).getHoldsValue() == 3));
         board.loadCargoAt(2, 3, 0, BlockType.YELLOW);
         assertTrue(board.hasTileOnPath(Source.LEFT, 3, CargoTile.class, tile -> ((CargoTile)tile).getHoldsValue() == 3));
     }
 
     @Test
-    void isRowOrColumnEmpty() {
+    void isPathEmpty() {
     }
 
     @Test

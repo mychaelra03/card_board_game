@@ -1,15 +1,15 @@
 package it.polimi.galaxy_trucker.cards;
 
 import it.polimi.galaxy_trucker.GameModel;
-import it.polimi.galaxy_trucker.Model.cards.StarDustCard;
-import it.polimi.galaxy_trucker.Model.tiles.*;
+import it.polimi.galaxy_trucker.Server.Model.cards.StarDustCard;
 import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.Model.tiles.Connector.*;
+import static it.polimi.galaxy_trucker.Server.Model.tiles.Connector.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardTest {
@@ -18,10 +18,14 @@ class CardTest {
 
     @Test
     void testEpidemicCard() throws Exception {
-        Player player1 = new Player("TestPlayer1", Player.Color.BLUE,2);
-        Player player2 = new Player("TestPlayer2", Player.Color.YELLOW,2);
-        Player player3 = new Player("TestPlayer3", Player.Color.RED,2);
-        Player player4 = new Player("TestPlayer4", Player.Color.GREEN,2);
+        Player player1 = new Player("TestPlayer1");
+        Player player2 = new Player("TestPlayer2");
+        Player player3 = new Player("TestPlayer3");
+        Player player4 = new Player("TestPlayer4");
+        player1.setNewShipBoard(2);
+        player2.setNewShipBoard(2);
+        player3.setNewShipBoard(2);
+        player4.setNewShipBoard(2);
         // 1st case
         player1.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
 
@@ -62,10 +66,14 @@ class CardTest {
     @Test
     void testStarDustCard() throws Exception {
 
-        Player player1 = new Player("TestPlayer1", Player.Color.BLUE,2);
-        Player player2 = new Player("TestPlayer2", Player.Color.YELLOW,2);
-        Player player3 = new Player("TestPlayer3", Player.Color.RED,2);
-        Player player4 = new Player("TestPlayer4", Player.Color.GREEN,2);
+        Player player1 = new Player("TestPlayer1");
+        Player player2 = new Player("TestPlayer2");
+        Player player3 = new Player("TestPlayer3");
+        Player player4 = new Player("TestPlayer4");
+        player1.setNewShipBoard(2);
+        player2.setNewShipBoard(2);
+        player3.setNewShipBoard(2);
+        player4.setNewShipBoard(2);
 
         // 1st case
          player1.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);

@@ -1,8 +1,7 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Model.cards.projectile.CannonShot;
-import it.polimi.galaxy_trucker.Model.cards.projectile.Projectile;
-import it.polimi.galaxy_trucker.Model.tiles.*;
+import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -13,9 +12,9 @@ import java.util.function.Predicate;
 
 public class ShipBoard {
 
-    private final Tile[][] tiles = new Tile[5][7];
+    private final Tile[][] tiles;
     private final int shipBoardType;
-    private int lostTiles;
+    private int removedTiles;
 
     // TODO: Cannon and Engine checks.
     // TODO: IsColumnCannonProtected.
@@ -25,10 +24,11 @@ public class ShipBoard {
 
 
     public ShipBoard(int shipBoardType) {
+        this.tiles = new Tile[5][7];
         this.shipBoardType = shipBoardType;
         if(shipBoardType < 1 || shipBoardType > 2) throw new IllegalArgumentException("Ship Board must be type 1 or 2.");
         initializeShip();
-        lostTiles = 0;
+        removedTiles = 0;
     }
 
     private void initializeShip() {
@@ -53,11 +53,11 @@ public class ShipBoard {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         return tiles[y][x];
     }
-    public void setTile(int x, int y, int tileID, int rotation) {
+    public void setTile(int x, int y, int tileId, int rotation) {
         // Places one of the 152 default tiles.
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
-        tiles[y][x] = TileFactory.getInstance().getTile(tileID);
+        tiles[y][x] = TileFactory.getInstance().getTile(tileId);
         tiles[y][x].setRotation(rotation);
         //if(!areTileConnectionsValid(x, y)) {
         //    // Checks if the tile is not connected or if the connectors are not compatible.
@@ -67,7 +67,7 @@ public class ShipBoard {
         //}
         // If a cabin and an alien support are placed adjacent one another, it allows the cabin to host that type of alien.
         //applyAlienSupport(x, y);
-        updateAlienSupport();
+        // FIXME: if(tile.getClass() == CabinTile.class || tile.getClass() == AlienSupportTile.class) updateAlienSupport();
     }
     public void setTile(int x, int y, Tile tile, int rotation) {
         // Places the passed tile (used for testing).
@@ -84,7 +84,7 @@ public class ShipBoard {
         updateAlienSupport();
         // Checks if the removal of this tile left other tiles not connected to the ship.
         checkConnectivity();
-        lostTiles++;
+        removedTiles++;
     }
 //    public void removeTile(Tile tile) {
 //        tile = new EmptyTile();
@@ -130,11 +130,6 @@ public class ShipBoard {
         }
         return false;
     }
-    public void applyCannonShot(CannonShot shot, int row) {
-        if(shot.getSize() == Projectile.Size.SMALL && isSideShielded(shot.getSource().toInt())) {
-            // TODO:
-        }
-    }
 
     // CABIN TILES
     public int getTotalHumanCount() {
@@ -161,6 +156,7 @@ public class ShipBoard {
         return false;
     }
     public boolean hasAlienAt(int x, int y, CrewType alienType) {
+        // for debugging
         // For tests, maybe I'll remove it later
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof CabinTile)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
@@ -243,7 +239,6 @@ public class ShipBoard {
         deactivateAllTiles(CannonTile.class);
         double count = 0;
         int batteries = getTotalBatteriesCount();
-        System.out.println(batteries);
         for(Tile[] row : tiles) {
             for(Tile tile : row) {
                 if(tile instanceof CannonTile cannon) {
@@ -283,8 +278,6 @@ public class ShipBoard {
             }
         }
     }
-
-    // ENGINE TILES
 
 
     public int getExposedConnectorsCount() {
@@ -329,9 +322,9 @@ public class ShipBoard {
     }
     public void removeMostValuableCargo(int quantity) {
         class BlockInfo {
-            CargoTile tile;
-            int index;
-            int value;
+            final CargoTile tile;
+            final int index;
+            final int value;
             BlockInfo(CargoTile tile, int index, int value) {
                 this.tile = tile;
                 this.index = index;
@@ -404,7 +397,7 @@ public class ShipBoard {
         return false;
     }
 
-    public boolean isRowOrColumnEmpty(Projectile.Source source, int index) {
+    public boolean isPathEmpty(Projectile.Source source, int index) {
         return !hasTileOnPath(source, index, Tile.class, tile -> !(tile instanceof EmptyTile));
     }
     public enum DefendingCannonType {
@@ -427,17 +420,9 @@ public class ShipBoard {
         }
         return DefendingCannonType.NO_CANNON;
     }
-    public void removeFirstTileInPath(Projectile.Source source, int index) {
-        Point pos = getFirstNonEmptyTilePosition(source, index);
-        if(pos != null) removeTile(pos.x, pos.y);
-    }
-    public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
-        Point pos = getFirstNonEmptyTilePosition(source, index);
-        if(pos == null) return false;
-        return getTile(pos.x, pos.y).getConnector(source.toInt()) != Connector.NONE;
-    }
+
     private Point getFirstNonEmptyTilePosition(Projectile.Source source, int index) {
-        if(isRowOrColumnEmpty(source, index)) return null;
+        if(isPathEmpty(source, index)) return null;
 
         if(source == Projectile.Source.UP) {
             for(int y = 0; y < tiles.length; y++) {
@@ -458,6 +443,15 @@ public class ShipBoard {
         }
         // Should not be able to reach here.
         throw new RuntimeException("Error while getting first non-empty tile position");
+    }
+    public void removeFirstTileInPath(Projectile.Source source, int index) {
+        Point pos = getFirstNonEmptyTilePosition(source, index);
+        if(pos != null) removeTile(pos.x, pos.y);
+    }
+    public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
+        Point pos = getFirstNonEmptyTilePosition(source, index);
+        if(pos == null) return false;
+        return getTile(pos.x, pos.y).getConnector(source.toInt()) != Connector.NONE;
     }
 
     private boolean areConnectorsCompatible(Connector a, Connector b) {
@@ -670,7 +664,7 @@ public class ShipBoard {
             // I can directly set the removed tile to Empty,
             // there is no need to check alien support.
             tiles[p.y][p.x] = new EmptyTile();
-            lostTiles++;
+            removedTiles++;
         }
     }
 

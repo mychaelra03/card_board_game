@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Model.cards.Card;
+import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -69,6 +69,7 @@ public class GameModel {
     public static int rollTwoDice() {
         return (1 + (int)(Math.random() * 6)) + (1 + (int)(Math.random() * 6));
     }
+
     private void tellToListener(Integer from, Integer to) {
         PropertyChangeEvent evt = new PropertyChangeEvent(this,"Player added",from,to );
         listener.propertyChange(evt);
@@ -79,5 +80,4 @@ public class GameModel {
     public void setListener(PropertyChangeListener listener) {
         this.listener = listener;
     }
-
 }

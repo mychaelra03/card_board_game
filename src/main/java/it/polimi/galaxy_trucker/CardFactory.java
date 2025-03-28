@@ -2,7 +2,7 @@ package it.polimi.galaxy_trucker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.Model.cards.*;
+import it.polimi.galaxy_trucker.Server.Model.cards.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +58,7 @@ public class CardFactory {
         return groupMap;
     }
 
+    // TODO: make one?
     public List<Card> getLearningDeck() {
         // Returns a list of all cards from the "learningFlight" group.
         List<Card> result = new ArrayList<>();
@@ -132,7 +133,7 @@ public class CardFactory {
 
             case "combatZone": {
                 try {
-                    return mapper.readValue(cardNode.toString(),CombatZoneCard.class);
+                    return mapper.readValue(cardNode.toString(), CombatZoneCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -156,7 +157,7 @@ public class CardFactory {
 
             case "openSpace": {
                 try {
-                    return mapper.readValue(cardNode.toString(),OpenSpaceCard.class);
+                    return mapper.readValue(cardNode.toString(), OpenSpaceCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -188,7 +189,7 @@ public class CardFactory {
 
             case "smugglers": {
                 try {
-                    return mapper.readValue(cardNode.toString(),SmugglersCard.class);
+                    return mapper.readValue(cardNode.toString(), SmugglersCard.class);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

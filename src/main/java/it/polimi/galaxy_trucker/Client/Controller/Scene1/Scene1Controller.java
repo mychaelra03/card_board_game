@@ -1,9 +1,6 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene1;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
-import it.polimi.galaxy_trucker.GameLogic;
-import it.polimi.galaxy_trucker.Model.PlayerUsername;
-import it.polimi.galaxy_trucker.Model.SceneSwitch;
+import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
@@ -12,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 
 public class Scene1Controller {

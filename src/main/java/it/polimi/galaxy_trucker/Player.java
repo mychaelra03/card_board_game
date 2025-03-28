@@ -1,14 +1,14 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Model.cards.projectile.Meteor;
-import it.polimi.galaxy_trucker.Model.cards.projectile.Projectile;
-import it.polimi.galaxy_trucker.Model.tiles.*;
+import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Meteor;
+import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.Model.cards.projectile.Projectile.Size.*;
+import static it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile.Size.*;
 
 public class Player {
 
@@ -16,16 +16,16 @@ public class Player {
         BLUE, RED, YELLOW, GREEN
     }
     private final String name;
-    private final Color color;
-    private final ShipBoard shipBoard;
+    private Color color;
+    private ShipBoard shipBoard;
     private int credits;
     private int position;
     private boolean isEliminated;
 
-    public Player(String name, Color color, int shipType) {
+    public Player(String name) {
         this.name = name;
-        this.color = color;
-        this.shipBoard = new ShipBoard(shipType);
+        this.color = null;
+        this.shipBoard = null;
         this.credits = 0;
         this.position = 0;
         this.isEliminated = false;
@@ -35,8 +35,14 @@ public class Player {
     public String getName() {
         return name;
     }
+    public void setColor(Color color) {
+        this.color = color;
+    }
     public Color getColor() {
         return color;
+    }
+    public void setNewShipBoard(int shipBoardType) {
+        this.shipBoard = new ShipBoard(shipBoardType);
     }
     public ShipBoard getShipBoard() {
         return shipBoard;
@@ -68,6 +74,7 @@ public class Player {
         return shipBoard.getExposedConnectorsCount();
     }
     public void applyEpidemicCard() {
+        // TODO: move it here
         shipBoard.applyEpidemicCard();
     }
     public void removeMostValuableCargo(int quantity) {
@@ -120,7 +127,7 @@ public class Player {
     public void giveCargoReward(BlockType[] cargo) {
         List<BlockType> cargoList = Arrays.asList(cargo);
         boolean done = false;
-         do {
+        do {
             List<Point> cargoPositions = shipBoard.getTilesPositions(CargoTile.class, tile -> true); // TODO: to client
             int chosenBlockToTake = 0;      // TODO: from javafx
             int chosenCargoTileToSet = 0;   // TODO: from javafx
@@ -155,7 +162,7 @@ public class Player {
     }
 
     public void applyProjectile(Projectile projectile, int diceSum) {
-        if(shipBoard.isRowOrColumnEmpty(projectile.getSource(), diceSum)) return;
+        if(shipBoard.isPathEmpty(projectile.getSource(), diceSum)) return;
 
         if(projectile.getSize() == SMALL) {
             if(projectile instanceof Meteor) {

@@ -13,7 +13,7 @@ public class Controller {
     }
 
     String processCmd(String cmd, String cmd2) {
-        Player player = new Player(cmd, Player.Color.valueOf(cmd2),2);
+        Player player = new Player(cmd);
 
         gameModel.addPlayer(player);
 
