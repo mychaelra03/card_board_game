@@ -3,12 +3,12 @@ package it.polimi.galaxy_trucker.cards;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameBoard;
+import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.GameBoard.Direction.*;
+import static it.polimi.galaxy_trucker.GameModel.Direction.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AbandonedShipCard extends Card {
@@ -35,7 +35,7 @@ public class AbandonedShipCard extends Card {
 
 
     @Override
-    public void applyEffects(GameBoard board) {
+    public void applyEffects(GameModel board) {
         List<Player> players = board.getSortedPlayers();
         for(Player player : players) {
             if(player.getCrewCount() < crewToGiveUp) continue;

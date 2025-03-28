@@ -1,7 +1,7 @@
 package it.polimi.galaxy_trucker.cards;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameBoard;
+import it.polimi.galaxy_trucker.GameModel;
 
 public abstract class Card {
 
@@ -22,7 +22,7 @@ public abstract class Card {
         return level;
     }
 
-    public abstract void applyEffects(GameBoard board);
+    public abstract void applyEffects(GameModel board);
 
     public abstract String getCardType();
 }

@@ -10,7 +10,7 @@
 <!--<?import com.sun.org.apache.xpath.internal.operations.String?>-->
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
-<AnchorPane prefHeight="398.0" prefWidth="500.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Controller.Scene1.Scene1Controller"
+<AnchorPane prefHeight="398.0" prefWidth="500.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.Scene1.Scene1Controller"
  fx:id="scene1AnchorPane">
 
     <!-- TextField per inserire il nome -->

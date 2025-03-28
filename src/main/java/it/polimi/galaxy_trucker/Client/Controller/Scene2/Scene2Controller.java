@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker.Controller;
+package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -14,7 +14,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +22,6 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.effect.InnerShadow;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 
@@ -60,7 +58,9 @@ public class Scene2Controller {
     private Button rightButton,leftButton;
 
     public static AnimationHandler animationHandler;
+    @FXML
     private Settings settings;
+
     private TileManager tileManager;
     List<ImageView> imageViews = new ArrayList<>();
 

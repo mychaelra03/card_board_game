@@ -1,7 +1,6 @@
-package it.polimi.galaxy_trucker.Controller;
+package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
 import javafx.animation.*;
-import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;

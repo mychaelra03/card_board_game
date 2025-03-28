@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker.Controller;
+package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

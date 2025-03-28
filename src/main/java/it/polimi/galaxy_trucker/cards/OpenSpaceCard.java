@@ -3,7 +3,7 @@ package it.polimi.galaxy_trucker.cards;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameBoard;
+import it.polimi.galaxy_trucker.GameModel;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenSpaceCard extends Card {
@@ -15,7 +15,7 @@ public class OpenSpaceCard extends Card {
     }
 
     @Override
-    public void applyEffects(GameBoard board) {
+    public void applyEffects(GameModel board) {
 
     }
 

@@ -3,13 +3,12 @@ package it.polimi.galaxy_trucker;
 import it.polimi.galaxy_trucker.cards.Card;
 import org.junit.jupiter.api.Test;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameBoardTest {
+class GameModelTest {
 
     @Test
     void testCardFactory() throws Exception {
@@ -42,7 +41,7 @@ class GameBoardTest {
         players.add(player3);
         players.add(player4);
 
-        GameBoard gameBoard = new GameBoard(2, players);
+        GameModel gameModel = new GameModel(2, players);
 
 
         player1.setPosition(10);
@@ -50,7 +49,7 @@ class GameBoardTest {
         player3.setPosition(7);
         player4.setPosition(5);
 
-        gameBoard.movePlayer(player2,8, GameBoard.Direction.BACKWARD);
+        gameModel.movePlayer(player2,8, GameModel.Direction.BACKWARD);
 
 
         assertEquals(-7,player2.getPosition(),"Player2 should move backward of 8 position so be in -7 position");

@@ -1,7 +1,6 @@
 package it.polimi.galaxy_trucker.cards;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import it.polimi.galaxy_trucker.GameBoard;
+import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 
 public abstract class AbstractEnemy extends Card {
@@ -21,7 +20,7 @@ public abstract class AbstractEnemy extends Card {
     public abstract void applyPunishment(Player player);
 
     @Override
-    public void applyEffects(GameBoard board) {
+    public void applyEffects(GameModel board) {
 
     }
 }

@@ -1,6 +1,6 @@
-package it.polimi.galaxy_trucker.Controller;
+package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
-import it.polimi.galaxy_trucker.Client;
+import it.polimi.galaxy_trucker.Client.ClientMain;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,7 +11,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.Objects;
 
-import static it.polimi.galaxy_trucker.Controller.Scene2Controller.*;
+import static it.polimi.galaxy_trucker.Client.Controller.Scene2.Scene2Controller.*;
 
 public class TileManager {
 
@@ -23,7 +23,7 @@ public class TileManager {
     private GridPane gridPane;
     private AnchorPane scene2AnchorPane;
 
-    public Client client = new Client();
+    public ClientMain client = new ClientMain();
 
 
 
@@ -126,7 +126,7 @@ public class TileManager {
                 //we remove the rectangle of the gridpane in the position of the imageView placed, not allowing it to be clicked anymore.
                 removeRectFromGridPane(gridPane,col,row);
 
-                client.sendPlacedTileData(col,row, placedImageView.getId(), (int) (((placedImageView.getRotate()%360+360)%360)/90));
+               // client.sendPlacedTileData(col,row, placedImageView.getId(), (int) (((placedImageView.getRotate()%360+360)%360)/90));
 
             }
         });

@@ -1,16 +1,21 @@
 package it.polimi.galaxy_trucker.Model;
 
-import it.polimi.galaxy_trucker.Client;
+import it.polimi.galaxy_trucker.Client.ClientMain;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.net.URL;
 
 public class SceneSwitch {
-    public static void SceneSwitch(AnchorPane container, String fxmlFile) throws IOException {
-        AnchorPane nextAnchorPane = FXMLLoader.load(Objects.requireNonNull(Client.class.getResource(fxmlFile)));
-        container.getChildren().removeAll();
-        container.getChildren().setAll(nextAnchorPane);
+    public static void switchScene(AnchorPane container, String fxmlFile) throws IOException {
+        URL resource = ClientMain.class.getResource(fxmlFile);
+        if (resource == null) {
+            throw new IOException("FXML file not found: " + fxmlFile);
+        }
+
+        AnchorPane nextAnchorPane = FXMLLoader.load(resource);
+        container.getChildren().clear(); // Clear previous content
+        container.getChildren().add(nextAnchorPane);
     }
 }

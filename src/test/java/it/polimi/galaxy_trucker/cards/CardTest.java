@@ -1,8 +1,7 @@
 package it.polimi.galaxy_trucker.cards;
 
-import it.polimi.galaxy_trucker.GameBoard;
+import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
-import it.polimi.galaxy_trucker.ShipBoard;
 import it.polimi.galaxy_trucker.tiles.*;
 import org.junit.jupiter.api.Test;
 
@@ -49,12 +48,12 @@ class CardTest {
         players.add(player3);
         players.add(player4);
 //        GameBoard gameBoard = new GameBoard(2,new ArrayList<>());
-        GameBoard gameBoard = new GameBoard(2, players); //TODO: check for addPlayer if arraylist has already players in it
+        GameModel gameModel = new GameModel(2, players); //TODO: check for addPlayer if arraylist has already players in it
 //        gameBoard.addPlayer(player1);
 //        gameBoard.addPlayer(player2);
 //        gameBoard.addPlayer(player3);
 
-        gameBoard.getSortedPlayers().forEach(player -> player.getShipBoard().applyEpidemicCard());
+        gameModel.getSortedPlayers().forEach(player -> player.getShipBoard().applyEpidemicCard());
 
         assertEquals(2, player1.getCrewCount(),"Crew count should be: 2 ");
         assertEquals(3, player2.getCrewCount(),"Crew count should be: 3 ");
@@ -96,7 +95,7 @@ class CardTest {
         players.add(player3);
         players.add(player4);
 
-        GameBoard gameBoard = new GameBoard(2, players);
+        GameModel gameModel = new GameModel(2, players);
 
         player1.setPosition(10);
         player2.setPosition(1);
@@ -105,7 +104,7 @@ class CardTest {
 
         StarDustCard starDustCard = new StarDustCard(24,1);
 
-        starDustCard.applyEffects(gameBoard);
+        starDustCard.applyEffects(gameModel);
 
         assertEquals(2,player1.getPosition(),"Player1 (1st) should lose 6 position and be therefore be in position 2");
         assertEquals(-8,player2.getPosition(),"Player2 (4th) should lose 8 position and be therefore be in position -8");
