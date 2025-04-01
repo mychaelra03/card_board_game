@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Server.Model.cards.*;
+import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,103 +109,34 @@ public class CardFactory {
         return result;
     }
 
+    private static final Map<String, Class<? extends Card>> CARD_MAP = new HashMap<>();
+    static {
+        CARD_MAP.put("abandonedShip", AbandonedShipCard.class);
+        CARD_MAP.put("abandonedStation", AbandonedStationCard.class);
+        CARD_MAP.put("combatZone", CombatZoneCard.class);
+        CARD_MAP.put("epidemic", EpidemicCard.class);
+        CARD_MAP.put("meteorSwarm", MeteorSwarmCard.class);
+        CARD_MAP.put("openSpace", OpenSpaceCard.class);
+        CARD_MAP.put("pirates", PiratesCard.class);
+        CARD_MAP.put("planets", PlanetsCard.class);
+        CARD_MAP.put("slavers", SlaversCard.class);
+        CARD_MAP.put("smugglers", SmugglersCard.class);
+        CARD_MAP.put("starDust", StarDustCard.class);
+    }
+
     private Card createCard(JsonNode cardNode) {
         // Instantiates a Card from its JSON definition.
-       int id = cardNode.get("id").asInt();
+
         String cardType = cardNode.get("cardType").asText();
-        //int level = cardNode.get("level").asInt();
 
-        switch (cardType) {
-            case "abandonedShip": {
-                try {
-                   return mapper.readValue(cardNode.toString(), AbandonedShipCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "abandonedStation": {
-                try {
-                    return mapper.readValue(cardNode.toString(), AbandonedStationCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "combatZone": {
-                try {
-                    return mapper.readValue(cardNode.toString(), CombatZoneCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "epidemic": {
-                try {
-                    return mapper.readValue(cardNode.toString(),EpidemicCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "meteorSwarm": {
-                try {
-                    return mapper.readValue(cardNode.toString(),MeteorSwarmCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "openSpace": {
-                try {
-                    return mapper.readValue(cardNode.toString(), OpenSpaceCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "pirates": {
-                try {
-                    return mapper.readValue(cardNode.toString(),PiratesCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "planets": {
-                try {
-                    return mapper.readValue(cardNode.toString(),PlanetsCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "slavers": {
-                try {
-                    return mapper.readValue(cardNode.toString(), SlaversCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "smugglers": {
-                try {
-                    return mapper.readValue(cardNode.toString(), SmugglersCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "starDust": {
-                try {
-                    return mapper.readValue(cardNode.toString(), StarDustCard.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            default:
-                throw new IllegalArgumentException("Unknown cardType: " + cardType + " for card id " + id);
+        Class<? extends Card> cardClass = CARD_MAP.get(cardType);
+        if (cardClass == null) {
+            throw new IllegalArgumentException("Unknown type in card " + cardNode.get("id") + ": " + cardType);
+        }
+        try {
+            return mapper.readValue(cardNode.toString(), cardClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 
 import java.io.File;
@@ -61,78 +62,31 @@ public class TileFactory {
         throw new IllegalArgumentException("Tile with ID " + id + " not found.");
     }
 
+    private static final Map<String, Class<? extends Tile>> TILE_MAP = new HashMap<>();
+    static {
+        TILE_MAP.put("alienSupport", AlienSupportTile.class);
+        TILE_MAP.put("batteries", BatteriesTile.class);
+        TILE_MAP.put("cabin", CabinTile.class);
+        TILE_MAP.put("cannon", CannonTile.class);
+        TILE_MAP.put("cargo", CargoTile.class);
+        TILE_MAP.put("engine", EngineTile.class);
+        TILE_MAP.put("shield", ShieldTile.class);
+        TILE_MAP.put("structural", StructuralTile.class);
+    }
+
     private Tile createTile(JsonNode tileNode) {
         // Instantiates a Tile from its JSON definition.
 
         String tileType = tileNode.get("tileType").asText();
 
-        switch (tileType) {
-            case "alienSupport": {
-                try {
-                    return mapper.readValue(tileNode.toString(), AlienSupportTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "cabin": {
-                try {
-                    return mapper.readValue(tileNode.toString(), CabinTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "cargo": {
-                try {
-                    return mapper.readValue(tileNode.toString(), CargoTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "batteries": {
-                try {
-                    return mapper.readValue(tileNode.toString(), BatteriesTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "cannon": {
-                try {
-                    return mapper.readValue(tileNode.toString(), CannonTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "engine": {
-                try {
-                    return mapper.readValue(tileNode.toString(), EngineTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "shield": {
-                try {
-                    return mapper.readValue(tileNode.toString(), ShieldTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case "structural": {
-                try {
-                    return mapper.readValue(tileNode.toString(), StructuralTile.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            default:
-                throw new IllegalArgumentException("Unknown tileType: " + tileType + " for tile id " + tileNode.get("id").asInt());
+        Class<? extends Tile> tileClass = TILE_MAP.get(tileType);
+        if (tileClass == null) {
+            throw new IllegalArgumentException("Unknown type in tile " + tileNode.get("id") + ": " + tileType);
+        }
+        try {
+            return mapper.readValue(tileNode.toString(), tileClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

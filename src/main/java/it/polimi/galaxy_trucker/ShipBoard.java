@@ -67,7 +67,7 @@ public class ShipBoard {
         //}
         // If a cabin and an alien support are placed adjacent one another, it allows the cabin to host that type of alien.
         //applyAlienSupport(x, y);
-        // FIXME: if(tile.getClass() == CabinTile.class || tile.getClass() == AlienSupportTile.class) updateAlienSupport();
+        if(tiles[y][x].getClass() == CabinTile.class || tiles[y][x].getClass() == AlienSupportTile.class) updateAlienSupport();
     }
     public void setTile(int x, int y, Tile tile, int rotation) {
         // Places the passed tile (used for testing).
@@ -367,8 +367,6 @@ public class ShipBoard {
     }
 
     public List<Point> getTilesPositions(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
-        // CabinTiles: checks if it has crew.
-        // BatteriesTiles: checks if it has batteries.
         List<Point> positions = new ArrayList<>();
         for(int y = 0; y < tiles.length; y++) {
             for(int x = 0; x < tiles[0].length; x++) {
@@ -442,11 +440,12 @@ public class ShipBoard {
             }
         }
         // Should not be able to reach here.
-        throw new RuntimeException("Error while getting first non-empty tile position");
+        throw new RuntimeException("Error while getting first non empty tile position");
     }
-    public void removeFirstTileInPath(Projectile.Source source, int index) {
+    public Point removeFirstTileInPath(Projectile.Source source, int index) {
         Point pos = getFirstNonEmptyTilePosition(source, index);
         if(pos != null) removeTile(pos.x, pos.y);
+        return pos;
     }
     public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
         Point pos = getFirstNonEmptyTilePosition(source, index);

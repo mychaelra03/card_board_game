@@ -74,7 +74,6 @@ public class Player {
         return shipBoard.getExposedConnectorsCount();
     }
     public void applyEpidemicCard() {
-        // TODO: move it here
         shipBoard.applyEpidemicCard();
     }
     public void removeMostValuableCargo(int quantity) {
@@ -89,14 +88,14 @@ public class Player {
 
     // NEW METHODS
     public boolean acceptsCardEffect() {
-        // TODO
-        return true;
+        boolean decision = true;            // TODO: from javafx
+        return decision;
     }
     public int choosePlanet(boolean[] planetTaken) {
-        // TODO
         // selects a valid index between 0 and planetTaken.length (planetTaken.length must be false)
         // -1 to refuse
-        return -1;
+        int chosenPlanet = -1;              // TODO: from javafx
+        return chosenPlanet;
     }
 
     public void chooseTilesToActivate(Class<? extends ActivatableTile> tileClass) {
@@ -105,8 +104,8 @@ public class Player {
         do {
             List<Point> activatableTiles = shipBoard.getTilesPositions(tileClass, tile -> ((ActivatableTile)tile).isDouble());   // TODO: to client
             List<Point> batteries = shipBoard.getTilesPositions(BatteriesTile.class, tile -> true);                       // TODO: to client
-            int chosenTileIndex = 0;   // TODO: from javafx
-            int chosenBatteryIndex = 0;
+            int chosenTileIndex = 0;        // TODO: from javafx
+            int chosenBatteryIndex = 0;     // TODO: from javafx
 
             ActivatableTile chosenTileToToggle = (ActivatableTile)shipBoard.getTile(activatableTiles.get(chosenTileIndex).x,activatableTiles.get(chosenTileIndex).y);
             BatteriesTile chosenBatteryToUse = (BatteriesTile)shipBoard.getTile(activatableTiles.get(chosenBatteryIndex).x,activatableTiles.get(chosenBatteryIndex).y);
@@ -145,14 +144,14 @@ public class Player {
         while(crewToRemove > 0 && getCrewCount() > 0) {
             List<Point> cabinsPositions = shipBoard.getTilesPositions(CabinTile.class, tile -> ((CabinTile)tile).hasCrew()); // TODO: to client
 
-            int chosenCabin = 0; // TODO: from javafx
+            int chosenCabin = 0;            // TODO: from javafx
             if(shipBoard.removeOneCrewMemberAt(cabinsPositions.get(chosenCabin).x, cabinsPositions.get(chosenCabin).y) != null) crewToRemove--;
         }
     }
 
     private boolean usedBattery() {
         List<Point> batteries = shipBoard.getTilesPositions(BatteriesTile.class, tile -> ((BatteriesTile) tile).getStoredBatteries() > 0);
-        int chosenBatteryTile = 0; // TODO: from javafx (-1 is don't use)
+        int chosenBatteryTile = 0;          // TODO: from javafx (-1 is don't use)
         if (chosenBatteryTile >= 0 && chosenBatteryTile < batteries.size()) {
             Point batteryPos = batteries.get(chosenBatteryTile);
             shipBoard.removeBatteryFrom(batteryPos.x, batteryPos.y);
@@ -161,25 +160,35 @@ public class Player {
         return false;
     }
 
+    private int diceSumToIndex(Projectile.Source source, int diceSum) {
+        if(source == Projectile.Source.UP || source == Projectile.Source.DOWN) {
+            return diceSum - 4;
+        } else if(source == Projectile.Source.LEFT || source == Projectile.Source.RIGHT) {
+            return diceSum - 5;
+        }
+        throw new IllegalArgumentException("Invalid source: " + source);
+    }
+
     public void applyProjectile(Projectile projectile, int diceSum) {
-        if(shipBoard.isPathEmpty(projectile.getSource(), diceSum)) return;
+        int index = diceSumToIndex(projectile.getSource(), diceSum);
+        if(shipBoard.isPathEmpty(projectile.getSource(), index)) return;
 
         if(projectile.getSize() == SMALL) {
             if(projectile instanceof Meteor) {
-                if(!shipBoard.hasExposedConnectorInPath(projectile.getSource(), diceSum)) return;
+                if(!shipBoard.hasExposedConnectorInPath(projectile.getSource(), index)) return;
             }
             if(shipBoard.isSideShielded(projectile.getSource().toInt()) && usedBattery()) return;
 
         } else if(projectile.getSize() == LARGE && projectile instanceof Meteor) {
-            ShipBoard.DefendingCannonType cannonType = shipBoard.getDefendingCannonType(projectile.getSource(), diceSum);
+            ShipBoard.DefendingCannonType cannonType = shipBoard.getDefendingCannonType(projectile.getSource(), index);
             if(cannonType == ShipBoard.DefendingCannonType.SINGLE) return;
             if(cannonType == ShipBoard.DefendingCannonType.DOUBLE && usedBattery()) return;
         }
-        shipBoard.removeFirstTileInPath(projectile.getSource(), diceSum);
+        shipBoard.removeFirstTileInPath(projectile.getSource(), index);
     }
 
     public void checkIfAlive() {
-        if(shipBoard.getTotalHumanCount() == 0) isEliminated = true;
+        if(shipBoard.getTotalHumanCount() == 0) setEliminated(true);
         // TODO
     }
 }
