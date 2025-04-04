@@ -537,9 +537,9 @@ public class ShipBoard {
         }
     }
 
-    public HashSet<Point> getInvalidTiles() {
+    public Set<Point> getInvalidTiles() {
         // Adds all invalid tile's coordinates to invalidTiles.
-        HashSet<Point> invalidTiles = new HashSet<>();
+        Set<Point> invalidTiles = new HashSet<>();
 
         for(int y = 0; y < tiles.length; y++) {
             for(int x = 0; x < tiles[0].length; x++) {
@@ -553,9 +553,12 @@ public class ShipBoard {
                     }
                 }
                 if(tile instanceof EngineTile || tile instanceof CannonTile) {
+                    int tileRotation = tile.getRotation();
+                    if(tile instanceof EngineTile) tileRotation = (tileRotation + 2) % 4;
+
                     int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
-                    int nx = x + offsets[tile.getRotation()][1];
-                    int ny = y + offsets[tile.getRotation()][0];
+                    int nx = x + offsets[tileRotation][1];
+                    int ny = y + offsets[tileRotation][0];
                     if(isInsideShip(nx, ny) && !(tiles[ny][nx] instanceof EmptyTile)) {
                         invalidTiles.add(new Point(x, y));
                         invalidTiles.add(new Point(nx, ny));
