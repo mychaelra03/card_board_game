@@ -34,7 +34,6 @@ public class Scene1Controller {
     @FXML
     private ImageView myImageView;
 
-    @FXML private ImageView backgroundView;
     @FXML private ImageView bodyView;
     @FXML private ImageView accessoryView;
     @FXML private ImageView backgroundImage;
@@ -77,8 +76,9 @@ public class Scene1Controller {
         bodyView.setImage(loadBodyImage(bodyIndex));
         accessoryView.setImage(loadAccessoryImage(accessoryIndex));
 
-        backgroundImage.toBack();
-
+        //backgroundImage.toBack();
+        String imageUrl = getClass().getResource("/textures/background.png").toExternalForm();
+        scene1AnchorPane.setStyle("-fx-background-image: url('" + imageUrl + "');");
         leftBodyBtn.setOnAction(e -> updateBody(-1));
         rightBodyBtn.setOnAction(e -> updateBody(1));
         leftAccessoryBtn.setOnAction(e -> updateAccessory(-1));
