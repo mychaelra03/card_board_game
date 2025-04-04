@@ -10,7 +10,7 @@
 
 <!--<?import com.sun.org.apache.xpath.internal.operations.String?>-->
 
-<AnchorPane fx:id="scene1AnchorPane" prefHeight="648.0" prefWidth="764.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.Scene1.Scene1Controller">
+<AnchorPane fx:id="scene1AnchorPane" prefHeight="648.0" prefWidth="764.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white; -fx-background-image: src/main/resources/textures/background.png;" stylesheets="@../CSS/hello-view.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.Scene1.Scene1Controller">
 
     <!-- ⬇️ Background image messo per primo -->
     <!--<ImageView fx:id="backgroundImage" fitWidth="764.0" fitHeight="648.0" preserveRatio="false" layoutX="0" layoutY="0">

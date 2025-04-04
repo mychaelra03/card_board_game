@@ -1,10 +1,5 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene1;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
-import it.polimi.galaxy_trucker.GameLogic;
-import it.polimi.galaxy_trucker.Model.PlayerUsername;
-import it.polimi.galaxy_trucker.Model.SceneSwitch;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,9 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 public class Scene1Controller {
 
