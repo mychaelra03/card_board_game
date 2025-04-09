@@ -22,10 +22,20 @@ public class Player {
     private int position;
     private boolean isEliminated;
 
-    public Player(String name) {
+    private int chosenPlanet;
+
+    public Player( String name) {
         this.name = name;
         this.color = null;
         this.shipBoard = null;
+        this.credits = 0;
+        this.position = 0;
+        this.isEliminated = false;
+    }
+    public Player(String name, ShipBoard shipBoard) {
+        this.name = name;
+        this.color = null;
+        this.shipBoard = shipBoard;
         this.credits = 0;
         this.position = 0;
         this.isEliminated = false;
@@ -92,10 +102,14 @@ public class Player {
         return decision;
     }
     public int choosePlanet(boolean[] planetTaken) {
+
+        if(chosenPlanet != -1 && planetTaken[chosenPlanet]) throw new IllegalArgumentException("Planet already taken");
+        return chosenPlanet;
+
         // selects a valid index between 0 and planetTaken.length (planetTaken.length must be false)
         // -1 to refuse
-        int chosenPlanet = -1;              // TODO: from javafx
-        return chosenPlanet;
+     //   int chosenPlanet = -1;              // TODO: from javafx
+
     }
 
     public void chooseTilesToActivate(Class<? extends ActivatableTile> tileClass) {
@@ -134,8 +148,11 @@ public class Player {
             done = true;                    // TODO: from javafx
 
             // TODO: blocks removal
-            cargoList.add(shipBoard.loadCargoAt(cargoPositions.get(chosenCargoTileToSet).x, cargoPositions.get(chosenCargoTileToSet).y, chosenContainerToSet, cargoList.get(chosenBlockToTake)));
-            cargoList.remove(chosenBlockToTake);
+            // cargoList.add(shipBoard.loadCargoAt(cargoPositions.get(chosenCargoTileToSet).x, cargoPositions.get(chosenCargoTileToSet).y, chosenContainerToSet, cargoList.get(chosenBlockToTake)));
+            // cargoList.remove(chosenBlockToTake);
+            // FIXME
+            shipBoard.loadCargoAt(cargoPositions.get(chosenCargoTileToSet).x, cargoPositions.get(chosenCargoTileToSet).y, chosenContainerToSet, cargoList.get(chosenBlockToTake));
+
         } while(!done);
     }
 
@@ -151,7 +168,7 @@ public class Player {
 
     private boolean usedBattery() {
         List<Point> batteries = shipBoard.getTilesPositions(BatteriesTile.class, tile -> ((BatteriesTile) tile).getStoredBatteries() > 0);
-        int chosenBatteryTile = 0;          // TODO: from javafx (-1 is don't use)
+        int chosenBatteryTile = -1; // TODO: from javafx (-1 is don't use)
         if (chosenBatteryTile >= 0 && chosenBatteryTile < batteries.size()) {
             Point batteryPos = batteries.get(chosenBatteryTile);
             shipBoard.removeBatteryFrom(batteryPos.x, batteryPos.y);

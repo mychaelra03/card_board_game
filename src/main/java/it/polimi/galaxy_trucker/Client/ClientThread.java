@@ -1,12 +1,13 @@
 package it.polimi.galaxy_trucker.Client;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 public class ClientThread extends Thread {
-    private BufferedReader reader;
+    private DataInputStream reader;
 
-    public ClientThread(BufferedReader reader) {
+    public ClientThread(DataInputStream reader) {
         this.reader = reader;
     }
 

@@ -1,31 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <!--<?import com.sun.org.apache.xpath.internal.operations.String?>-->
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<AnchorPane prefHeight="398.0" prefWidth="500.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.Scene1.Scene1Controller"
- fx:id="scene1AnchorPane">
+
+<AnchorPane fx:id="scene1AnchorPane" prefHeight="398.0" prefWidth="500.0" style="-fx-background-color: #0d1b2a; -fx-text-fill: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.Scene1.Scene1Controller">
 
     <!-- TextField per inserire il nome -->
     <TextField fx:id="usernameTextField" promptText="Insert your username" style="-fx-background-color: #560bad; -fx-text-fill: white; -fx-font-size: 16px;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
-
-    <!-- Selettore avatar con una ComboBox -->
-    <MenuButton fx:id="colorMenuButton" text="Choose your avatar" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0"
-              style="-fx-background-color: #FFD700; -fx-text-fill: white; -fx-prompt-text-fill: white; -jfx-focus-color: white; -jfx-unfocus-color: white;">
-        <items>
-            <MenuItem fx:id="red" mnemonicParsing="false" text="Red" />
-            <MenuItem fx:id="blue" mnemonicParsing="false" text="Blue" />
-            <MenuItem fx:id="green" mnemonicParsing="false" text="Green" />
-            <MenuItem fx:id="yellow" mnemonicParsing="false" text="Yellow" />
-        </items>
-    </MenuButton>
 
     <MenuButton fx:id="pilotMenuButton" layoutX="54.0" layoutY="173.0" mnemonicParsing="false" text="Pilot">
         <items>
@@ -34,13 +22,11 @@
         </items>
     </MenuButton>
     <!-- ListView per i log -->
-    <ListView fx:id="logList" layoutY="123.0" prefHeight="215.0" prefWidth="460.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="123.0"
-              style="-fx-background-color: #560bad; -fx-text-fill: black;"/>
+    <ListView fx:id="logList" layoutX="20.0" layoutY="61.0" prefHeight="278.0" prefWidth="460.0" style="-fx-background-color: #560bad; -fx-text-fill: black;" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="61.0" />
 
     <!-- Bottone per iniziare il gioco -->
-    <Button fx:id="startButton" prefHeight="31.0" prefWidth="460.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;" text="Start to play" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
-            onAction="#onClickStart"/>
-    <Label layoutX="20.0" layoutY="99.0" text="Server logs" textFill="WHITE" />
+    <Button fx:id="startButton" onAction="#onClickStart" prefHeight="31.0" prefWidth="460.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;" text="Start to play" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+    <Label layoutX="24.0" layoutY="61.0" text="Server logs" textFill="WHITE" />
 
 
 </AnchorPane>

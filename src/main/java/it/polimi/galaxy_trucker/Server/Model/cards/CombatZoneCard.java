@@ -86,6 +86,7 @@ public class CombatZoneCard extends Card {
                 case CANNON_SHOTS -> {
                     for(CannonShot shot : rule.getCannonShots()) {
                         int diceSum = GameModel.rollTwoDice();
+                        System.out.println(diceSum);  // TODO: just for tests
                         worstPlayer.applyProjectile(shot, diceSum);
                     }
                 }
@@ -112,11 +113,11 @@ public class CombatZoneCard extends Card {
             return player.getCrewCount();
         }
         if(condition == Condition.CANNON_POWER) {
-            player.chooseTilesToActivate(CannonTile.class);
+//            player.chooseTilesToActivate(CannonTile.class);     FIXME
             return player.getCurrentStrength(CannonTile.class);
         }
         if(condition == Condition.ENGINE_POWER) {
-            player.chooseTilesToActivate(EngineTile.class);
+//            player.chooseTilesToActivate(EngineTile.class);      FIXME
             return player.getCurrentStrength(EngineTile.class);
         }
         throw new IllegalArgumentException("Unknown condition: " + condition);

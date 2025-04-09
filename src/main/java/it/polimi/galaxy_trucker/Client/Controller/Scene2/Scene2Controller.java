@@ -1,5 +1,8 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
+import it.polimi.galaxy_trucker.Client.VirtualServer;
+import it.polimi.galaxy_trucker.Client.VirtualServerAware;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
@@ -22,13 +25,14 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.effect.InnerShadow;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
 public class Scene2Controller {
 
 
-    public static final String TILESPATH = "/textures/tiles/";
+    public static final String TILESPATH = "/textures/tiles2/";
     public static final double TAILHEIGHT = 83.5;
 
 
@@ -43,6 +47,7 @@ public class Scene2Controller {
     protected static Integer col = 3;
     protected static Integer row = 2;
     private int k;
+    private VirtualServer virtualServer;
 
 
     @FXML
@@ -86,11 +91,16 @@ public class Scene2Controller {
         timeline.play();
     }
 
+
+
+
     public void initialize() {
+
 
         animationHandler = new AnimationHandler(scene2AnchorPane);
         settings = new Settings(scene2AnchorPane);
         TileManager tileManager = new TileManager(gridPane);
+
 
 
         tileManager.availableSockets();
@@ -98,7 +108,7 @@ public class Scene2Controller {
         // initialize covered tiles
         for(int i = 1; i<151; i++) {
 
-            Image image = new Image(Objects.requireNonNull(getClass().getResource(TILESPATH + "tile_back.jpg")).toExternalForm());
+            Image image = new Image(Objects.requireNonNull(getClass().getResource(TILESPATH + "tile_back.png")).toExternalForm());
 
             ImageView imageView = new ImageView();
             imageView.setId(String.valueOf(i));
@@ -110,11 +120,20 @@ public class Scene2Controller {
             imageView.setRotate(Math.random() * 180);
             imageView.setCursor(Cursor.HAND);
 
+            DropShadow dropShadow = new DropShadow();
+            dropShadow.setColor(new Color(.2, .2, .2, .8));
+            dropShadow.setWidth(40);
+            dropShadow.setHeight(40);
+            dropShadow.setRadius(19.5);
+
+            imageView.setEffect(dropShadow);
+
 
             imageViews.add(imageView);
 
-
             tileManager.enableEvents(imageView);
+
+
 
         }
         Collections.shuffle(imageViews);
@@ -224,13 +243,16 @@ public class Scene2Controller {
                 }
             });
 
-        Image image = new Image(Objects.requireNonNull(getClass().getResource(TILESPATH + "tile_starter_cabin_green.jpg")).toExternalForm());
+        Image image = new Image(Objects.requireNonNull(getClass().getResource(TILESPATH + "tile_starter_cabin_green.png")).toExternalForm());
         ImageView imageView = new ImageView();
         imageView.setImage(image);
         imageView.setFitWidth(TAILHEIGHT);
         imageView.setFitHeight(TAILHEIGHT);
         gridPane.add(imageView, 3, 2);
+
+
     }
+
 
     @FXML
     public void onClickTurnTileRight(Event event) throws IOException {
@@ -241,6 +263,7 @@ public class Scene2Controller {
     public void onClickTurnTileLeft(Event event) throws IOException {
         animationHandler.onClickTurnTileLeft(selectedImageView,placedImageView);
     }
+
 
 
 

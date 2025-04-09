@@ -1,14 +1,25 @@
 package it.polimi.galaxy_trucker.Client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class VirtualServer {
+    DataInputStream in = null;
     PrintWriter out = null;
-    BufferedReader in = null;
+
+    private static VirtualServer instance;
+
+private VirtualServer() {
+
+}
+public static VirtualServer getInstance() {
+    if(instance == null){
+        instance = new VirtualServer();
+    }
+    return instance;
+}
+
 
     void start(){
         String hostName = "localhost";
@@ -27,20 +38,43 @@ public class VirtualServer {
         BufferedReader stdIn = null;
         try{
             out = new PrintWriter(socket.getOutputStream(),true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            in = new DataInputStream(socket.getInputStream());
             stdIn = new BufferedReader(new InputStreamReader(System.in));
         }catch (IOException e) {
             System.err.println(e.toString() + " " + hostName);
             System.exit(1);
         }
 
-        ClientThread clientThread = new ClientThread(in);
+        this.clientThread = new ClientThread(in);
         clientThread.start();
 
     }
 
     public void sendCmd(String cmd){
+        System.out.println(cmd);
         out.println(cmd);
+    }
+
+
+    public void sendPlacedTileData(Integer col, Integer row, String id, int rot) {
+
+        out.write(col);
+        out.write(row);
+        out.write(id);
+        out.write(rot);
+        out.flush();
+        System.out.println("data sent to server");
 
     }
+
+
+    ClientThread clientThread;
+    private UpdateUICallBack updateUICallBack;
+
+    void setUpdateUICallBack(UpdateUICallBack updateUICallBack) {
+        this.updateUICallBack = updateUICallBack;
+    }
+
+
+
 }

@@ -1,26 +1,29 @@
 package it.polimi.galaxy_trucker.Server;
 
 import java.beans.PropertyChangeEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class VirtualView implements Runnable {
     BufferedReader in = null;
-    PrintWriter out = null;
+     PrintWriter out = null;
     Socket clientSocket = null;
     Controller controller = null;
+    ArrayList<VirtualView> clients = new ArrayList<VirtualView>();
     ModelListener listener;
 
-    public VirtualView(Socket clientSocket, Controller controller) {
+    public VirtualView(Socket clientSocket, Controller controller, ArrayList<VirtualView> clients) {
         this.clientSocket = clientSocket;
         this.controller = controller;
+        this.clients = clients;
 
         CallBack callBack = (PropertyChangeEvent evt) -> {
             String debugStr= evt.getPropertyName() + ": " + evt.getOldValue() + " -> " + evt.getNewValue();
-            out.println(debugStr);
+            for(VirtualView client : clients) {
+                client.out.println(debugStr);
+
+            }
         };
 
         this.listener = new ModelListener(callBack);
@@ -29,20 +32,23 @@ public class VirtualView implements Runnable {
 
         try{
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out = new PrintWriter(clientSocket.getOutputStream(),true);
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     void networkEventLoop(){
-        String uN,c = "";
+        String username = "";
         try{
-            while(clientSocket.isConnected()){
-                uN = in.readLine();
-                c = in.readLine();
-                String player = this.controller.processCmd(uN,c);
-                System.out.println(player);
+            while(clientSocket.isConnected() ){
+
+                username = in.readLine();
+
+                this.controller.registerPlayer(this,username);
+
+                System.out.println("a");
+//                System.out.println(player + " tile positioned : ("+in.readInt()+","+in.readInt()+") of id: " + in.readUTF() + " with rotation: "+in.readInt());
 
             }
             System.out.println("done");

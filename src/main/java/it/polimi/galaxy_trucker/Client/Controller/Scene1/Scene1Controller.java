@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene1;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
+import it.polimi.galaxy_trucker.Client.VirtualServerAware;
 import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,7 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class Scene1Controller {
+public class Scene1Controller implements VirtualServerAware {
 
     @FXML
     private AnchorPane scene1AnchorPane;
@@ -25,11 +26,7 @@ public class Scene1Controller {
 
     @FXML
     public void initialize() {
-        for(MenuItem mi : colorMenuButton.getItems()) {
-            mi.setOnAction(event -> {
-                colorMenuButton.setText(mi.getText());
-            });
-        }
+
         for(MenuItem mi : pilotMenuButton.getItems()) {
             mi.setOnAction(event -> {
                 pilotMenuButton.setText(mi.getText());
@@ -41,34 +38,16 @@ public class Scene1Controller {
 
         String username = usernameTextField.getText();
         this.virtualServer.sendCmd(username);
-        String color = colorMenuButton.getText();
-        this.virtualServer.sendCmd(color.toUpperCase());
-
-//        PlayerUsername.getInstance().setUsername(usernameTextField.getText());
-//        PlayerUsername.getInstance().setPlayerID(1);
-//        PlayerUsername.getInstance().setColorP(colorMenuButton.getText());
-//        PlayerUsername.getInstance().setPlayerPic(22);
-//
-//
-//        ObjectMapper om = new ObjectMapper();
-//
-//        try{
-//            File file = new File("src/main/resources/it/polimi/galaxy_trucker/public/player1.json");
-//
-//            om.writeValue(file,PlayerUsername.getInstance());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-
 
         SceneSwitch sceneSwitch = new SceneSwitch();
-        sceneSwitch.switchScene(scene1AnchorPane,"/it/polimi/galaxy_trucker/View/scene2-view.fxml");
+        sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/scene2-view.fxml");
     }
 
     private Stage stage;
-    VirtualServer virtualServer;
-    public void setStage(Stage stage, VirtualServer virtualServer) {
-        this.stage = stage;
+    private VirtualServer virtualServer;
+
+    @Override
+    public void setVirtualServer(VirtualServer virtualServer) {
         this.virtualServer = virtualServer;
     }
 

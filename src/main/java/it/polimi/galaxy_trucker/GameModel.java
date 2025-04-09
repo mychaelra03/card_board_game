@@ -51,6 +51,10 @@ public class GameModel {
                 .collect(Collectors.toList());
     }
 
+    public Card getCurrentCard() {
+        return deck.getFirst();
+    }
+
     public enum Direction {
         FORWARD, BACKWARD
     }

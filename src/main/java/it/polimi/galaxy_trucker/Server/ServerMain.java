@@ -5,10 +5,12 @@ import it.polimi.galaxy_trucker.GameModel;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerMain {
     static int portNumber = 8080;
     static GameModel gameModel = new GameModel(2);
+    static ArrayList<VirtualView> clients = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -22,7 +24,6 @@ public class ServerMain {
 
         System.out.println("Listening on port " + portNumber);
 
-
         while (true) {
             Socket clientSocket = null;
             try {
@@ -33,12 +34,11 @@ public class ServerMain {
             }
             System.out.println("Accepted");
             Controller controller = new Controller(gameModel);
-            VirtualView virtualView = new VirtualView(clientSocket, controller);
+            VirtualView virtualView = new VirtualView(clientSocket, controller, clients);
             Thread t = new Thread(virtualView);
+            clients.add(virtualView);
             t.start();
         }
-
-
 
     }
 }
