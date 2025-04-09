@@ -1,47 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<VBox alignment="CENTER" spacing="20" prefHeight="600" prefWidth="500"
-      xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1"
-      fx:controller="it.polimi.galaxy_trucker.TestLogin">
-
-    <ImageView fx:id="gameTitle" fitWidth="300" preserveRatio="true" />
-
-    <HBox alignment="CENTER" spacing="20">
-        <VBox alignment="CENTER" spacing="20" translateY="0">
-            <Button fx:id="randomize" text="randomize" />
-            <ImageView />
-            <ImageView />
-            <Button fx:id="leftBodyBtn" text="&lt;" />
-            <Button fx:id="leftAccessoryBtn" text="&lt;" />
-        </VBox>
-
-        <StackPane>
-            <ImageView fx:id="backgroundView" fitWidth="200" fitHeight="200" />
-            <ImageView fx:id="bodyView" fitWidth="200" fitHeight="200" />
-            <ImageView fx:id="accessoryView" fitWidth="200" fitHeight="200" />
-        </StackPane>
-
-        <VBox alignment="CENTER" spacing="40" translateY="0">
-            <Button fx:id="random" text="options" />
-            <Button fx:id="rightBodyBtn" text="&gt;" />
-            <Button fx:id="rightAccessoryBtn" text="&gt;" />
-        </VBox>
-    </HBox>
-
-    <HBox alignment="CENTER">
-        <TextField fx:id="nameField" promptText="Enter your name" prefWidth="400"/>
-    </HBox>
-
-    <Label fx:id="errorLabel" textFill="red" visible="false" />
-
-    <Button fx:id="playButton" text="Play" />
-
-</VBox>
+<AnchorPane prefHeight="612.0" prefWidth="502.0" style="-fx-background-color: #0d1b2a;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.Scene1.TestLogin">
+   <children>
+         <Button fx:id="leftBodyBtn" layoutX="72.0" layoutY="363.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&lt;" />
+         <Button fx:id="leftAccessoryBtn" layoutX="72.0" layoutY="421.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&lt;" />
+   
+          <Button fx:id="playButton" layoutX="17.0" layoutY="563.0" prefHeight="35.0" prefWidth="469.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="Play" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="16.0" />
+         <Button fx:id="randomize" layoutX="47.0" layoutY="293.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="randomize" />
+         <Button fx:id="random" layoutX="371.0" layoutY="293.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="options" />
+         <Button fx:id="rightBodyBtn" layoutX="387.0" layoutY="363.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&gt;" />
+         <Button fx:id="rightAccessoryBtn" layoutX="387.0" layoutY="421.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&gt;" />
+         <ImageView fx:id="backgroundView" fitHeight="200" fitWidth="200" layoutX="149.0" layoutY="283.0" />
+         <ImageView fx:id="bodyView" fitHeight="200" fitWidth="200" layoutX="149.0" layoutY="283.0" />
+         <ImageView fx:id="accessoryView" fitHeight="200" fitWidth="200" layoutX="149.0" layoutY="283.0" />
+        <!--<TextField fx:id="nameField" layoutX="60.0" layoutY="557.0" prefWidth="400" promptText="Enter your name" />-->
+   
+          <ImageView fx:id="gameTitle" fitWidth="300" layoutX="92.0" layoutY="57.0" preserveRatio="true" />
+   </children>
+</AnchorPane>
