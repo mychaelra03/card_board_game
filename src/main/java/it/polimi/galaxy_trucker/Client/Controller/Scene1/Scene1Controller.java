@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 public class Scene1Controller implements VirtualServerAware {
 
@@ -24,6 +25,9 @@ public class Scene1Controller implements VirtualServerAware {
 
     @FXML
     private TextField usernameTextField;
+
+   // @FXML
+    //private MenuButton colorMenuButton,pilotMenuButton;
 
     @FXML
     private ImageView myImageView;
@@ -47,15 +51,7 @@ public class Scene1Controller implements VirtualServerAware {
 
     @FXML
     public void initialize() {
-        BackgroundImage bg = new BackgroundImage(
 
-                new Image(getClass().getResource("/textures/background.png").toExternalForm()),
-                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.DEFAULT,
-                new BackgroundSize(100, 100, true, true, true, false)
-        );
-
-        scene1AnchorPane.setBackground(new Background(bg));
         System.out.println(getClass().getResource("/textures/background.png"));
         /*Platform.runLater(() -> {
             myImageView.fitWidthProperty().bind(myImageView.getScene().widthProperty().subtract(205));
@@ -70,9 +66,6 @@ public class Scene1Controller implements VirtualServerAware {
         bodyView.setImage(loadBodyImage(bodyIndex));
         accessoryView.setImage(loadAccessoryImage(accessoryIndex));
 
-        //backgroundImage.toBack();
-        String imageUrl = getClass().getResource("/textures/background.png").toExternalForm();
-        scene1AnchorPane.setStyle("-fx-background-image: url('" + imageUrl + "');");
         leftBodyBtn.setOnAction(e -> updateBody(-1));
         rightBodyBtn.setOnAction(e -> updateBody(1));
         leftAccessoryBtn.setOnAction(e -> updateAccessory(-1));
