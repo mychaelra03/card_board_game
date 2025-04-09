@@ -16,20 +16,20 @@
 
 
     <!-- TextField per inserire il nome -->
-    <TextField fx:id="usernameTextField" layoutX="21.0" layoutY="252.0" prefHeight="31.0" prefWidth="726.0" promptText="Insert your username" style="-fx-background-color: #560bad; -fx-text-fill: white; -fx-font-size: 16px;-fx-background-radius: 10;                   -fx-border-radius: 10;" AnchorPane.bottomAnchor="365.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="17.0" />
+    <TextField fx:id="usernameTextField" layoutX="21.0" layoutY="252.0" prefHeight="31.0" prefWidth="726.0" promptText="Insert your username..." AnchorPane.bottomAnchor="365.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="17.0" />
 
     <!-- Selettore avatar con una ComboBox -->
 
     <!-- ListView per i log -->
-    <ListView fx:id="logList" layoutX="20.0" layoutY="314.0" prefHeight="268.0" prefWidth="298.0" style="-fx-background-color: #560bad; -fx-text-fill: black;" AnchorPane.bottomAnchor="66.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="446.0" />
+    <ListView fx:id="logList" layoutX="20.0" layoutY="314.0" prefHeight="268.0" prefWidth="298.0"  AnchorPane.bottomAnchor="66.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="446.0" />
     <Label layoutX="20.0" layoutY="291.0" text="Choose a server to join:" textFill="WHITE" AnchorPane.bottomAnchor="340.0" AnchorPane.leftAnchor="20.0" />
-   <Button fx:id="leftBodyBtn" layoutX="366.0" layoutY="423.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&lt;" AnchorPane.bottomAnchor="190.0" AnchorPane.rightAnchor="363.0" />
-   <Button fx:id="leftAccessoryBtn" layoutX="366.0" layoutY="481.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&lt;" AnchorPane.bottomAnchor="132.0" AnchorPane.rightAnchor="363.0" />
-   <Button fx:id="playButton" layoutX="19.0" layoutY="599.0" prefHeight="35.0" prefWidth="726.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="Play" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="19.0" AnchorPane.rightAnchor="19.0" />
-   <Button fx:id="randomize" layoutX="341.0" layoutY="353.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="randomize" AnchorPane.bottomAnchor="260.0" AnchorPane.rightAnchor="319.5" />
-   <Button fx:id="random" layoutX="665.0" layoutY="353.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="options" AnchorPane.bottomAnchor="260.0" AnchorPane.rightAnchor="19.0" />
-   <Button fx:id="rightBodyBtn" layoutX="681.0" layoutY="423.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&gt;" AnchorPane.bottomAnchor="190.0" AnchorPane.rightAnchor="48.0" />
-   <Button fx:id="rightAccessoryBtn" layoutX="681.0" layoutY="481.0" style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;-fx-background-radius: 10; -fx-border-radius: 10;" text="&gt;" AnchorPane.bottomAnchor="132.0" AnchorPane.rightAnchor="48.0" />
+   <Button fx:id="leftBodyBtn" layoutX="366.0" layoutY="423.0" text="&lt;" AnchorPane.bottomAnchor="190.0" AnchorPane.rightAnchor="363.0" />
+   <Button fx:id="leftAccessoryBtn" layoutX="366.0" layoutY="481.0" text="&lt;" AnchorPane.bottomAnchor="132.0" AnchorPane.rightAnchor="363.0" />
+   <Button fx:id="playButton" layoutX="19.0" layoutY="599.0" prefHeight="35.0" prefWidth="726.0" text="Play" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="19.0" AnchorPane.rightAnchor="19.0" />
+   <Button fx:id="randomize" layoutX="341.0" layoutY="353.0" text="randomize" AnchorPane.bottomAnchor="260.0" AnchorPane.rightAnchor="319.5" />
+   <Button fx:id="random" layoutX="665.0" layoutY="353.0" text="options" AnchorPane.bottomAnchor="260.0" AnchorPane.rightAnchor="19.0" />
+   <Button fx:id="rightBodyBtn" layoutX="681.0" layoutY="423.0" text="&gt;"  AnchorPane.bottomAnchor="190.0" AnchorPane.rightAnchor="48.0" />
+   <Button fx:id="rightAccessoryBtn" layoutX="681.0" layoutY="481.0" text="&gt;" AnchorPane.bottomAnchor="132.0" AnchorPane.rightAnchor="48.0" />
     <ImageView fx:id="myImageView" fitHeight="200.0" fitWidth="362.0" layoutX="203.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
        <image>
           <Image url="@../../../../textures/title.png" />
