@@ -4,29 +4,22 @@ import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class ShipBoard {
 
     private final Tile[][] tiles;
-    private final int shipBoardType;
+    private final Integer[] privateTiles;
+    private final BoardType shipType;
     private int removedTiles;
 
-    // TODO: Cannon and Engine checks.
-    // TODO: IsColumnCannonProtected.
-    // TODO: All checks at the end of the building phase.
+    // TODO: 2 private tiles spaces
 
-    // TODO: isDirectionCannonProtected()
-
-
-    public ShipBoard(int shipBoardType) {
+    public ShipBoard(BoardType shipType) {
         this.tiles = new Tile[5][7];
-        this.shipBoardType = shipBoardType;
-        if(shipBoardType < 1 || shipBoardType > 2) throw new IllegalArgumentException("Ship Board must be type 1 or 2.");
+        this.privateTiles = new Integer[2];
+        this.shipType = shipType;
         initializeShip();
         removedTiles = 0;
     }
@@ -38,44 +31,46 @@ public class ShipBoard {
                 tiles[i][j] = new EmptyTile();
             }
         }
+        Arrays.fill(privateTiles, null);
+
         tiles[2][3] = new StartingCabinTile();
     }
 
     public Tile[][] getTiles() {
         return tiles;
     }
+    public Integer[] getPrivateTiles() {
+        return privateTiles;
+    }
 
-    public int getShipBoardType() {
-        return shipBoardType;
+    public BoardType getShipType() {
+        return shipType;
     }
 
     public Tile getTile(int x, int y) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         return tiles[y][x];
     }
+    public Integer getPrivateTile(int index) {
+        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: "+index+".");
+        return privateTiles[index];
+    }
+
     public void setTile(int x, int y, int tileId, int rotation) {
         // Places one of the 152 default tiles.
-        if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
-        if(getTile(x, y).getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
-        tiles[y][x] = TileFactory.getInstance().getTile(tileId);
-        tiles[y][x].setRotation(rotation);
-        //if(!areTileConnectionsValid(x, y)) {
-        //    // Checks if the tile is not connected or if the connectors are not compatible.
-        //    //
-        //    //tiles[y][x] = new EmptyTile();
-        //    throw new IllegalArgumentException("Invalid placement, connectors don't match");
-        //}
-        // If a cabin and an alien support are placed adjacent one another, it allows the cabin to host that type of alien.
-        //applyAlienSupport(x, y);
-        if(tiles[y][x].getClass() == CabinTile.class || tiles[y][x].getClass() == AlienSupportTile.class) updateAlienSupport();
+        Tile tile = TileFactory.getInstance().getTile(tileId);
+        placeTile(x, y, tile, rotation);
     }
     public void setTile(int x, int y, Tile tile, int rotation) {
         // Places the passed tile (used for testing).
+        placeTile(x, y, tile, rotation);
+    }
+    private void placeTile(int x, int y, Tile tile, int rotation) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         if(tiles[y][x].getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = tile;
         tiles[y][x].setRotation(rotation);
-        if(tile.getClass() == CabinTile.class || tile.getClass() == AlienSupportTile.class) updateAlienSupport();
+        if((tile instanceof CabinTile && !(tile instanceof StartingCabinTile)) || tile instanceof AlienSupportTile) updateAlienSupport();
     }
 
     public void removeTile(int x, int y) {
@@ -86,15 +81,17 @@ public class ShipBoard {
         checkConnectivity();
         removedTiles++;
     }
-//    public void removeTile(Tile tile) {
-//        tile = new EmptyTile();
-//
-//        updateAlienSupport();
-//        // Checks if the removal of this tile left other tiles not connected to the ship.
-//        checkConnectivity();
-//        lostTiles++;
-//    }
 
+    public void pushPrivateTile(int index, int tileId) {
+        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: "+index+".");
+        if(privateTiles[index] != null) throw new IllegalArgumentException("Slot occupied.");
+        privateTiles[index] = tileId;
+    }
+    public int popPrivateTile(int index) {
+        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: "+index+".");
+        if(privateTiles[index] == null) throw new IllegalArgumentException("Slot is empty.");
+        return privateTiles[index];
+    }
 
     // BATTERY TILES
     public int getTotalBatteriesCount() {
@@ -485,7 +482,7 @@ public class ShipBoard {
     public boolean isInsideShip(int x, int y) {
         // Returns true if(x,y) is inside the usable space of the spaceship.
         if(y < 0 || x < 0 || y >= tiles.length || x >= tiles[0].length) return false;
-        if(shipBoardType == 1) {
+        if(shipType == BoardType.LEARNING) {
             int[][] type1 = {
                     {0, 0, 0, 1, 0, 0, 0},
                     {0, 0, 1, 1, 1, 0, 0},
@@ -495,7 +492,7 @@ public class ShipBoard {
             };
             return type1[y][x] == 1;
         }
-        else {
+        if(shipType == BoardType.LEVEL_TWO) {
             int[][] type2 = {
                     {0, 0, 1, 0, 1, 0, 0},
                     {0, 1, 1, 1, 1, 1, 0},
@@ -505,6 +502,7 @@ public class ShipBoard {
             };
             return type2[y][x] == 1;
         }
+        throw new RuntimeException("Invalid ship type: " + shipType);
     }
 
     private void updateAlienSupport() {
@@ -537,9 +535,9 @@ public class ShipBoard {
         }
     }
 
-    public HashSet<Point> getInvalidTiles() {
+    public Set<Point> getInvalidTiles() {
         // Adds all invalid tile's coordinates to invalidTiles.
-        HashSet<Point> invalidTiles = new HashSet<>();
+        Set<Point> invalidTiles = new HashSet<>();
 
         for(int y = 0; y < tiles.length; y++) {
             for(int x = 0; x < tiles[0].length; x++) {
@@ -553,9 +551,12 @@ public class ShipBoard {
                     }
                 }
                 if(tile instanceof EngineTile || tile instanceof CannonTile) {
+                    int tileRotation = tile.getRotation();
+                    if(tile instanceof EngineTile) tileRotation = (tileRotation + 2) % 4;
+
                     int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
-                    int nx = x + offsets[tile.getRotation()][1];
-                    int ny = y + offsets[tile.getRotation()][0];
+                    int nx = x + offsets[tileRotation][1];
+                    int ny = y + offsets[tileRotation][0];
                     if(isInsideShip(nx, ny) && !(tiles[ny][nx] instanceof EmptyTile)) {
                         invalidTiles.add(new Point(x, y));
                         invalidTiles.add(new Point(nx, ny));

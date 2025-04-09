@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.Server;
 
+import it.polimi.galaxy_trucker.BoardType;
 import it.polimi.galaxy_trucker.GameModel;
 
 import java.io.IOException;
@@ -9,8 +10,8 @@ import java.util.ArrayList;
 
 public class ServerMain {
     static int portNumber = 8080;
-    static GameModel gameModel = new GameModel(2);
     static ArrayList<VirtualView> clients = new ArrayList<>();
+    static GameModel gameModel = new GameModel(BoardType.LEVEL_TWO);
 
     public static void main(String[] args) {
 
@@ -23,6 +24,7 @@ public class ServerMain {
         }
 
         System.out.println("Listening on port " + portNumber);
+
 
         while (true) {
             Socket clientSocket = null;

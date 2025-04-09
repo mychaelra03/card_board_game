@@ -116,7 +116,7 @@
             "positionCost": 1
         }
     ],
-    "level1": [
+    "levelOne": [
         {
             "id": 1,
             "level": 1,
@@ -297,7 +297,7 @@
             "positionCost": 1
         }
     ],
-    "level2": [
+    "levelTwo": [
         {
             "id": 21,
             "level": 2,

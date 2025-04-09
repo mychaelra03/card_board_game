@@ -6,19 +6,20 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.polimi.galaxy_trucker.BoardType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameModelTest {
 
     @Test
-    void testCardFactory() throws Exception {
+    void testCardFactory() {
+        //FIXME
         CardFactory cardFactory = CardFactory.getInstance();
-        List<Card> levelTwoDeck = cardFactory.getLevelTwoDeck();
-        List<Card> levelTwoDeck2 = cardFactory.getLevelTwoDeck();
-        List<Card> learningDeck = cardFactory.getLearningDeck();
-        List<Card> learningDeck2 = cardFactory.getLearningDeck();
+        List<Card> levelTwoDeck = cardFactory.getDeck(LEVEL_TWO);
+        List<Card> levelTwoDeck2 = cardFactory.getDeck(LEVEL_TWO);
+        List<Card> learningDeck = cardFactory.getDeck(LEARNING);
+        List<Card> learningDeck2 = cardFactory.getDeck(LEARNING);
         System.out.println();
-
     }
 
     @Test
@@ -31,10 +32,10 @@ class GameModelTest {
 
     @Test
     void movePlayerBackward() throws Exception {
-        Player player1 = new Player("TestPlayer1");
-        Player player2 = new Player("TestPlayer2");
-        Player player3 = new Player("TestPlayer3");
-        Player player4 = new Player("TestPlayer4");
+        Player player1 = new Player("TestPlayer1", new int[]{0, 0});
+        Player player2 = new Player("TestPlayer2", new int[]{0, 0});
+        Player player3 = new Player("TestPlayer3", new int[]{0, 0});
+        Player player4 = new Player("TestPlayer4", new int[]{0, 0});
 
         List<Player> players = new ArrayList<>();
         players.add(player1);
@@ -42,7 +43,7 @@ class GameModelTest {
         players.add(player3);
         players.add(player4);
 
-        GameModel gameModel = new GameModel(2, players);
+        GameModel gameModel = new GameModel(LEVEL_TWO, players);
 
 
         player1.setPosition(10);
@@ -54,8 +55,6 @@ class GameModelTest {
 
 
         assertEquals(-7,player2.getPosition(),"Player2 should move backward of 8 position so be in -7 position");
-
-
 
     }
 }

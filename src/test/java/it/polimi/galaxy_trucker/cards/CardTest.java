@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.cards;
 
+import it.polimi.galaxy_trucker.BoardType;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Server.Model.cards.CombatZoneCard;
 import it.polimi.galaxy_trucker.Server.Model.cards.PlanetsCard;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.polimi.galaxy_trucker.BoardType.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.CombatZoneCard.CombatRule.*;
 import static it.polimi.galaxy_trucker.Server.Model.tiles.BlockType.*;
 import static it.polimi.galaxy_trucker.Server.Model.tiles.Connector.*;
@@ -167,14 +169,14 @@ class CardTest {
 
     @Test
     void testEpidemicCard() throws Exception {
-        Player player1 = new Player("TestPlayer1");
-        Player player2 = new Player("TestPlayer2");
-        Player player3 = new Player("TestPlayer3");
-        Player player4 = new Player("TestPlayer4");
-        player1.setNewShipBoard(2);
-        player2.setNewShipBoard(2);
-        player3.setNewShipBoard(2);
-        player4.setNewShipBoard(2);
+        Player player1 = new Player("TestPlayer1", new int[]{0, 0});
+        Player player2 = new Player("TestPlayer2", new int[]{0, 0});
+        Player player3 = new Player("TestPlayer3", new int[]{0, 0});
+        Player player4 = new Player("TestPlayer4", new int[]{0, 0});
+        player1.setNewShipBoard(LEVEL_TWO);
+        player2.setNewShipBoard(LEVEL_TWO);
+        player3.setNewShipBoard(LEVEL_TWO);
+        player4.setNewShipBoard(LEVEL_TWO);
         // 1st case
         player1.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
 
@@ -201,7 +203,7 @@ class CardTest {
         players.add(player2);
         players.add(player3);
         players.add(player4);
-        GameModel gameModel = new GameModel(2, players); //TODO: check for addPlayer if arraylist has already players in it
+        GameModel gameModel = new GameModel(LEVEL_TWO, players); //TODO: check for addPlayer if arraylist has already players in it
 
 
         gameModel.getSortedPlayers().forEach(player -> player.getShipBoard().applyEpidemicCard());
@@ -215,14 +217,14 @@ class CardTest {
     @Test
     void testStarDustCard() throws Exception {
 
-        Player player1 = new Player("TestPlayer1");
-        Player player2 = new Player("TestPlayer2");
-        Player player3 = new Player("TestPlayer3");
-        Player player4 = new Player("TestPlayer4");
-        player1.setNewShipBoard(2);
-        player2.setNewShipBoard(2);
-        player3.setNewShipBoard(2);
-        player4.setNewShipBoard(2);
+        Player player1 = new Player("TestPlayer1", new int[]{0, 0});
+        Player player2 = new Player("TestPlayer2", new int[]{0, 0});
+        Player player3 = new Player("TestPlayer3", new int[]{0, 0});
+        Player player4 = new Player("TestPlayer4", new int[]{0, 0});
+        player1.setNewShipBoard(LEVEL_TWO);
+        player2.setNewShipBoard(LEVEL_TWO);
+        player3.setNewShipBoard(LEVEL_TWO);
+        player4.setNewShipBoard(LEVEL_TWO);
 
         // 1st case
          player1.getShipBoard().setTile(2,2, new CabinTile(0,FULL_UNIVERSAL_CONNECTORS),0);
@@ -250,7 +252,7 @@ class CardTest {
         players.add(player3);
         players.add(player4);
 
-        GameModel gameModel = new GameModel(2, players);
+        GameModel gameModel = new GameModel(LEVEL_TWO, players);
 
         player1.setPosition(10);
         player2.setPosition(1);
