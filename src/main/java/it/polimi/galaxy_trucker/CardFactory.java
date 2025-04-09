@@ -60,40 +60,24 @@ public class CardFactory {
     }
 
     // TODO: make one?
-    public List<Card> getLearningDeck() {
-        // Returns a list of all cards from the "learningFlight" group.
+    public List<Card> getDeck(BoardType deckType) {
         List<Card> result = new ArrayList<>();
-        List<JsonNode> learningFlightNodes = cardsByGroup.get("learningFlight");
-        if(learningFlightNodes == null || learningFlightNodes.size() < 8) {
-            throw new IllegalArgumentException("Not enough learning cards available. Required: 8, available: " + ((learningFlightNodes == null)? 0 : learningFlightNodes.size()));
+        List<JsonNode> cardsNodes = cardsByGroup.get(deckType.toString());
+
+        if(cardsNodes == null || cardsNodes.size() < 8) {
+            throw new IllegalArgumentException("Not enough " + deckType + "cards available. Required: 8, available: " + ((cardsNodes == null)? 0 : cardsNodes.size()));
         }
-        Collections.shuffle(learningFlightNodes, random);
+        List<JsonNode> cardsNodesCopy = new ArrayList<>(cardsNodes);
+        Collections.shuffle(cardsNodesCopy, random);
         for(int i = 0; i < 8; i++) {
-            result.add(createCard(learningFlightNodes.get(i)));
+            result.add(createCard(cardsNodesCopy.get(i)));
         }
-        return result;
-    }
+        if(deckType == BoardType.LEARNING) return result;
 
-    public List<Card> getLevelTwoDeck() {
-        // Returns a list of cards for level 2 play:
-        // 8 random level 2 cards and 4 random level 1 cards (from both "level1" and "learningFlight").
-        List<Card> result = new ArrayList<>();
-
-        // Select 8 random levelTwo cards.
-        List<JsonNode> levelTwoNodes = cardsByGroup.get("level2");
-        if(levelTwoNodes == null || levelTwoNodes.size() < 8) {
-            throw new IllegalArgumentException("Not enough level 2 cards available. Required: 8, available: " + ((levelTwoNodes == null)? 0 : levelTwoNodes.size()));
-        }
-        List<JsonNode> levelTwoCopy = new ArrayList<>(levelTwoNodes);
-        Collections.shuffle(levelTwoCopy, random);
-        for(int i = 0; i < 8; i++) {
-            result.add(createCard(levelTwoCopy.get(i)));
-        }
-
-        // Combine level1 cards from "level1" and "learningFlight".
+        // Combine level 1 cards from "levelOne" and "learningFlight".
         List<JsonNode> levelOneNodes = new ArrayList<>();
-        if(cardsByGroup.containsKey("level1")) {
-            levelOneNodes.addAll(cardsByGroup.get("level1"));
+        if(cardsByGroup.containsKey("levelOne")) {
+            levelOneNodes.addAll(cardsByGroup.get("levelOne"));
         }
         if(cardsByGroup.containsKey("learningFlight")) {
             levelOneNodes.addAll(cardsByGroup.get("learningFlight"));
@@ -108,6 +92,55 @@ public class CardFactory {
 
         return result;
     }
+
+//    public List<Card> getLearningDeck() {
+//        // Returns a list of all cards from the "learningFlight" group.
+//        List<Card> result = new ArrayList<>();
+//        List<JsonNode> learningFlightNodes = cardsByGroup.get("learningFlight");
+//        if(learningFlightNodes == null || learningFlightNodes.size() < 8) {
+//            throw new IllegalArgumentException("Not enough learning cards available. Required: 8, available: " + ((learningFlightNodes == null)? 0 : learningFlightNodes.size()));
+//        }
+//        Collections.shuffle(learningFlightNodes, random);
+//        for(int i = 0; i < 8; i++) {
+//            result.add(createCard(learningFlightNodes.get(i)));
+//        }
+//        return result;
+//    }
+//
+//    public List<Card> getLevelTwoDeck() {
+//        // Returns a list of cards for level 2 play:
+//        // 8 random level 2 cards and 4 random level 1 cards (from both "level1" and "learningFlight").
+//        List<Card> result = new ArrayList<>();
+//
+//        // Select 8 random levelTwo cards.
+//        List<JsonNode> levelTwoNodes = cardsByGroup.get("level2");
+//        if(levelTwoNodes == null || levelTwoNodes.size() < 8) {
+//            throw new IllegalArgumentException("Not enough level 2 cards available. Required: 8, available: " + ((levelTwoNodes == null)? 0 : levelTwoNodes.size()));
+//        }
+//        List<JsonNode> levelTwoCopy = new ArrayList<>(levelTwoNodes);
+//        Collections.shuffle(levelTwoCopy, random);
+//        for(int i = 0; i < 8; i++) {
+//            result.add(createCard(levelTwoCopy.get(i)));
+//        }
+//
+//        // Combine level1 cards from "level1" and "learningFlight".
+//        List<JsonNode> levelOneNodes = new ArrayList<>();
+//        if(cardsByGroup.containsKey("level1")) {
+//            levelOneNodes.addAll(cardsByGroup.get("level1"));
+//        }
+//        if(cardsByGroup.containsKey("learningFlight")) {
+//            levelOneNodes.addAll(cardsByGroup.get("learningFlight"));
+//        }
+//        if(levelOneNodes.size() < 4) {
+//            throw new IllegalArgumentException("Not enough level 1 cards available. Required: 4, available: " + levelOneNodes.size());
+//        }
+//        Collections.shuffle(levelOneNodes, random);
+//        for(int i = 0; i < 4; i++) {
+//            result.add(createCard(levelOneNodes.get(i)));
+//        }
+//
+//        return result;
+//    }
 
     private static final Map<String, Class<? extends Card>> CARD_MAP = new HashMap<>();
     static {

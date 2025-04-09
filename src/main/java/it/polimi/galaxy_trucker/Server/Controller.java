@@ -13,7 +13,7 @@ public class Controller {
     }
 
     String processCmd(String cmd, String cmd2) {
-        Player player = new Player(cmd);
+        Player player = new Player(cmd, new int[]{0, 0});
 
         gameModel.addPlayer(player);
 

@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.Server;
 
+import it.polimi.galaxy_trucker.BoardType;
 import it.polimi.galaxy_trucker.GameModel;
 
 import java.io.IOException;
@@ -8,7 +9,7 @@ import java.net.Socket;
 
 public class ServerMain {
     static int portNumber = 8080;
-    static GameModel gameModel = new GameModel(2);
+    static GameModel gameModel = new GameModel(BoardType.LEVEL_TWO);
 
     public static void main(String[] args) {
 

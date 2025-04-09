@@ -15,15 +15,18 @@ public class Player {
     public enum Color{
         BLUE, RED, YELLOW, GREEN
     }
+
     private final String name;
+    private final int[] profilePictureIds;
     private Color color;
     private ShipBoard shipBoard;
     private int credits;
     private int position;
     private boolean isEliminated;
 
-    public Player(String name) {
+    public Player(String name, int[] profilePictureIds) {
         this.name = name;
+        this.profilePictureIds = profilePictureIds;
         this.color = null;
         this.shipBoard = null;
         this.credits = 0;
@@ -41,8 +44,8 @@ public class Player {
     public Color getColor() {
         return color;
     }
-    public void setNewShipBoard(int shipBoardType) {
-        this.shipBoard = new ShipBoard(shipBoardType);
+    public void setNewShipBoard(BoardType shipType) {
+        this.shipBoard = new ShipBoard(shipType);
     }
     public ShipBoard getShipBoard() {
         return shipBoard;

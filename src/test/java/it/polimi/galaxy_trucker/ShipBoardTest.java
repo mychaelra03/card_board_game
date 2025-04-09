@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 
+import static it.polimi.galaxy_trucker.BoardType.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile.*;
 import static it.polimi.galaxy_trucker.Server.Model.tiles.CargoTile.CargoType.*;
 import static it.polimi.galaxy_trucker.Server.Model.tiles.Connector.*;
@@ -24,7 +25,7 @@ public class ShipBoardTest {
     private static final Connector[] FULL_NONE_CONNECTORS = {NONE, NONE, NONE, NONE};
     @Test
     void initializationBoard1() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         Tile[][] tiles = ship.getTiles();
         for (int y = 0; y < tiles.length; y++) {
             for (int x = 0; x < tiles[y].length; x++) {
@@ -38,7 +39,7 @@ public class ShipBoardTest {
 
     @Test
     void initializationBoard2() {
-        ShipBoard ship = new ShipBoard(2);
+        ShipBoard ship = new ShipBoard(LEVEL_TWO);
         Tile[][] tiles = ship.getTiles();
         for (int y = 0; y < tiles.length; y++) {
             for (int x = 0; x < tiles[y].length; x++) {
@@ -52,14 +53,14 @@ public class ShipBoardTest {
 
     @Test
     void isInsideShipType1() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         assertTrue(ship.isInsideShip(3, 2), "Coordinate (3,2) should be inside the ship for type 1");
         assertFalse(ship.isInsideShip(0, 0), "Coordinate (0,0) should be outside the ship for type 1");
     }
 
     @Test
     void setTileValid() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         CabinTile cabin = new CabinTile(0, FULL_UNIVERSAL_CONNECTORS);
         ship.setTile(2, 2, cabin, 1);
         assertEquals(cabin, ship.getTile(2, 2), "The tile should be the cabin.");
@@ -68,7 +69,7 @@ public class ShipBoardTest {
 
     @Test
     void setTileValidFactory() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, 40, 1);
         assertInstanceOf(CabinTile.class, ship.getTile(2, 2), "The tile should be a cabin.");
         assertEquals(SINGLE, ship.getTile(2, 2).getConnector(2), "Given the rotation, the bottom connector should be single.");
@@ -91,7 +92,7 @@ public class ShipBoardTest {
 
     @Test
     void setTileOccupied() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0));
         assertTrue(exception.getMessage().contains("Tile occupied"), "Exception message should indicate tile occupation.");
@@ -99,7 +100,7 @@ public class ShipBoardTest {
 
     @Test
     void getBatteriesCount() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2,  new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
         assertEquals(3, ship.getTotalBatteriesCount(), "Batteries count should be 3.");
         ship.setTile(4, 2,  new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 2), 0);
@@ -108,7 +109,7 @@ public class ShipBoardTest {
 
     @Test
     void isSideShielded() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new ShieldTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         assertFalse(ship.isSideShielded(0), "The shield should not have energy to activate.");
         ship.setTile(4, 2, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
@@ -120,7 +121,7 @@ public class ShipBoardTest {
 
     @Test
     void removeCrewMemberAtAt() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         CabinTile cabin = new CabinTile(0, FULL_UNIVERSAL_CONNECTORS);
         ship.setTile(2, 2, cabin, 0);
         assertEquals(4, ship.getTotalHumanCount(), "Human count should be 4.");
@@ -135,7 +136,7 @@ public class ShipBoardTest {
 
     @Test
     void hasAlien() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         assertFalse(ship.hasAlien(CrewType.BROWN_ALIEN), "Should not have a brown alien initially.");
         ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(1, 2, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
@@ -147,7 +148,7 @@ public class ShipBoardTest {
 
     @Test
     void getCurrentCannonStrength() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         assertEquals(0, ship.getCurrentStrength(CannonTile.class), "Total cannon strength should be 0.");
         ship.setTile(3, 1, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(4, 1, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.PURPLE_ALIEN), 0);
@@ -166,7 +167,7 @@ public class ShipBoardTest {
 
     @Test
     void getMinMaxCannonStrength() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         assertEquals(0, ship.getMinCannonStrength(), "Total minimal cannon strength should be 0.");
         assertEquals(0, ship.getMaxCannonStrength(), "Total maximum cannon strength should be 0.");
         ship.setTile(3, 1, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
@@ -185,7 +186,7 @@ public class ShipBoardTest {
 
     @Test
     void getCurrentEngineStrength() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         assertEquals(0, ship.getCurrentStrength(EngineTile.class), "Total engine strength should be 0.");
         ship.setTile(3, 1, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(4, 1, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
@@ -200,7 +201,7 @@ public class ShipBoardTest {
 
     @Test
     void calculateCargoValue() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         CargoTile cargo = new CargoTile(0, FULL_UNIVERSAL_CONNECTORS, NORMAL, 3);
         ship.setTile(2, 2, cargo, 0);
         ship.loadCargoAt(2, 2, 0, BlockType.YELLOW);
@@ -211,7 +212,7 @@ public class ShipBoardTest {
 
     @Test
     void getExposedConnectorsCount() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         CannonTile cannon = new CannonTile(0,FULL_SINGLE_CONNECTORS, false);
         CabinTile cabin = new CabinTile(1,FULL_SINGLE_CONNECTORS);
         assertEquals(4, ship.getExposedConnectorsCount(), "Exposed connectors should be 4.");
@@ -223,7 +224,7 @@ public class ShipBoardTest {
 
     @Test
     void tileUpdateAlienSupport() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         Connector[] connectors = {UNIVERSAL, UNIVERSAL, UNIVERSAL, NONE};
         CabinTile cabin = new CabinTile(0, connectors);
         AlienSupportTile alienSuppNotConnected = new AlienSupportTile(0, FULL_NONE_CONNECTORS, CrewType.BROWN_ALIEN);
@@ -245,7 +246,7 @@ public class ShipBoardTest {
 
     @Test
     void tileRemoveAlienSupport() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         Connector[] connectors = {UNIVERSAL, UNIVERSAL, UNIVERSAL, NONE};
         CabinTile cabin = new CabinTile(0,connectors);
         AlienSupportTile alienSuppToRemove = new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN);
@@ -269,7 +270,7 @@ public class ShipBoardTest {
 
     @Test
     void automaticTileRemoval() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(1, 2, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
         ship.setTile(4, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
@@ -288,7 +289,7 @@ public class ShipBoardTest {
 
     @Test
     void removeBatteryFrom() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
         ship.setTile(1, 2, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
         ship.setTile(4, 2, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 2), 0);
@@ -310,7 +311,7 @@ public class ShipBoardTest {
 
     @Test
     void removeMostValuableCargo() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
         ship.setTile(1, 2, new CargoTile(0, FULL_UNIVERSAL_CONNECTORS, NORMAL, 3), 0);
         ship.setTile(1, 3, new CargoTile(0, FULL_UNIVERSAL_CONNECTORS, RED, 2), 0);
@@ -334,7 +335,7 @@ public class ShipBoardTest {
 
     @Test
     void hasTileOnPath() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(1, 2, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
         ship.setTile(3, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 2);
@@ -355,7 +356,7 @@ public class ShipBoardTest {
 
     @Test
     void isPathEmpty() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(1, 2, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
         ship.setTile(3, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 2);
@@ -377,7 +378,7 @@ public class ShipBoardTest {
 
     @Test
     void getDefendingCannonType() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
         ship.setTile(4, 2, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 0);
         ship.setTile(2, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 3);
@@ -410,7 +411,7 @@ public class ShipBoardTest {
 
     @Test
     void getTilesPositions() {
-        ShipBoard ship = new ShipBoard(2);
+        ShipBoard ship = new ShipBoard(LEVEL_TWO);
         ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(1, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(0, 2, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
@@ -445,7 +446,7 @@ public class ShipBoardTest {
 
     @Test
     void removeFirstTileInPath() {
-        ShipBoard ship = new ShipBoard(2);
+        ShipBoard ship = new ShipBoard(LEVEL_TWO);
         ship.setTile(2, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(1, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(0, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
@@ -471,7 +472,7 @@ public class ShipBoardTest {
 
     @Test
     void hasExposedConnectorInPath() {
-        ShipBoard ship = new ShipBoard(2);
+        ShipBoard ship = new ShipBoard(LEVEL_TWO);
         ship.setTile(2, 2, new StructuralTile(0, new Connector[]{DOUBLE, SINGLE, UNIVERSAL, NONE}), 0);
         ship.setTile(2, 3, new StructuralTile(0, new Connector[]{UNIVERSAL, UNIVERSAL, NONE, SINGLE}), 0);
         ship.setTile(4, 2, new StructuralTile(0, new Connector[]{NONE, UNIVERSAL, UNIVERSAL, SINGLE}), 0);
@@ -503,7 +504,7 @@ public class ShipBoardTest {
 
     @Test
     void getInvalidTiles() {
-        ShipBoard ship = new ShipBoard(1);
+        ShipBoard ship = new ShipBoard(LEARNING);
         ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(3, 1, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
         ship.setTile(4, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);

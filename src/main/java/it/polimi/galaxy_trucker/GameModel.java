@@ -10,28 +10,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameModel {
-    private final int boardType;
+    private final BoardType boardType;
     private final List<Player> players;
     private final List<Card> deck;
     private final int flightTrackLength;
 
-    public GameModel(int boardType, List<Player> players) {
-        if (boardType < 1 || boardType > 2) throw new IllegalArgumentException("boardType must be between 1 and 2.");
+    public GameModel(BoardType boardType, List<Player> players) {
         this.boardType = boardType;
-      //  if (players.size() < 2 || players.size() > 4) throw new IllegalArgumentException("Invalid number of players.");
+        //if (players.size() < 2 || players.size() > 4) throw new IllegalArgumentException("Invalid number of players.");
         this.players = players;
 
-        CardFactory cardFactory = CardFactory.getInstance();
-        this.deck = (boardType == 1) ? cardFactory.getLearningDeck() : cardFactory.getLevelTwoDeck();
-        this.flightTrackLength = (boardType == 1)? 18 : 24;
+        this.deck = CardFactory.getInstance().getDeck(boardType);
+        this.flightTrackLength = (boardType == BoardType.LEARNING)? 18 : 24;
     }
-    public GameModel(int boardType) {
-        if (boardType < 1 || boardType > 2) throw new IllegalArgumentException("boardType must be between 1 and 2.");
-        this.boardType = boardType;
-        this.players = new ArrayList<>();
-        CardFactory cardFactory = CardFactory.getInstance();
-        this.deck = (boardType == 1) ? cardFactory.getLearningDeck() : cardFactory.getLevelTwoDeck();
-        this.flightTrackLength = (boardType == 1)? 18 : 24;
+    public GameModel(BoardType boardType) {
+        this(boardType, new ArrayList<>());
     }
 
     public boolean addPlayer(Player player){
