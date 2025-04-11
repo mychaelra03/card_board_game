@@ -79,7 +79,7 @@ public class ClientMain extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(ClientMain.class.getResource("/it/polimi/galaxy_trucker/View/hello-view.fxml"));
 
 
-        Scene scene = new Scene(fxmlLoader.load(), 1400, 800);
+        Scene scene = new Scene(fxmlLoader.load(), 764, 648);
    //     Parent root = fxmlLoader.load();
         Scene1Controller controller = fxmlLoader.getController();
         controller.setStage(stage,this.virtualServer);
