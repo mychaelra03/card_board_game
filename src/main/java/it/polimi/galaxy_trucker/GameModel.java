@@ -21,6 +21,9 @@ public class GameModel {
         this.players = players;
 
         this.deck = CardFactory.getInstance().getDeck(boardType);
+        for(Card card : this.deck) {
+            card.assignBoard(this);
+        }
         this.flightTrackLength = (boardType == BoardType.LEARNING)? 18 : 24;
     }
     public GameModel(BoardType boardType) {

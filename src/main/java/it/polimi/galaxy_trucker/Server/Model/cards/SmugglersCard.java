@@ -27,12 +27,12 @@ public class SmugglersCard extends AbstractEnemy {
     }
 
     @Override
-    public void giveReward(Player player) {
+    protected void giveReward(Player player) {
         player.giveCargoReward(rewardCargo);
     }
 
     @Override
-    public void applyPunishment(Player player) {
+    protected void applyPunishment(Player player) {
         player.removeMostValuableCargo(cargoLossOnDefeat);
     }
 

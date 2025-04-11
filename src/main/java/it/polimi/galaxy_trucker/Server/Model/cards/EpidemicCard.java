@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public class EpidemicCard extends Card {
     }
 
     @Override
-    public void applyEffects(GameModel board) {
+    protected void onActivate() {
         List<Player> players = board.getSortedPlayers();
         for(Player player : players) {
             player.applyEpidemicCard();

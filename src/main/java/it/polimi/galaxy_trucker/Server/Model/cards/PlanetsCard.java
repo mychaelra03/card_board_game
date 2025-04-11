@@ -2,11 +2,12 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.tiles.BlockType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.BACKWARD;
 
@@ -17,6 +18,10 @@ public class PlanetsCard extends Card {
 
     private final BlockType[][] planets;
     private final int positionCost;
+
+    private List<Player> playerQueue;
+    private boolean[] planetTaken;
+    private Map<Player, BlockType[]> decisions;
 
     public PlanetsCard(
             @JsonProperty("id") int id,
@@ -31,21 +36,64 @@ public class PlanetsCard extends Card {
     }
 
     @Override
-    public void applyEffects(GameModel board) {
-        List<Player> players = board.getSortedPlayers();
-        boolean[] planetTaken = new boolean[planets.length];
+    protected void onActivate() {
+        this.playerQueue = board.getSortedPlayers();
+        this.planetTaken = new boolean[planets.length];
+        this.decisions = new HashMap<>();
+        askFirstPlayer();
+    }
 
-        for(Player player : players) {
-            int chosenPlanet = player.choosePlanet(planetTaken);
-            if(chosenPlanet != -1) {
-                if(planetTaken[chosenPlanet]) throw new IllegalArgumentException("Planet " + chosenPlanet + " is already taken.");
-                planetTaken[chosenPlanet] = true;
+    private void askFirstPlayer() {
+        if(!playerQueue.isEmpty()) {
+            Player player = playerQueue.getFirst();
+            // TODO
+        } else giveRewards();
+    }
 
-                player.giveCargoReward(planets[chosenPlanet]);
+    private void askNextPlayer() {
+        playerQueue.removeFirst();
+        askFirstPlayer();
+    }
+
+    public void choosePlanet(int index) {
+        if(index < 0 || index >= planets.length) throw new IllegalArgumentException("Planet index out of bounds.");
+        if(planetTaken[index]) throw new IllegalArgumentException("Planet " + index + " is already taken.");
+        if(playerQueue.isEmpty()) throw new IllegalStateException("No player available to make a choice.");
+        planetTaken[index] = true;
+        decisions.put(playerQueue.getFirst(), planets[index]);
+        askNextPlayer();
+    }
+
+    public void refuse() {
+        askNextPlayer();
+    }
+
+    private void giveRewards() {
+        for(Player player : board.getSortedPlayers().reversed()) {
+            if(decisions.containsKey(player)) {
+                BlockType[] chosenPlanets = decisions.get(player);
+                if(chosenPlanets == null) throw new IllegalArgumentException("A planet is null.");
+                player.giveCargoReward(chosenPlanets);
                 board.movePlayer(player, positionCost, BACKWARD);
             }
         }
     }
+//    @Override
+//    public void applyEffects() {
+//        List<Player> players = board.getSortedPlayers();
+//        boolean[] planetTaken = new boolean[planets.length];
+//
+//        for(Player player : players) {
+//            int chosenPlanet = player.choosePlanet(planetTaken);
+//            if(chosenPlanet != -1) {
+//                if(planetTaken[chosenPlanet]) throw new IllegalArgumentException("Planet " + chosenPlanet + " is already taken.");
+//                planetTaken[chosenPlanet] = true;
+//
+//                player.giveCargoReward(planets[chosenPlanet]);
+//                board.movePlayer(player, positionCost, BACKWARD);
+//            }
+//        }
+//    }
 
     @Override
     public String getCardType() {

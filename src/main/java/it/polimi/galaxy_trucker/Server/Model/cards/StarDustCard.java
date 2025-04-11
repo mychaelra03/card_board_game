@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class StarDustCard extends Card {
     }
 
     @Override
-    public void applyEffects(GameModel board) {
+    protected void onActivate() {
         List<Player> playersReversed = board.getSortedPlayers().reversed();
         for(Player player : playersReversed) {
             int exposedConnectors = player.getExposedConnectorsCount();

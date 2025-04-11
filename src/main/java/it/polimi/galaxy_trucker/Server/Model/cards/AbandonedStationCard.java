@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.tiles.BlockType;
 
@@ -19,6 +18,8 @@ public class AbandonedStationCard extends Card {
     private final BlockType[] rewardCargo;
     private final int positionCost;
 
+    private List<Player> playerQueue;
+
     public AbandonedStationCard(
             @JsonProperty("id") int id,
             @JsonProperty("level") int level,
@@ -34,20 +35,49 @@ public class AbandonedStationCard extends Card {
     }
 
     @Override
-    public void applyEffects(GameModel board) {
-        List<Player> players = board.getSortedPlayers();
-        for(Player player : players) {
-            if(player.getCrewCount() < requiredCrew) continue;
+    protected void onActivate() {
+        this.playerQueue = board.getSortedPlayers();
+        askFirstPlayer();
+    }
 
-            boolean accepted = player.acceptsCardEffect();
-
-            if(accepted) {
-                player.giveCargoReward(rewardCargo);
-                board.movePlayer(player, positionCost, BACKWARD);
-                break;
-            }
+    private void askFirstPlayer() {
+        while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() < requiredCrew) {
+            playerQueue.removeFirst();
+        }
+        if(!playerQueue.isEmpty()) {
+            Player player = playerQueue.getFirst();
+            // TODO
         }
     }
+
+    // TODO: merge ship and station?
+    public void accept() {
+        if(playerQueue.isEmpty()) throw new IllegalStateException("No player available to make a choice.");
+        Player player = playerQueue.getFirst();
+        player.giveCargoReward(rewardCargo);
+        board.movePlayer(player, positionCost, BACKWARD);
+    }
+
+    public void refuse() {
+        playerQueue.remove(playerQueue.getFirst());
+        askFirstPlayer();
+    }
+
+    //@Override
+//    public void applyEffects() {
+//        List<Player> players = board.getSortedPlayers();
+//        for(Player player : players) {
+//            if(player.getCrewCount() < requiredCrew) continue;
+//
+//            boolean accepted = player.acceptsCardEffect();
+//
+//            if(accepted) {
+//                player.giveCargoReward(rewardCargo);
+//                board.movePlayer(player, positionCost, BACKWARD);
+//                break;
+//            }
+//        }
+//    }
 
     @Override
     public String getCardType() {

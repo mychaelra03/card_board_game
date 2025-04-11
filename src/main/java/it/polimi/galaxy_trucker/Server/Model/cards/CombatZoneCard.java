@@ -73,7 +73,12 @@ public class CombatZoneCard extends Card {
     }
 
     @Override
-    public void applyEffects(GameModel board) {
+    protected void onActivate() {
+
+    }
+
+    //@Override
+    public void applyEffects() {
         for(CombatRule rule : combatRules) {
             List<Player> players = board.getSortedPlayers();
             if(players.size() < 2) return;
