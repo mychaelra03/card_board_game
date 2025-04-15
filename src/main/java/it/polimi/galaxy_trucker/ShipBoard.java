@@ -114,6 +114,11 @@ public class ShipBoard {
         if(!(tiles[y][x] instanceof BatteriesTile)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a BatteriesTile.");
         return ((BatteriesTile)tiles[y][x]).removeBattery();
     }
+    public void removeBatteries(List<Point> coordinates) {
+        for(Point tile : coordinates) {
+            if(!removeBatteryFrom(tile.x, tile.y)) throw new IllegalArgumentException("No battery found at " + tile);
+        }
+    }
 
     // SHIELD TILES
     public boolean isSideShielded(int side) {
@@ -209,71 +214,30 @@ public class ShipBoard {
         }
     }
 
-    // CANNON TILES
-    public double getCurrentStrength(Class<? extends ActivatableTile> tileClass) {
-        double count = 0;
-        for(Tile[] row : tiles) {
-            for(Tile tile : row) {
-                if(tileClass.isInstance(tile)) count += ((ActivatableTile)tile).getStrength();
-            }
-        }
-        if((tileClass == EngineTile.class && hasAlien(CrewType.BROWN_ALIEN))
-                || (tileClass == CannonTile.class && hasAlien(CrewType.PURPLE_ALIEN)) && count != 0) count += 2;
-        return count;
+    // ACTIVATABLE TILES
+    public double getStrength(Class<? extends ActivatableTile> tileClass, int doubleVertical, int doubleRotated) {
+        return StrengthCalculator.calculateStrength(this, tileClass, doubleVertical, doubleRotated);
     }
-    public double getMinCannonStrength() {
+    public double getStrength(Class<? extends ActivatableTile> tileClass, int doubleVertical) {
+        return StrengthCalculator.calculateStrength(this, tileClass, doubleVertical, 0);
+    }
+
+    public double getMinStrength(Class<? extends ActivatableTile> tileClass) {
         // TODO: should the game let the player decide if they want to activate more cannons even when the single ones are enough?
-        double count = 0;
-        for(Tile[] row : tiles) {
-            for(Tile tile : row) {
-                if(tile instanceof CannonTile cannon && !cannon.isDouble()) count += cannon.getStrength();
-            }
-        }
-        if(hasAlien(CrewType.PURPLE_ALIEN) && count != 0) count += 2;
-        return count;
+        return getStrength(tileClass, 0, 0);
     }
-    public double getMaxCannonStrength() {
-        deactivateAllTiles(CannonTile.class);
-        double count = 0;
+
+    public double getMaxStrength(Class<? extends ActivatableTile> tileClass) {
         int batteries = getTotalBatteriesCount();
-        for(Tile[] row : tiles) {
-            for(Tile tile : row) {
-                if(tile instanceof CannonTile cannon) {
-                    if(cannon.isDouble()) {
-                        if(cannon.getRotation() == 0 && batteries > 0) {
-                            cannon.setPowered(true);
-                            count += cannon.getStrength();
-                            batteries--;
-                        }
-                    } else {
-                        count += cannon.getStrength();
-                    }
-                }
-            }
-        }
-        for(Tile[] row : tiles) {
-            for(Tile tile : row) {
-                if(batteries == 0) break;
-                if(tile instanceof CannonTile cannon && cannon.isDouble()) {
-                    if(cannon.getRotation() != 0 && batteries > 0) {
-                        cannon.setPowered(true);
-                        count += cannon.getStrength();
-                        batteries--;
-                    }
-                }
-            }
-        }
-        if(hasAlien(CrewType.PURPLE_ALIEN) && count != 0) count += 2;
-        return count;
-    }
-    public void deactivateAllTiles(Class<? extends ActivatableTile> tileClass) {
-        for(Tile[] row : tiles) {
-            for(Tile tile : row) {
-                if(tileClass.isInstance(tile) && ((ActivatableTile)tile).isDouble()) {
-                    ((ActivatableTile)tile).setPowered(false);
-                }
-            }
-        }
+
+        int doubleVerticalAvailable = getTileCount(tileClass, tile -> ((ActivatableTile) tile).isDouble() && tile.getRotation() == 0);
+        int doubleVertical = Math.min(batteries, doubleVerticalAvailable);
+        batteries -= doubleVertical;
+
+        int doubleRotatedAvailable = getTileCount(tileClass, tile -> ((ActivatableTile) tile).isDouble() && tile.getRotation() != 0);
+        int doubleRotated = Math.min(batteries, doubleRotatedAvailable);
+
+        return getStrength(tileClass, doubleVertical, doubleRotated);
     }
 
 
@@ -374,6 +338,11 @@ public class ShipBoard {
             }
         }
         return positions;
+    }
+
+    public int getTileCount(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
+        List<Point> positions = getTilesPositions(tileClass, filter);
+        return positions.size();
     }
 
     public boolean hasTileOnPath(Projectile.Source source, int index, Class<? extends Tile> tileClass, Predicate<Tile> filter) {

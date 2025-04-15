@@ -7,6 +7,7 @@ import it.polimi.galaxy_trucker.Player;
 import java.util.List;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.*;
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
@@ -24,6 +25,7 @@ public class StarDustCard extends Card {
             int exposedConnectors = player.getExposedConnectorsCount();
             board.movePlayer(player, exposedConnectors, BACKWARD);
         }
+        setInputState(FINISHED);
     }
 
     @Override

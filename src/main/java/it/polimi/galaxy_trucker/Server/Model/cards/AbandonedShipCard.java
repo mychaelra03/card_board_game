@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Queue;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.*;
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
@@ -20,7 +21,12 @@ public class AbandonedShipCard extends Card {
 
     private List<Player> playerQueue;
 
-    public AbandonedShipCard(@JsonProperty("id")int id, @JsonProperty("level")int level, @JsonProperty("crewToGiveUp")int crewToGiveUp, @JsonProperty("rewardCredits")int rewardCredits, @JsonProperty("positionCost")int positionCost) {
+    public AbandonedShipCard(
+            @JsonProperty("id") int id,
+            @JsonProperty("level") int level,
+            @JsonProperty("crewToGiveUp") int crewToGiveUp,
+            @JsonProperty("rewardCredits") int rewardCredits,
+            @JsonProperty("positionCost") int positionCost) {
         super(id, level);
         if (crewToGiveUp < 0) throw new IllegalArgumentException("crewToGiveUp must be a positive number.");
         this.crewToGiveUp = crewToGiveUp;
@@ -33,49 +39,36 @@ public class AbandonedShipCard extends Card {
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
-        askFirstPlayer();
+        setInputState(REWARD_DECISION);
+        skipIneligiblePlayers();
     }
 
-    private void askFirstPlayer() {
-        while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() < crewToGiveUp) {
+    public void accept(Player caller) {
+        verifyInputState(REWARD_DECISION);
+        validatePlayerTurn(caller, playerQueue);
+        caller.removeCrew(crewToGiveUp);
+        caller.giveCredits(rewardCredits);
+        board.movePlayer(caller, positionCost, BACKWARD);
+        playerQueue.clear();
+        setInputState(FINISHED);
+    }
+
+    public void refuse(Player caller) {
+        verifyInputState(REWARD_DECISION);
+        validatePlayerTurn(caller, playerQueue);
+        playerQueue.removeFirst();
+        skipIneligiblePlayers();
+    }
+
+    private void skipIneligiblePlayers() {
+        verifyInputState(REWARD_DECISION);
+        while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() <= crewToGiveUp) {
             playerQueue.removeFirst();
         }
-        if(!playerQueue.isEmpty()) {
-            Player player = playerQueue.getFirst();
-            // TODO
+        if(playerQueue.isEmpty()) {
+            setInputState(FINISHED);
         }
     }
-
-    // TODO: merge ship and station?
-    public void accept() {
-        if(playerQueue.isEmpty()) throw new IllegalStateException("No player available to make a choice.");
-        Player player = playerQueue.getFirst();
-        player.removeCrew(crewToGiveUp);
-        player.giveCredits(rewardCredits);
-        board.movePlayer(player, positionCost, BACKWARD);
-    }
-
-    public void refuse() {
-        playerQueue.remove(playerQueue.getFirst());
-        askFirstPlayer();
-    }
-
-    //@Override
-//    public void applyEffects() {
-//        List<Player> players = board.getSortedPlayers();
-//        for(Player player : players) {
-//            if(player.getCrewCount() < crewToGiveUp) continue;
-//
-//            boolean accepted = player.acceptsCardEffect();
-//
-//            if(accepted) {
-//                player.removeCrew(crewToGiveUp);
-//                player.giveCredits(rewardCredits);
-//                board.movePlayer(player, positionCost, BACKWARD);
-//                break;
-//            }
-//        }
-//    }
 
     @Override
     public String getCardType() {

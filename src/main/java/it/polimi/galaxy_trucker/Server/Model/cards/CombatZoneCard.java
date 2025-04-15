@@ -6,13 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.cards.projectile.CannonShot;
+import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.Server.Model.tiles.CannonTile;
 import it.polimi.galaxy_trucker.Server.Model.tiles.EngineTile;
 
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.CombatZoneCard.CombatRule.*;
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
@@ -43,25 +47,32 @@ public class CombatZoneCard extends Card {
             if (punishment == Punishment.CANNON_SHOTS) this.cannonShots = cannonShots;
             else this.cannonShots = null;
         }
-
         public Condition getCondition() {
             return condition;
         }
-
         public Punishment getPunishment() {
             return punishment;
         }
-
         public int getPunishmentValue() {
             return punishmentValue;
         }
-
         public CannonShot[] getCannonShots() {
             return cannonShots;
         }
     }
 
     private final CombatRule[] combatRules;
+
+    private List<CombatRule> ruleQueue;
+    private CombatRule currentRule;
+
+    private List<Player> playerQueue;
+    private Map<Player, Double> playerScores;
+
+    private List<CannonShot> shotQueue;
+    private Player punishedPlayer;
+    private CannonShot currentShot;
+    private int currentPathIndex;
 
     @JsonCreator
     public CombatZoneCard(
@@ -74,36 +85,148 @@ public class CombatZoneCard extends Card {
 
     @Override
     protected void onActivate() {
-
+        this.ruleQueue = new LinkedList<>(Arrays.asList(combatRules));
+        setInputState(NONE);
+        applyRule();
     }
 
-    //@Override
-    public void applyEffects() {
-        for(CombatRule rule : combatRules) {
-            List<Player> players = board.getSortedPlayers();
-            if(players.size() < 2) return;
+    private void applyRule() {
+        verifyInputState(NONE);
+        if(ruleQueue.isEmpty()) {
+            setInputState(FINISHED);
+            return;
+        }
+        this.currentRule = ruleQueue.getFirst();
+        List<Player> players = board.getSortedPlayers();
+        if(players.size() < 2) return;
 
-            Player worstPlayer = getWorstPlayer(players, rule.condition);
-            switch(rule.getPunishment()) {
-                case FLIGHT_DAYS -> board.movePlayer(worstPlayer, rule.punishmentValue, BACKWARD);
-                case CREW_LOSS -> worstPlayer.removeCrew(rule.punishmentValue);
-                case CARGO_LOSS -> worstPlayer.removeMostValuableCargo(rule.punishmentValue); //TODO: rules does not specify if the most valuable
-                case CANNON_SHOTS -> {
-                    for(CannonShot shot : rule.getCannonShots()) {
-                        int diceSum = GameModel.rollTwoDice();
-                        worstPlayer.applyProjectile(shot, diceSum);
-                    }
+        this.playerScores = new HashMap<>();
+
+        switch(currentRule.getCondition()) {
+            case CREW_SIZE -> {
+                for(Player player : players) {
+                    playerScores.put(player, (double)player.getCrewCount());
                 }
+                applyPunishment();
+            }
+            case ENGINE_POWER -> {
+                this.playerQueue = board.getSortedPlayers();
+                setInputState(ENGINE_SELECTION);
+            }
+            case CANNON_POWER -> {
+                this.playerQueue = board.getSortedPlayers();
+                setInputState(CANNON_SELECTION);
             }
         }
     }
 
+    public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
+        verifyInputState(ENGINE_SELECTION);
+        validatePlayerTurn(caller, playerQueue);
+        if(activatedEngines != batteryTiles.size()) throw new IllegalArgumentException("The number of activated engines does not match the number of batteries used.");
+        double strength = caller.getStrength(EngineTile.class, activatedEngines);
+        caller.removeBatteries(batteryTiles);
+        playerScores.put(caller, strength);
+        playerQueue.removeFirst();
+
+        if(playerQueue.isEmpty()) {
+            setInputState(NONE);
+            applyPunishment();
+        }
+    }
+    public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
+        verifyInputState(CANNON_SELECTION);
+        validatePlayerTurn(caller, playerQueue);
+        if(verticalCannons + rotatedCannons != batteryTiles.size()) throw new IllegalArgumentException("The number of activated cannons does not match the number of batteries used.");
+        double strength = caller.getStrength(CannonTile.class, verticalCannons, rotatedCannons);
+        caller.removeBatteries(batteryTiles);
+        playerScores.put(caller, strength);
+        playerQueue.removeFirst();
+
+        if(playerQueue.isEmpty()) {
+            setInputState(NONE);
+            applyPunishment();
+        }
+    }
+
+    private void applyPunishment() {
+        verifyInputState(NONE);
+
+        Player worstPlayer = getWorstPlayer(board.getSortedPlayers(), currentRule.condition);
+
+        switch(currentRule.getPunishment()) {
+            case FLIGHT_DAYS -> board.movePlayer(worstPlayer, currentRule.punishmentValue, BACKWARD);
+            case CREW_LOSS -> worstPlayer.removeCrew(currentRule.punishmentValue);
+            case CARGO_LOSS -> worstPlayer.removeMostValuableCargo(currentRule.punishmentValue);
+            case CANNON_SHOTS -> {
+                this.punishedPlayer = worstPlayer;
+                this.shotQueue = new LinkedList<>(Arrays.asList(currentRule.getCannonShots()));
+                applyShot();
+                return;
+            }
+        }
+        handleNextRule();
+    }
+
+    private void handleNextRule() {
+        ruleQueue.removeFirst();
+        applyRule();
+    }
+
+    private void applyShot() {
+        verifyInputState(NONE);
+        if(shotQueue.isEmpty()) {
+            handleNextRule();
+            return;
+        }
+        this.currentShot = shotQueue.getFirst();
+        int[] dice = GameModel.rollTwoDice();
+        this.currentPathIndex = Projectile.diceSumToIndex(currentShot.getSource(), dice[0] + dice[1]);
+
+        boolean isPlayerAtRisk = currentShot.evaluateDefense(punishedPlayer, currentPathIndex);
+
+        if(isPlayerAtRisk) {
+            setInputState(BATTERY_DECISION);
+            return;
+        }
+        handleNextShot();
+    }
+
+    private void handleNextShot() {
+        shotQueue.removeFirst();
+        applyShot();
+    }
+
+    public void useBattery(Player caller, Point batteryCoords) {
+        verifyInputState(BATTERY_DECISION);
+        if(caller != punishedPlayer) throw new IllegalArgumentException("It is not " + caller.getName() + "'s turn. It is currently " + punishedPlayer.getName() + "'s turn.");
+
+        if(!caller.removeBatteryFrom(batteryCoords.x, batteryCoords.y)) throw new IllegalArgumentException("No battery found at " + batteryCoords);
+
+        setInputState(NONE);
+        handleNextShot();
+    }
+    public void refuseBattery(Player caller) {
+        verifyInputState(BATTERY_DECISION);
+        if(caller != punishedPlayer) throw new IllegalArgumentException("It is not " + caller.getName() + "'s turn. It is currently " + punishedPlayer.getName() + "'s turn.");
+
+        caller.removeFirstTileInPath(currentShot.getSource(), currentPathIndex);
+
+        setInputState(NONE);
+        handleNextShot();
+    }
+
     private Player getWorstPlayer(List<Player> players, Condition condition) {
+
+        if(players.isEmpty()) throw new IllegalArgumentException("Players list cannot be empty.");
+
         Player worstPlayer = players.getFirst();
-        double worstScore = getScore(worstPlayer, condition);
+        if(!playerScores.containsKey(worstPlayer)) throw new RuntimeException("Player " + worstPlayer.getName() + " score was not found.");
+        double worstScore = playerScores.get(worstPlayer);
 
         for(Player player : players) {
-            double currentScore = getScore(player, condition);
+            if(!playerScores.containsKey(player)) throw new RuntimeException("Player " + player.getName() + " score was not found.");
+            double currentScore = playerScores.get(player);
 
             if(currentScore < worstScore) {
                 worstPlayer = player;
@@ -111,20 +234,6 @@ public class CombatZoneCard extends Card {
             }
         }
         return worstPlayer;
-    }
-    private double getScore(Player player, Condition condition) {
-        if(condition == Condition.CREW_SIZE) {
-            return player.getCrewCount();
-        }
-        if(condition == Condition.CANNON_POWER) {
-            player.chooseTilesToActivate(CannonTile.class);
-            return player.getCurrentStrength(CannonTile.class);
-        }
-        if(condition == Condition.ENGINE_POWER) {
-            player.chooseTilesToActivate(EngineTile.class);
-            return player.getCurrentStrength(EngineTile.class);
-        }
-        throw new IllegalArgumentException("Unknown condition: " + condition);
     }
 
     @Override

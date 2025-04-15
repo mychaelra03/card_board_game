@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.tiles.BlockType;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.BACKWARD;
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
@@ -19,6 +23,8 @@ public class AbandonedStationCard extends Card {
     private final int positionCost;
 
     private List<Player> playerQueue;
+
+    private Player rewardedPlayer;
 
     public AbandonedStationCard(
             @JsonProperty("id") int id,
@@ -37,47 +43,50 @@ public class AbandonedStationCard extends Card {
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
-        askFirstPlayer();
+        setInputState(REWARD_DECISION);
+        skipIneligiblePlayers();
     }
 
-    private void askFirstPlayer() {
-        while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() < requiredCrew) {
+    public void accept(Player caller) {
+        verifyInputState(REWARD_DECISION);
+        validatePlayerTurn(caller, playerQueue);
+        board.movePlayer(caller, positionCost, BACKWARD);
+        this.rewardedPlayer = caller;
+        caller.setCargoPool(new ArrayList<>(Arrays.asList(rewardCargo)));
+        playerQueue.clear();
+        setInputState(CARGO_DECISION);
+    }
+
+    public void refuse(Player caller) {
+        verifyInputState(REWARD_DECISION);
+        validatePlayerTurn(caller, playerQueue);
+        playerQueue.removeFirst();
+        skipIneligiblePlayers();
+    }
+
+    private void skipIneligiblePlayers() {
+        verifyInputState(REWARD_DECISION);
+        while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() <= requiredCrew) {
             playerQueue.removeFirst();
         }
-        if(!playerQueue.isEmpty()) {
-            Player player = playerQueue.getFirst();
-            // TODO
+        if(playerQueue.isEmpty()) {
+            setInputState(FINISHED);
         }
     }
 
-    // TODO: merge ship and station?
-    public void accept() {
-        if(playerQueue.isEmpty()) throw new IllegalStateException("No player available to make a choice.");
-        Player player = playerQueue.getFirst();
-        player.giveCargoReward(rewardCargo);
-        board.movePlayer(player, positionCost, BACKWARD);
+    public void placeCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
+        verifyInputState(CARGO_DECISION);
+        if(caller != rewardedPlayer) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+
+        caller.swapCargo(blockIndex, tileCoords, containerIndex);
     }
 
-    public void refuse() {
-        playerQueue.remove(playerQueue.getFirst());
-        askFirstPlayer();
+    public void confirmDone(Player caller) {
+        verifyInputState(CARGO_DECISION);
+        if(caller != rewardedPlayer) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+        caller.clearCargoPool();
+        setInputState(FINISHED);
     }
-
-    //@Override
-//    public void applyEffects() {
-//        List<Player> players = board.getSortedPlayers();
-//        for(Player player : players) {
-//            if(player.getCrewCount() < requiredCrew) continue;
-//
-//            boolean accepted = player.acceptsCardEffect();
-//
-//            if(accepted) {
-//                player.giveCargoReward(rewardCargo);
-//                board.movePlayer(player, positionCost, BACKWARD);
-//                break;
-//            }
-//        }
-//    }
 
     @Override
     public String getCardType() {

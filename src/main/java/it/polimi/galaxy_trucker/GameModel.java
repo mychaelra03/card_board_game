@@ -62,8 +62,11 @@ public class GameModel {
         player.setPosition(newPosition);
     }
 
-    public static int rollTwoDice() {
-        return (1 + (int)(Math.random() * 6)) + (1 + (int)(Math.random() * 6));
+    public static int[] rollTwoDice() {
+        int[] dice = new int[2];
+        dice[0] = 1 + (int)(Math.random() * 6);
+        dice[1] = 1 + (int)(Math.random() * 6);
+        return dice;
     }
 
     private void tellToListener(Integer from, Integer to) {

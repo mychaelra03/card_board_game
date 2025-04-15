@@ -1,5 +1,17 @@
 package it.polimi.galaxy_trucker.Server.Model.cards.projectile;
 
+import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.ShipBoard;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile.Size.LARGE;
+import static it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile.Size.SMALL;
+import static it.polimi.galaxy_trucker.ShipBoard.DefendingCannonType.DOUBLE;
+import static it.polimi.galaxy_trucker.ShipBoard.DefendingCannonType.SINGLE;
+
 public abstract class Projectile {
 
     private final Size size;
@@ -30,5 +42,16 @@ public abstract class Projectile {
 
     public Source getSource() {
         return source;
+    }
+
+    public abstract boolean evaluateDefense(Player player, int pathIndex);
+
+    public static int diceSumToIndex(Source source, int diceSum) {
+        if(source == Projectile.Source.UP || source == Projectile.Source.DOWN) {
+            return diceSum - 4;
+        } else if(source == Projectile.Source.LEFT || source == Projectile.Source.RIGHT) {
+            return diceSum - 5;
+        }
+        throw new IllegalArgumentException("Invalid source: " + source);
     }
 }

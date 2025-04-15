@@ -24,6 +24,8 @@ public class Player {
     private int position;
     private boolean isEliminated;
 
+    private List<BlockType> cargoPool;
+
     public Player(String name, int[] profilePictureIds) {
         this.name = name;
         this.profilePictureIds = profilePictureIds;
@@ -37,6 +39,9 @@ public class Player {
     // GETTERS AND SETTERS
     public String getName() {
         return name;
+    }
+    public int[] getProfilePictureIds() {
+        return profilePictureIds;
     }
     public void setColor(Color color) {
         this.color = color;
@@ -68,6 +73,12 @@ public class Player {
     public boolean isEliminated() {
         return isEliminated;
     }
+    public List<BlockType> getCargoPool() {
+        return cargoPool;
+    }
+    public void setCargoPool(List<BlockType> cargoPool) {
+        this.cargoPool = cargoPool;
+    }
 
     // DELEGATE METHODS
     public int getCrewCount() {
@@ -82,66 +93,41 @@ public class Player {
     public void removeMostValuableCargo(int quantity) {
         shipBoard.removeMostValuableCargo(quantity);
     }
-    public double getMaxCannonStrength() {
-        return shipBoard.getMaxCannonStrength();
+    public double getMaxStrength(Class<? extends ActivatableTile> tileClass) {
+        return shipBoard.getMaxStrength(tileClass);
     }
-    public double getCurrentStrength(Class<? extends ActivatableTile> tileClass) {
-        return shipBoard.getCurrentStrength(tileClass);
+    public double getStrength(Class<? extends ActivatableTile> tileClass, int doubleVertical, int doubleRotated) {
+        return shipBoard.getStrength(tileClass, doubleVertical, doubleRotated);
+    }
+    public double getStrength(Class<? extends ActivatableTile> tileClass, int doubleVertical) {
+        return shipBoard.getStrength(tileClass, doubleVertical, 0);
+    }
+    public boolean removeBatteryFrom(int x, int y) {
+        return shipBoard.removeBatteryFrom(x, y);
+    }
+    public void removeBatteries(List<Point> coordinates) {
+        shipBoard.removeBatteries(coordinates);
+    }
+    public Point removeFirstTileInPath(Projectile.Source source, int index) {
+        return shipBoard.removeFirstTileInPath(source, index);
+    }
+    public ShipBoard.DefendingCannonType getDefendingCannonType(Projectile.Source source, int index) {
+        return shipBoard.getDefendingCannonType(source, index);
+    }
+    public boolean isPathEmpty(Projectile.Source source, int index) {
+        return shipBoard.isPathEmpty(source, index);
+    }
+    public boolean isSideShielded(int side) {
+        return shipBoard.isSideShielded(side);
+    }
+    public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
+        return shipBoard.hasExposedConnectorInPath(source, index);
+    }
+    public BlockType loadCargoAt(int x, int y, int index, BlockType blockType) {
+        return shipBoard.loadCargoAt(x, y, index, blockType);
     }
 
     // NEW METHODS
-    public boolean acceptsCardEffect() {
-        boolean decision = true;            // TODO: from javafx
-        return decision;
-    }
-    public int choosePlanet(boolean[] planetTaken) {
-        // selects a valid index between 0 and planetTaken.length (planetTaken.length must be false)
-        // -1 to refuse
-        int chosenPlanet = -1;              // TODO: from javafx
-        return chosenPlanet;
-    }
-
-    public void chooseTilesToActivate(Class<? extends ActivatableTile> tileClass) {
-        shipBoard.deactivateAllTiles(tileClass);
-        boolean done = false;
-        do {
-            List<Point> activatableTiles = shipBoard.getTilesPositions(tileClass, tile -> ((ActivatableTile)tile).isDouble());   // TODO: to client
-            List<Point> batteries = shipBoard.getTilesPositions(BatteriesTile.class, tile -> true);                       // TODO: to client
-            int chosenTileIndex = 0;        // TODO: from javafx
-            int chosenBatteryIndex = 0;     // TODO: from javafx
-
-            ActivatableTile chosenTileToToggle = (ActivatableTile)shipBoard.getTile(activatableTiles.get(chosenTileIndex).x,activatableTiles.get(chosenTileIndex).y);
-            BatteriesTile chosenBatteryToUse = (BatteriesTile)shipBoard.getTile(activatableTiles.get(chosenBatteryIndex).x,activatableTiles.get(chosenBatteryIndex).y);
-
-            if(chosenTileToToggle.isPowered() && !chosenBatteryToUse.isFull()) {
-                chosenTileToToggle.setPowered(false);
-                chosenBatteryToUse.addBattery();
-            } else if(!chosenTileToToggle.isPowered() && chosenBatteryToUse.getStoredBatteries() > 0) {
-                chosenBatteryToUse.removeBattery();
-                chosenTileToToggle.setPowered(true);
-            }
-            chosenTileToToggle = null;
-            chosenBatteryToUse = null;
-            done = true;                    // TODO: from javafx
-        } while(!done);
-    }
-
-    public void giveCargoReward(BlockType[] cargo) {
-        List<BlockType> cargoList = Arrays.asList(cargo);
-        boolean done = false;
-        do {
-            List<Point> cargoPositions = shipBoard.getTilesPositions(CargoTile.class, tile -> true); // TODO: to client
-            int chosenBlockToTake = 0;      // TODO: from javafx
-            int chosenCargoTileToSet = 0;   // TODO: from javafx
-            int chosenContainerToSet = 0;   // TODO: from javafx
-            done = true;                    // TODO: from javafx
-
-            // TODO: blocks removal
-            cargoList.add(shipBoard.loadCargoAt(cargoPositions.get(chosenCargoTileToSet).x, cargoPositions.get(chosenCargoTileToSet).y, chosenContainerToSet, cargoList.get(chosenBlockToTake)));
-            cargoList.remove(chosenBlockToTake);
-        } while(!done);
-    }
-
     public void removeCrew(int amount) {
         int crewToRemove = amount;
         while(crewToRemove > 0 && getCrewCount() > 0) {
@@ -152,42 +138,21 @@ public class Player {
         }
     }
 
-    private boolean usedBattery() {
-        List<Point> batteries = shipBoard.getTilesPositions(BatteriesTile.class, tile -> ((BatteriesTile) tile).getStoredBatteries() > 0);
-        int chosenBatteryTile = 0;          // TODO: from javafx (-1 is don't use)
-        if (chosenBatteryTile >= 0 && chosenBatteryTile < batteries.size()) {
-            Point batteryPos = batteries.get(chosenBatteryTile);
-            shipBoard.removeBatteryFrom(batteryPos.x, batteryPos.y);
-            return true;
+    public void swapCargo(int blockIndex, Point tileCoords, int containerIndex) {
+        if(cargoPool == null) throw new RuntimeException("cargoPool has not been initialized.");
+        if(blockIndex < 0 || blockIndex >= cargoPool.size()) throw new IllegalArgumentException("Invalid block index.");
+
+        BlockType selectedBlock = cargoPool.get(blockIndex);
+        BlockType replaced = loadCargoAt(tileCoords.x, tileCoords.y, containerIndex, selectedBlock);
+
+        cargoPool.remove(blockIndex);
+        if (replaced != null) {
+            cargoPool.add(replaced);
         }
-        return false;
     }
 
-    private int diceSumToIndex(Projectile.Source source, int diceSum) {
-        if(source == Projectile.Source.UP || source == Projectile.Source.DOWN) {
-            return diceSum - 4;
-        } else if(source == Projectile.Source.LEFT || source == Projectile.Source.RIGHT) {
-            return diceSum - 5;
-        }
-        throw new IllegalArgumentException("Invalid source: " + source);
-    }
-
-    public void applyProjectile(Projectile projectile, int diceSum) {
-        int index = diceSumToIndex(projectile.getSource(), diceSum);
-        if(shipBoard.isPathEmpty(projectile.getSource(), index)) return;
-
-        if(projectile.getSize() == SMALL) {
-            if(projectile instanceof Meteor) {
-                if(!shipBoard.hasExposedConnectorInPath(projectile.getSource(), index)) return;
-            }
-            if(shipBoard.isSideShielded(projectile.getSource().toInt()) && usedBattery()) return;
-
-        } else if(projectile.getSize() == LARGE && projectile instanceof Meteor) {
-            ShipBoard.DefendingCannonType cannonType = shipBoard.getDefendingCannonType(projectile.getSource(), index);
-            if(cannonType == ShipBoard.DefendingCannonType.SINGLE) return;
-            if(cannonType == ShipBoard.DefendingCannonType.DOUBLE && usedBattery()) return;
-        }
-        shipBoard.removeFirstTileInPath(projectile.getSource(), index);
+    public void clearCargoPool() {
+        this.cargoPool = null;
     }
 
     public void checkIfAlive() {

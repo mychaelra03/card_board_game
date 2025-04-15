@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.Player;
 
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class SlaversCard extends AbstractEnemy {
-    // Lose crew members if defeated.
+    // Combat encounter, win to gain credits, lose to lose crew members.
 
     private final int rewardCredits;
     private final int crewLossOnDefeat;
@@ -28,12 +30,16 @@ public class SlaversCard extends AbstractEnemy {
 
     @Override
     protected void giveReward(Player player) {
+        verifyInputState(NONE);
         player.giveCredits(rewardCredits);
+        setInputState(FINISHED);
     }
 
     @Override
     protected void applyPunishment(Player player) {
+        verifyInputState(NONE);
         player.removeCrew(crewLossOnDefeat);
+        handleNextPlayer();
     }
 
     @Override

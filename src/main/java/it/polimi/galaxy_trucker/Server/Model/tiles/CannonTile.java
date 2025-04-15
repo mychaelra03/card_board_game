@@ -11,17 +11,13 @@ public class CannonTile extends ActivatableTile {
         super(id, connectors, isDouble);
     }
 
-    @Override
-    public double getStrength() {
-        if(isDouble()) {
-            if(!isPowered()) return 0;
-            return (getRotation() == 0) ? 2 : 1;
-        }
-        return (getRotation() == 0) ? 1 : 0.5;
+    public static double getStrength(int rotation, boolean isDouble) {
+        if(isDouble) return (rotation == 0) ? 2 : 1;
+        return (rotation == 0) ? 1 : 0.5;
     }
 
     @Override
     public String getTileType() {
-        return (isDouble())? "Double Cannon" : "Cannon";
+        return isDouble()? "Double Cannon" : "Cannon";
     }
 }

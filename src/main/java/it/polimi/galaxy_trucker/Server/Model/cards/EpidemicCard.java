@@ -6,6 +6,8 @@ import it.polimi.galaxy_trucker.Player;
 
 import java.util.List;
 
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class EpidemicCard extends Card {
@@ -21,7 +23,9 @@ public class EpidemicCard extends Card {
         for(Player player : players) {
             player.applyEpidemicCard();
         }
+        setInputState(FINISHED);
     }
+
 
     @Override
     public String getCardType() {

@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.tiles.EngineTile;
 
+import java.awt.*;
 import java.util.List;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.*;
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
@@ -23,34 +25,26 @@ public class OpenSpaceCard extends Card {
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
-        for(Player player : players) {
-            // TODO: should the player be forced to use a battery to not get eliminated?
-            player.chooseTilesToActivate(EngineTile.class);
-            int strength = (int)player.getCurrentStrength(EngineTile.class);
-            if(strength == 0) {
-                player.setEliminated(true);
-                break;
-            }
-            board.movePlayer(player, strength, FORWARD);
-        }
+        setInputState(ENGINE_SELECTION);
     }
 
+    public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
+        verifyInputState(ENGINE_SELECTION);
+        validatePlayerTurn(caller, playerQueue);
+        if(activatedEngines != batteryTiles.size()) throw new IllegalArgumentException("The number of activated engines does not match the number of batteries used.");
+        int strength = (int)caller.getStrength(EngineTile.class, activatedEngines);
+        if(strength == 0) {
+            caller.setEliminated(true);
+            return;
+        }
+        caller.removeBatteries(batteryTiles);
+        board.movePlayer(caller, strength, FORWARD);
+        playerQueue.removeFirst();
 
-
-    //@Override
-//    public void applyEffects() {
-//        List<Player> players = board.getSortedPlayers();
-//        for(Player player : players) {
-//            // TODO: should the player be forced to use a battery to not get eliminated?
-//            player.chooseTilesToActivate(EngineTile.class);
-//            int strength = (int)player.getCurrentStrength(EngineTile.class);
-//            if(strength == 0) {
-//                player.setEliminated(true);
-//                break;
-//            }
-//            board.movePlayer(player, strength, FORWARD);
-//        }
-//    }
+        if(playerQueue.isEmpty()) {
+            setInputState(FINISHED);
+        }
+    }
 
     @Override
     public String getCardType() {

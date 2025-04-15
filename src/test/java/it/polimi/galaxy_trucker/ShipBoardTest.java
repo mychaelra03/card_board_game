@@ -147,56 +147,79 @@ public class ShipBoardTest {
     }
 
     @Test
-    void getCurrentCannonStrength() {
+    void getCannonStrength() {
         ShipBoard ship = new ShipBoard(LEARNING);
-        assertEquals(0, ship.getCurrentStrength(CannonTile.class), "Total cannon strength should be 0.");
-        ship.setTile(3, 1, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
-        ship.setTile(4, 1, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.PURPLE_ALIEN), 0);
-        ship.setCrewTypeAt(3,1, CrewType.PURPLE_ALIEN);
-        assertEquals(0, ship.getCurrentStrength(CannonTile.class), "Total cannon strength should be 0.");
-        CannonTile cannon = new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false);
-        ship.setTile(2, 2, cannon, 0);
-        assertEquals(3, ship.getCurrentStrength(CannonTile.class), "Total cannon strength should be 3.");
-        CannonTile rotatedCannon = new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false);
-        ship.setTile(4, 2, rotatedCannon, 1);
-        assertEquals(3.5, ship.getCurrentStrength(CannonTile.class), "Total cannon strength should be 3.5.");
-        ship.removeTile(3, 1);
-        assertEquals(1.5, ship.getCurrentStrength(CannonTile.class), "Total cannon strength should be 1.5.");
-        // TODO: Double Cannons tests
+        assertEquals(0, ship.getStrength(CannonTile.class, 0, 0), "Total cannon strength should be 0.");
+        ship.setTile(3, 1, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.PURPLE_ALIEN), 0);
+        ship.setTile(4, 1, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
+        ship.setCrewTypeAt(4,1, CrewType.PURPLE_ALIEN);
+        assertEquals(0, ship.getStrength(CannonTile.class, 0, 0), "Total cannon strength should be 0.");
+        ship.setTile(2, 2, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
+        assertEquals(3, ship.getStrength(CannonTile.class, 0, 0), "Total cannon strength should be 3.");
+        ship.setTile(4, 2, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 2);
+        assertEquals(3.5, ship.getStrength(CannonTile.class, 0, 0), "Total cannon strength should be 3.5.");
+        ship.removeTile(4, 1);
+        assertEquals(1.5, ship.getStrength(CannonTile.class, 0, 0), "Total cannon strength should be 1.5.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, -1, 0), "The number of cannons can't be negative.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 1, 0), "There should be no double cannons.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 0, 1), "There should be no double cannons.");
+        ship.setTile(5, 2, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 0);
+        assertEquals(1.5, ship.getStrength(CannonTile.class, 0, 0), "Total cannon strength should be 1.5. The cannon has not been activated.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 0, 1), "There should be no double rotated cannons.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 1, 0), "There are no batteries to activate the cannon.");
+        ship.setTile(4, 1, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
+        assertEquals(3.5, ship.getStrength(CannonTile.class, 1, 0), "Total cannon strength should be 3.5.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 0, 1), "There should be no double rotated cannons.");
+        ship.setTile(5, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 1);
+        assertEquals(1.5, ship.getStrength(CannonTile.class, 0, 0), "Total cannon strength should be 1.5.");
+        assertEquals(3.5, ship.getStrength(CannonTile.class, 1, 0), "Total cannon strength should be 3.5.");
+        assertEquals(2.5, ship.getStrength(CannonTile.class, 0, 1), "Total cannon strength should be 2.5.");
+        assertEquals(4.5, ship.getStrength(CannonTile.class, 1, 1), "Total cannon strength should be 4.5.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 1, 2), "There should be only one double rotated cannon.");
+        ship.setTile(3, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 2);
+        assertEquals(3.5, ship.getStrength(CannonTile.class, 1, 0), "Total cannon strength should be 3.5.");
+        assertEquals(2.5, ship.getStrength(CannonTile.class, 0, 1), "Total cannon strength should be 2.5.");
+        assertEquals(4.5, ship.getStrength(CannonTile.class, 1, 1), "Total cannon strength should be 4.5.");
+        assertEquals(5.5, ship.getStrength(CannonTile.class, 1, 2), "Total cannon strength should be 5.5.");
+        ship.setTile(2, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 2);
+        assertEquals(4.5, ship.getStrength(CannonTile.class, 0, 3), "Total cannon strength should be 4.5.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 1, 3), "There shouldn't be enough batteries.");
     }
 
     @Test
     void getMinMaxCannonStrength() {
         ShipBoard ship = new ShipBoard(LEARNING);
-        assertEquals(0, ship.getMinCannonStrength(), "Total minimal cannon strength should be 0.");
-        assertEquals(0, ship.getMaxCannonStrength(), "Total maximum cannon strength should be 0.");
+        assertEquals(0, ship.getMinStrength(CannonTile.class), "Total minimal cannon strength should be 0.");
+        assertEquals(0, ship.getMaxStrength(CannonTile.class), "Total maximum cannon strength should be 0.");
         ship.setTile(3, 1, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
-        assertEquals(1, ship.getMinCannonStrength(), "Total minimal cannon strength should be 1.");
-        assertEquals(1, ship.getMaxCannonStrength(), "Total maximum cannon strength should be 1.");
+        assertEquals(1, ship.getMinStrength(CannonTile.class), "Total minimal cannon strength should be 1.");
+        assertEquals(1, ship.getMaxStrength(CannonTile.class), "Total maximum cannon strength should be 1.");
         ship.setTile(2, 1, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 0);
-        assertEquals(1, ship.getMinCannonStrength(), "Total minimal cannon strength should be 1.");
-        assertEquals(1, ship.getMaxCannonStrength(), "Total maximum cannon strength should be 1.");
+        assertEquals(1, ship.getMinStrength(CannonTile.class), "Total minimal cannon strength should be 1.");
+        assertEquals(1, ship.getMaxStrength(CannonTile.class), "Total maximum cannon strength should be 1.");
         ship.setTile(2, 3, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
-        assertEquals(1, ship.getMinCannonStrength(), "Total minimal cannon strength should be 1.");
-        assertEquals(3, ship.getMaxCannonStrength(), "Total maximum cannon strength should be 3.");
+        assertEquals(1, ship.getMinStrength(CannonTile.class), "Total minimal cannon strength should be 1.");
+        assertEquals(3, ship.getMaxStrength(CannonTile.class), "Total maximum cannon strength should be 3.");
         ship.setTile(4, 1, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 1);
-        assertEquals(1, ship.getMinCannonStrength(), "Total minimal cannon strength should be 1.");
-        assertEquals(4, ship.getMaxCannonStrength(), "Total maximum cannon strength should be 4.");
+        assertEquals(1, ship.getMinStrength(CannonTile.class), "Total minimal cannon strength should be 1.");
+        assertEquals(4, ship.getMaxStrength(CannonTile.class), "Total maximum cannon strength should be 4.");
     }
 
     @Test
-    void getCurrentEngineStrength() {
+    void getEngineStrength() {
         ShipBoard ship = new ShipBoard(LEARNING);
-        assertEquals(0, ship.getCurrentStrength(EngineTile.class), "Total engine strength should be 0.");
+        assertEquals(0, ship.getStrength(EngineTile.class, 0), "Total engine strength should be 0.");
         ship.setTile(3, 1, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
         ship.setTile(4, 1, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
         ship.setCrewTypeAt(3,1, CrewType.BROWN_ALIEN);
-        assertEquals(0, ship.getCurrentStrength(CannonTile.class), "Total cannon strength should be 0.");
-        EngineTile engine = new EngineTile(0, FULL_UNIVERSAL_CONNECTORS, false);
-        ship.setTile(2, 2, engine, 0);
-        assertEquals(3, ship.getCurrentStrength(EngineTile.class), "Total engine strength should be 3.");
+        assertEquals(0, ship.getStrength(EngineTile.class, 0), "Total engine strength should be 0.");
+        ship.setTile(2, 2, new EngineTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
+        assertEquals(3, ship.getStrength(EngineTile.class, 0), "Total engine strength should be 3.");
         ship.removeTile(3, 1);
-        assertEquals(1, ship.getCurrentStrength(EngineTile.class), "Total engine strength should be 1.");
+        assertEquals(1, ship.getStrength(EngineTile.class, 0), "Total engine strength should be 1.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, -1, 0), "The number of engines can't be negative.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 1, 0), "There should be no double engines.");
+        assertThrows(IllegalArgumentException.class, () -> ship.getStrength(CannonTile.class, 0, 1), "There should be no double rotated engines.");
     }
 
     @Test
@@ -204,7 +227,9 @@ public class ShipBoardTest {
         ShipBoard ship = new ShipBoard(LEARNING);
         CargoTile cargo = new CargoTile(0, FULL_UNIVERSAL_CONNECTORS, NORMAL, 3);
         ship.setTile(2, 2, cargo, 0);
+        assertEquals(0, ship.getTotalHoldsValue(), "Cargo value should be 0.");
         ship.loadCargoAt(2, 2, 0, BlockType.YELLOW);
+        assertEquals(3, ship.getTotalHoldsValue(), "Cargo value should be 3.");
         ship.loadCargoAt(2, 2, 2, BlockType.BLUE);
         assertEquals(4, ship.getTotalHoldsValue(), "Cargo value should be 4.");
         assertEquals(BlockType.YELLOW, ship.removeCargoAt(2,2,0), "Should return the removed hold.");

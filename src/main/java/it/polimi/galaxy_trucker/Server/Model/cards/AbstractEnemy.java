@@ -3,9 +3,11 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.tiles.CannonTile;
 
+import java.awt.*;
 import java.util.List;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.*;
+import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 public abstract class AbstractEnemy extends Card {
 
@@ -28,52 +30,56 @@ public abstract class AbstractEnemy extends Card {
     @Override
     protected void onActivate() {
         playerQueue = board.getSortedPlayers();
-        for(Player player : playerQueue) {
-            if(player.getMaxCannonStrength() < requiredCannonPower) {
-                applyPunishment(player);
-                continue;
-            }
-            player.chooseTilesToActivate(CannonTile.class);
-            double currentStrength = player.getCurrentStrength(CannonTile.class);
-            if(currentStrength > requiredCannonPower) {
+        handlePlayer();
+    }
 
-                boolean accepted = player.acceptsCardEffect();
-
-                if(accepted) {
-                    giveReward(player);
-                    board.movePlayer(player, positionCost, BACKWARD);
-                }
-                break;
-            }
-            if(currentStrength < requiredCannonPower) {
-                applyPunishment(player);
-            }
+    private void handlePlayer() {
+        verifyInputState(NONE);
+        if(playerQueue.isEmpty()) {
+            setInputState(FINISHED);
+            return;
+        }
+        Player currentPlayer = playerQueue.getFirst();
+        if(currentPlayer.getMaxStrength(CannonTile.class) < requiredCannonPower) {
+            applyPunishment(currentPlayer);
+        } else {
+            setInputState(CANNON_SELECTION);
         }
     }
 
-    //@Override
-//    public void applyEffects() {
-//        List<Player> players = board.getSortedPlayers();
-//        for(Player player : players) {
-//            if(player.getMaxCannonStrength() < requiredCannonPower) {
-//                applyPunishment(player);
-//                continue;
-//            }
-//            player.chooseTilesToActivate(CannonTile.class);
-//            double currentStrength = player.getCurrentStrength(CannonTile.class);
-//            if(currentStrength > requiredCannonPower) {
-//
-//                boolean accepted = player.acceptsCardEffect();
-//
-//                if(accepted) {
-//                    giveReward(player);
-//                    board.movePlayer(player, positionCost, BACKWARD);
-//                }
-//                break;
-//            }
-//            if(currentStrength < requiredCannonPower) {
-//                applyPunishment(player);
-//            }
-//        }
-//    }
+    protected void handleNextPlayer() {
+        playerQueue.removeFirst();
+        handlePlayer();
+    }
+
+    public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
+        verifyInputState(CANNON_SELECTION);
+        validatePlayerTurn(caller, playerQueue);
+        if(verticalCannons + rotatedCannons != batteryTiles.size()) throw new IllegalArgumentException("The number of activated cannons does not match the number of batteries used.");
+        double strength = caller.getStrength(CannonTile.class, verticalCannons, rotatedCannons);
+        caller.removeBatteries(batteryTiles);
+        if(strength > requiredCannonPower) {
+            setInputState(REWARD_DECISION);
+        } else if (strength < requiredCannonPower) {
+            setInputState(NONE);
+            applyPunishment(caller);
+        } else {
+            handleNextPlayer();
+        }
+    }
+
+    public void acceptReward(Player caller) {
+        verifyInputState(REWARD_DECISION);
+        validatePlayerTurn(caller, playerQueue);
+        board.movePlayer(caller, positionCost, BACKWARD);
+        playerQueue.clear();
+        setInputState(NONE);
+        giveReward(caller);
+    }
+    public void refuseReward(Player caller) {
+        verifyInputState(REWARD_DECISION);
+        validatePlayerTurn(caller, playerQueue);
+        playerQueue.clear();
+        setInputState(FINISHED);
+    }
 }

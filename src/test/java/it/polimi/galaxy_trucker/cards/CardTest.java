@@ -20,7 +20,7 @@ class CardTest {
     public static final Connector[] FULL_UNIVERSAL_CONNECTORS = {UNIVERSAL, UNIVERSAL, UNIVERSAL, UNIVERSAL};
 
     @Test
-    void testEpidemicCard() {
+    void epidemicCard() {
         Player player1 = new Player("TestPlayer1", new int[]{0, 0});
         Player player2 = new Player("TestPlayer2", new int[]{0, 0});
         Player player3 = new Player("TestPlayer3", new int[]{0, 0});
@@ -58,12 +58,8 @@ class CardTest {
         GameModel gameModel = new GameModel(LEVEL_TWO, players); //TODO: check for addPlayer if arraylist has already players in it
 
         EpidemicCard epidemicCard = new EpidemicCard(24,1);
-
         epidemicCard.assignBoard(gameModel);
         epidemicCard.activate();
-
-        //gameModel.getSortedPlayers().forEach(player -> player.getShipBoard().applyEpidemicCard());
-
 
         assertEquals(2, player1.getCrewCount(),"Crew count should be: 2 ");
         assertEquals(3, player2.getCrewCount(),"Crew count should be: 3 ");
@@ -72,7 +68,7 @@ class CardTest {
     }
 
     @Test
-    void testStarDustCard() throws Exception {
+    void starDustCard() {
 
         Player player1 = new Player("TestPlayer1", new int[]{0, 0});
         Player player2 = new Player("TestPlayer2", new int[]{0, 0});
@@ -127,4 +123,30 @@ class CardTest {
         assertEquals(-11,player4.getPosition(),"Player4 (3rd) should lose 14 position and be therefore be in position -12");
     }
 
+    @Test
+    void openSpaceCard() {
+        Player player1 = new Player("TestPlayer1", new int[]{0, 0});
+        Player player2 = new Player("TestPlayer2", new int[]{0, 0});
+        Player player3 = new Player("TestPlayer3", new int[]{0, 0});
+        Player player4 = new Player("TestPlayer4", new int[]{0, 0});
+        player1.setNewShipBoard(LEVEL_TWO);
+        player2.setNewShipBoard(LEVEL_TWO);
+        player3.setNewShipBoard(LEVEL_TWO);
+        player4.setNewShipBoard(LEVEL_TWO);
+
+        List<Player> players = new ArrayList<>();
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+        players.add(player4);
+
+        GameModel gameModel = new GameModel(LEVEL_TWO, players);
+
+        player1.setPosition(10);
+        player2.setPosition(1);
+        player3.setPosition(7);
+        player4.setPosition(5);
+
+
+    }
 }
