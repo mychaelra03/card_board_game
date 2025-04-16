@@ -26,11 +26,25 @@ public class Player {
 
     private int chosenPlanet;
 
+    public int[] getProfilePictureIds() {
+        return profilePictureIds;
+    }
+
     public Player(String name, int[] profilePictureIds) {
         this.name = name;
         this.profilePictureIds = profilePictureIds;
         this.color = null;
         this.shipBoard = null;
+        this.credits = 0;
+        this.position = 0;
+        this.isEliminated = false;
+    }
+
+    public Player(String name, ShipBoard shipBoard) {
+        this.name = name;
+        this.profilePictureIds = null;
+        this.color = null;
+        this.shipBoard = shipBoard;
         this.credits = 0;
         this.position = 0;
         this.isEliminated = false;

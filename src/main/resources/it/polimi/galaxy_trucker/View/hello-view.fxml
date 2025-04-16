@@ -21,14 +21,14 @@
     <!-- Selettore avatar con una ComboBox -->
 
     <!-- ListView per i log -->
-    <ListView fx:id="logList" layoutX="20.0" layoutY="314.0" prefHeight="268.0" prefWidth="298.0"  AnchorPane.bottomAnchor="66.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="446.0" />
+    <ListView fx:id="logList" layoutX="20.0" layoutY="314.0" prefHeight="268.0" prefWidth="298.0" AnchorPane.bottomAnchor="66.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="446.0" />
     <Label layoutX="20.0" layoutY="291.0" text="Choose a server to join:" textFill="WHITE" AnchorPane.bottomAnchor="340.0" AnchorPane.leftAnchor="20.0" />
    <Button fx:id="leftBodyBtn" layoutX="366.0" layoutY="423.0" text="&lt;" AnchorPane.bottomAnchor="190.0" AnchorPane.rightAnchor="363.0" />
    <Button fx:id="leftAccessoryBtn" layoutX="366.0" layoutY="481.0" text="&lt;" AnchorPane.bottomAnchor="132.0" AnchorPane.rightAnchor="363.0" />
    <Button fx:id="playButton" layoutX="19.0" layoutY="599.0" prefHeight="35.0" prefWidth="726.0" text="Play" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="19.0" AnchorPane.rightAnchor="19.0" />
    <Button fx:id="randomize" layoutX="341.0" layoutY="353.0" text="randomize" AnchorPane.bottomAnchor="260.0" AnchorPane.rightAnchor="319.5" />
    <Button fx:id="random" layoutX="665.0" layoutY="353.0" text="options" AnchorPane.bottomAnchor="260.0" AnchorPane.rightAnchor="19.0" />
-   <Button fx:id="rightBodyBtn" layoutX="681.0" layoutY="423.0" text="&gt;"  AnchorPane.bottomAnchor="190.0" AnchorPane.rightAnchor="48.0" />
+   <Button fx:id="rightBodyBtn" layoutX="681.0" layoutY="423.0" text="&gt;" AnchorPane.bottomAnchor="190.0" AnchorPane.rightAnchor="48.0" />
    <Button fx:id="rightAccessoryBtn" layoutX="681.0" layoutY="481.0" text="&gt;" AnchorPane.bottomAnchor="132.0" AnchorPane.rightAnchor="48.0" />
     <ImageView fx:id="myImageView" fitHeight="200.0" fitWidth="362.0" layoutX="203.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
        <image>
@@ -38,5 +38,6 @@
    <ImageView fx:id="backgroundView" fitHeight="200" fitWidth="200" layoutX="456.0" layoutY="341.0" />
    <ImageView fx:id="bodyView" fitHeight="200" fitWidth="200" layoutX="456.0" layoutY="341.0" />
    <ImageView fx:id="accessoryView" fitHeight="200" fitWidth="200" layoutX="456.0" layoutY="341.0" AnchorPane.bottomAnchor="107.0" AnchorPane.rightAnchor="108.0" />
+   <Label fx:id="errorLabel" layoutX="39.0" layoutY="215.0" prefHeight="17.0" prefWidth="697.0" />
 
 </AnchorPane>

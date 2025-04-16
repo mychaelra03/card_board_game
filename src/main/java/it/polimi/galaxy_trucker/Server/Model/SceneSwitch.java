@@ -29,6 +29,7 @@ public class SceneSwitch {
         Parent root = fxmlLoader.load();
 
         Object controller = fxmlLoader.getController();
+
         if(controller instanceof VirtualServerAware aware) {
             aware.setVirtualServer(VirtualServer.getInstance());
         }

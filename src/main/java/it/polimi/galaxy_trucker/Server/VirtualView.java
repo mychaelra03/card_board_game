@@ -1,33 +1,34 @@
 package it.polimi.galaxy_trucker.Server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.Common.PlayerInfo;
+import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
+import it.polimi.galaxy_trucker.Player;
+
 import java.beans.PropertyChangeEvent;
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.*;
 
 public class VirtualView implements Runnable {
     BufferedReader in = null;
-     PrintWriter out = null;
+    PrintWriter out = null;
     Socket clientSocket = null;
     Controller controller = null;
     ArrayList<VirtualView> clients = new ArrayList<VirtualView>();
-    ModelListener listener;
 
     public VirtualView(Socket clientSocket, Controller controller, ArrayList<VirtualView> clients) {
         this.clientSocket = clientSocket;
         this.controller = controller;
         this.clients = clients;
 
-        CallBack callBack = (PropertyChangeEvent evt) -> {
-            String debugStr= evt.getPropertyName() + ": " + evt.getOldValue() + " -> " + evt.getNewValue();
-            for(VirtualView client : clients) {
-                client.out.println(debugStr);
-
-            }
-        };
-
-        this.listener = new ModelListener(callBack);
-        controller.setListener(this.listener);
+//        CallBack callBack = ( evt) -> {
+//            for(VirtualView client : clients) {
+//                client.out.println(evt.getNewValue());
+//
+//            }
+//        };
 
 
         try{
@@ -38,18 +39,24 @@ public class VirtualView implements Runnable {
         }
     }
 
+    public void sendPlayerAdded(PlayersInfoMessage players) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(players);
+
+            this.out.println(json);
+    }
+
+
+    public void broadcastMessage(String message) {
+
+        clients.forEach(client -> {client.out.println(message);});
+    }
+
     void networkEventLoop(){
-        String username = "";
+        String line;
         try{
-            while(clientSocket.isConnected() ){
-
-                username = in.readLine();
-
-                this.controller.registerPlayer(this,username);
-
-                System.out.println("a");
-//                System.out.println(player + " tile positioned : ("+in.readInt()+","+in.readInt()+") of id: " + in.readUTF() + " with rotation: "+in.readInt());
-
+            while((line = in.readLine()) != null ){
+                this.controller.processCmd(this,line);
             }
             System.out.println("done");
         }catch (IOException e){

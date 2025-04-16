@@ -40,7 +40,7 @@ class CardTest {
     static private ShipBoard genericShipBoard(int id){
 
         //1st shipB
-        ShipBoard shipBoard1 = new ShipBoard(2);
+        ShipBoard shipBoard1 = new ShipBoard(LEVEL_TWO);
         shipBoard1.setTile(4,2,new CargoTile(0,new Connector[]{NONE,UNIVERSAL,NONE,UNIVERSAL}, CargoTile.CargoType.RED,1),0);
         shipBoard1.setTile(5,2,new CabinTile(0,new Connector[]{SINGLE,NONE,SINGLE,UNIVERSAL}),0);
         shipBoard1.setTile(6,2,new CargoTile(0,new Connector[]{NONE,NONE,SINGLE,NONE}, CargoTile.CargoType.NORMAL,3),0);
@@ -70,7 +70,7 @@ class CardTest {
 
         // 2nd shipB
 
-        ShipBoard shipBoard2 = new ShipBoard(2);
+        ShipBoard shipBoard2 = new ShipBoard(LEVEL_TWO);
 
         shipBoard2.setTile(3,3,80,0);
         shipBoard2.setTile(3,1,105,0);
@@ -99,7 +99,7 @@ class CardTest {
 
         //3rd ship
 
-        ShipBoard shipBoard3 = new ShipBoard(2);
+        ShipBoard shipBoard3 = new ShipBoard(LEVEL_TWO);
 
 
         shipBoard3.setTile(4,2,32,0);
@@ -130,7 +130,7 @@ class CardTest {
 
         // 4th shipB
 
-        ShipBoard shipBoard4 = new ShipBoard(2);
+        ShipBoard shipBoard4 = new ShipBoard(LEVEL_TWO);
 
         shipBoard4.setTile(4,2,33,0);
         shipBoard4.setTile(4,1,121,0);
@@ -312,7 +312,7 @@ class CardTest {
         players.add(player4);
 
 
-        GameModel gameModel = new GameModel(2, players);
+        GameModel gameModel = new GameModel(LEVEL_TWO, players);
 
         // loading cargoHolds ship 1
         player1.getShipBoard().loadCargoAt(2,1, 0, BlockType.BLUE);

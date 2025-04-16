@@ -1,5 +1,10 @@
 package it.polimi.galaxy_trucker;
 
+import it.polimi.galaxy_trucker.Common.PlayerInfo;
+import it.polimi.galaxy_trucker.Server.Event.EventDispatcher;
+import it.polimi.galaxy_trucker.Server.Event.EventModel;
+import it.polimi.galaxy_trucker.Server.Event.ModelEventListener;
+import it.polimi.galaxy_trucker.Server.Event.PlayerAddedEvent;
 import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 
 import java.beans.PropertyChangeEvent;
@@ -14,6 +19,8 @@ public class GameModel {
     private final List<Player> players;
     private final List<Card> deck;
     private final int flightTrackLength;
+
+
 
     public GameModel(BoardType boardType, List<Player> players) {
         this.boardType = boardType;
@@ -31,10 +38,17 @@ public class GameModel {
         if(players.size() < 4) {
             Integer prevNumPlayers = players.size();
             players.add(player);
-            tellToListener(prevNumPlayers,(Integer)players.size());
+
+            eventDispatcher.fireEvent(new PlayerAddedEvent(getPlayerInfo()));
             return true;
         }
         return false;
+    }
+
+    private List<PlayerInfo> getPlayerInfo(){
+        return players.stream()
+                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds()))
+                .collect(Collectors.toList());
     }
 
     public List<Player> getSortedPlayers() {
@@ -67,14 +81,10 @@ public class GameModel {
         return (1 + (int)(Math.random() * 6)) + (1 + (int)(Math.random() * 6));
     }
 
-    private void tellToListener(Integer from, Integer to) {
-        PropertyChangeEvent evt = new PropertyChangeEvent(this,"Player added",from,to );
-        listener.propertyChange(evt);
-    }
 
-    private PropertyChangeListener listener;
+    private final EventDispatcher eventDispatcher = new EventDispatcher();
 
-    public void setListener(PropertyChangeListener listener) {
-        this.listener = listener;
+    public <T extends EventModel> void addEventListener(Class<T> eventType, ModelEventListener<T> listener) {
+        eventDispatcher.addListener(eventType, listener);
     }
 }

@@ -1,22 +1,17 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene1;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
 import it.polimi.galaxy_trucker.Client.VirtualServerAware;
+import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 public class Scene1Controller implements VirtualServerAware {
 
@@ -25,9 +20,6 @@ public class Scene1Controller implements VirtualServerAware {
 
     @FXML
     private TextField usernameTextField;
-
-   // @FXML
-    //private MenuButton colorMenuButton,pilotMenuButton;
 
     @FXML
     private ImageView myImageView;
@@ -43,26 +35,16 @@ public class Scene1Controller implements VirtualServerAware {
     @FXML private TextField nameField;
     @FXML private Label errorLabel;
 
-    private int bodyIndex = 0;
-    private int accessoryIndex = 0;
+    private static int bodyIndex = 0;
+    private static int accessoryIndex = 0;
     private static final int MAX_BODIES = 9;
     private static final int MAX_ACCESSORIES = 8;
-
 
     @FXML
     public void initialize() {
 
         System.out.println(getClass().getResource("/textures/background.png"));
-        /*Platform.runLater(() -> {
-            myImageView.fitWidthProperty().bind(myImageView.getScene().widthProperty().subtract(205));
-            myImageView.fitHeightProperty().bind(myImageView.getScene().heightProperty().subtract(290));
-            VBox parent = (VBox) myImageView.getParent();
-           /* myImageView.layoutXProperty().bind(
-                    parent.widthProperty().subtract(myImageView.fitWidthProperty()).divide(2)
-            );*/
-        //});
-        //gameTitle.setImage(loadImage("/textures/title.png"));
-        //backgroundView.setImage(loadImage("/textures/characters/bg_blue.png"));
+
         bodyView.setImage(loadBodyImage(bodyIndex));
         accessoryView.setImage(loadAccessoryImage(accessoryIndex));
 
@@ -70,45 +52,16 @@ public class Scene1Controller implements VirtualServerAware {
         rightBodyBtn.setOnAction(e -> updateBody(1));
         leftAccessoryBtn.setOnAction(e -> updateAccessory(-1));
         rightAccessoryBtn.setOnAction(e -> updateAccessory(1));
-        playButton.setOnAction(e -> validateName());
-        // Imposta le dimensioni esplicitamente nel codice (puoi usare il valore che desideri)
-        //scene1AnchorPane.setPrefWidth(100);
-        //scene1AnchorPane.setPrefHeight(100);
+        playButton.setOnAction(e -> {
+            try {
+                validateName();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
     }
-    @FXML
-    void onClickStart(ActionEvent event) throws IOException {
 
-        String username = usernameTextField.getText();
-        this.virtualServer.sendCmd(username);
-        String color = "Rosso";
-        this.virtualServer.sendCmd(color.toUpperCase());
-
-
-//        PlayerUsername.getInstance().setUsername(usernameTextField.getText());
-//        PlayerUsername.getInstance().setPlayerID(1);
-//        PlayerUsername.getInstance().setColorP(colorMenuButton.getText());
-//        PlayerUsername.getInstance().setPlayerPic(22);
-//
-//
-//        ObjectMapper om = new ObjectMapper();
-//
-//        try{
-//            File file = new File("src/main/resources/it/polimi/galaxy_trucker/public/player1.json");
-//
-//            om.writeValue(file,PlayerUsername.getInstance());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        String fxmlFile = "/it/polimi/galaxy_trucker/View/login-view.fxml";
-        Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
-
-        // Crea una nuova scena con il root caricato
-        Scene scene = new Scene(root);
-
-
-        SceneSwitch sceneSwitch = new SceneSwitch();
-        sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/scene2-view.fxml");
-    }
 
     private Stage stage;
     private VirtualServer virtualServer;
@@ -140,25 +93,30 @@ public class Scene1Controller implements VirtualServerAware {
         accessoryView.setImage(loadAccessoryImage(accessoryIndex));
     }
 
-    private void validateName() {
-        String name = nameField.getText().trim();
+    private void validateName() throws IOException {
+        String name = usernameTextField.getText().trim();
         if (name.isEmpty() || name.length() > 12) {
             errorLabel.setText("Name must be between 1 and 12 characters.");
             errorLabel.setVisible(true);
-        } else if(true) { // check for duplicate names.
+        } else if(false) { // check for duplicate names.
             errorLabel.setText("There is already a player named \""+ name +"\" in the lobby.");
             errorLabel.setVisible(true);
         } else {
             errorLabel.setVisible(false);
-            loadGameScene();
-        }
-    }
+            String username = usernameTextField.getText();
 
-    private void loadGameScene() {
-        Stage stage = (Stage) playButton.getScene().getWindow();
-        Label welcomeLabel = new Label("Welcome, " + nameField.getText() + "!");
-        Scene nextScene = new Scene(new StackPane(welcomeLabel), 400, 300);
-        stage.setScene(nextScene);
+            System.out.println(bodyIndex + " " + accessoryIndex + " " + username);
+
+            int[] profilePicIds = new int[2];
+            profilePicIds[0] = bodyIndex;
+            profilePicIds[1] = accessoryIndex;
+
+            PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds);
+
+            this.virtualServer.sendCmd(playerInfo);
+            SceneSwitch sceneSwitch = new SceneSwitch();
+            sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
+        }
     }
 
 }
