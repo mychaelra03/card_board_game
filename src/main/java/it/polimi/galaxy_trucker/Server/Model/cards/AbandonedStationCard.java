@@ -49,7 +49,7 @@ public class AbandonedStationCard extends Card {
 
     public void accept(Player caller) {
         verifyInputState(REWARD_DECISION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         board.movePlayer(caller, positionCost, BACKWARD);
         this.rewardedPlayer = caller;
         caller.setCargoPool(new ArrayList<>(Arrays.asList(rewardCargo)));
@@ -59,14 +59,14 @@ public class AbandonedStationCard extends Card {
 
     public void refuse(Player caller) {
         verifyInputState(REWARD_DECISION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         playerQueue.removeFirst();
         skipIneligiblePlayers();
     }
 
     private void skipIneligiblePlayers() {
         verifyInputState(REWARD_DECISION);
-        while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() <= requiredCrew) {
+        while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() < requiredCrew) {
             playerQueue.removeFirst();
         }
         if(playerQueue.isEmpty()) {
@@ -74,16 +74,23 @@ public class AbandonedStationCard extends Card {
         }
     }
 
-    public void placeCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
+    public void loadCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
-        if(caller != rewardedPlayer) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+        verifyCaller(caller, rewardedPlayer);
 
         caller.swapCargo(blockIndex, tileCoords, containerIndex);
     }
 
+    public void unloadCargo(Player caller, Point tileCoords, int containerIndex) {
+        verifyInputState(CARGO_DECISION);
+        verifyCaller(caller, rewardedPlayer);
+
+        caller.unloadCargo(tileCoords, containerIndex);
+    }
+
     public void confirmDone(Player caller) {
         verifyInputState(CARGO_DECISION);
-        if(caller != rewardedPlayer) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+        verifyCaller(caller, rewardedPlayer);
         caller.clearCargoPool();
         setInputState(FINISHED);
     }

@@ -18,17 +18,20 @@ public class CannonShot extends Projectile {
     public CannonShot(@JsonProperty("size") Size size, @JsonProperty("direction") Source source) {
         super(size, source);
     }
+    public CannonShot(Size size, Source source, int pathIndex) {
+        super(size, source, pathIndex);
+    }
 
     @Override
-    public boolean evaluateDefense(Player player, int pathIndex) {
+    public boolean evaluateDefense(Player player) {
         // Returns true if the player have to use a battery to block the projectile.
         // It damages ship if not blocked.
 
-        if(player.isPathEmpty(getSource(), pathIndex)) return false;
+        if(player.isPathEmpty(getSource(), getPathIndex())) return false;
 
         if(getSize() == SMALL && player.isSideShielded(getSource().toInt())) return true;
 
-        player.removeFirstTileInPath(getSource(), pathIndex);
+        player.removeFirstTileInPath(getSource(), getPathIndex());
         return false;
     }
 }

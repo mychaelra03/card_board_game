@@ -22,7 +22,6 @@ public class MeteorSwarmCard extends Card {
 
     private List<Meteor> meteorQueue;
     private Meteor currentMeteor;
-    private int currentPathIndex;
     private Set<Player> playersAtRisk;
 
     public MeteorSwarmCard(
@@ -45,14 +44,14 @@ public class MeteorSwarmCard extends Card {
             setInputState(FINISHED);
             return;
         }
-        this.currentMeteor = meteorQueue.getFirst();
         List<Player> players = board.getSortedPlayers();
-        int[] dice = GameModel.rollTwoDice();
-        this.currentPathIndex = Projectile.diceSumToIndex(currentMeteor.getSource(), dice[0] + dice[1]);
+        this.currentMeteor = meteorQueue.getFirst();
+        currentMeteor.randomizePathIndex();
+
 
         this.playersAtRisk = new HashSet<>(players);
         for(Player player : players) {
-            if(currentMeteor.evaluateDefense(player, currentPathIndex)) {
+            if(currentMeteor.evaluateDefense(player)) {
                 playersAtRisk.add(player);
                 setInputState(BATTERY_DECISION);
             }
@@ -62,18 +61,18 @@ public class MeteorSwarmCard extends Card {
 
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
-        if(!playersAtRisk.contains(caller)) throw new IllegalArgumentException(caller.getName() + " is not currently at risk.");
+        verifyPlayerInList(caller, playersAtRisk, "Player " + caller.getName() + " is not currently at risk.");
 
-        if(!caller.removeBatteryFrom(batteryCoords.x, batteryCoords.y)) throw new IllegalArgumentException("No battery found at " + batteryCoords + ".");
+        caller.ensureBatteryRemovedFrom(batteryCoords);
         playersAtRisk.remove(caller);
 
         handleNextMeteorIfReady();
     }
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);
-        if(!playersAtRisk.contains(caller)) throw new IllegalArgumentException(caller.getName() + " is not currently at risk.");
+        verifyPlayerInList(caller, playersAtRisk, "Player " + caller.getName() + " is not currently at risk.");
 
-        caller.removeFirstTileInPath(currentMeteor.getSource(), currentPathIndex);
+        caller.removeFirstTileInPath(currentMeteor.getSource(), currentMeteor.getPathIndex());
         playersAtRisk.remove(caller);
 
         handleNextMeteorIfReady();

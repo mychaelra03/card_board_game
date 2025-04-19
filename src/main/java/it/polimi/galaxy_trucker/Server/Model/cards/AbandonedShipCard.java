@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.Player;
 
+import java.awt.*;
 import java.util.List;
-import java.util.Queue;
 
 import static it.polimi.galaxy_trucker.GameModel.Direction.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
@@ -20,6 +20,8 @@ public class AbandonedShipCard extends Card {
     private final int positionCost;
 
     private List<Player> playerQueue;
+    private Player rewardedPlayer;
+    private int remainingCrewToGiveUp;
 
     public AbandonedShipCard(
             @JsonProperty("id") int id,
@@ -45,17 +47,33 @@ public class AbandonedShipCard extends Card {
 
     public void accept(Player caller) {
         verifyInputState(REWARD_DECISION);
-        validatePlayerTurn(caller, playerQueue);
-        caller.removeCrew(crewToGiveUp);
+        verifyPlayerTurn(caller, playerQueue);
+        if(caller.getCrewCount() <= crewToGiveUp) throw new IllegalStateException("Caller should have been skipped.");
         caller.giveCredits(rewardCredits);
         board.movePlayer(caller, positionCost, BACKWARD);
         playerQueue.clear();
-        setInputState(FINISHED);
+        if(crewToGiveUp > 0) {
+            this.rewardedPlayer = caller;
+            this.remainingCrewToGiveUp = crewToGiveUp;
+            setInputState(CREW_DECISION);
+        }
+        else setInputState(FINISHED);
+    }
+
+    public void removeMemberFrom(Player caller, Point cabinCoords, int index) {
+        verifyInputState(CREW_DECISION);
+        verifyCaller(caller, rewardedPlayer);
+        if(remainingCrewToGiveUp <= 0) throw new RuntimeException("No more crew members are required to be removed.");
+        caller.ensureCrewRemovedAt(cabinCoords, index);
+        remainingCrewToGiveUp--;
+        if(remainingCrewToGiveUp == 0) {
+            setInputState(FINISHED);
+        }
     }
 
     public void refuse(Player caller) {
         verifyInputState(REWARD_DECISION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         playerQueue.removeFirst();
         skipIneligiblePlayers();
     }

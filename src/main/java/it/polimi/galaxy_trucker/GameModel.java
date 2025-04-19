@@ -17,34 +17,50 @@ public class GameModel {
 
     public GameModel(BoardType boardType, List<Player> players) {
         this.boardType = boardType;
-        //if (players.size() < 2 || players.size() > 4) throw new IllegalArgumentException("Invalid number of players.");
         this.players = players;
-
-        this.deck = CardFactory.getInstance().getDeck(boardType);
-        for(Card card : this.deck) {
-            card.assignBoard(this);
-        }
-        this.flightTrackLength = (boardType == BoardType.LEARNING)? 18 : 24;
+        this.deck = CardFactory.getInstance().generateDeck(boardType, this);
+        this.flightTrackLength = boardType.getFlightTrackLength();
     }
     public GameModel(BoardType boardType) {
         this(boardType, new ArrayList<>());
+    }
+
+    public BoardType getBoardType() {
+        return boardType;
+    }
+    public List<Card> getDeck() {
+        return deck;
     }
 
     public boolean addPlayer(Player player){
         if(players.size() < 4) {
             Integer prevNumPlayers = players.size();
             players.add(player);
-            tellToListener(prevNumPlayers,(Integer)players.size());
+            tellToListener(prevNumPlayers, players.size());
             return true;
         }
         return false;
     }
 
+    public boolean removePlayer(Player player) {
+        Integer prevNumPlayers = players.size();
+        boolean playerRemoved = players.remove(player);
+        tellToListener(prevNumPlayers, players.size());
+        return playerRemoved;
+    }
+
     public List<Player> getSortedPlayers() {
+        // Returns a sorted list of the non eliminated players.
+        // First is the one furthest ahead (highest position value).
         return players.stream()
                 .filter(player -> !player.isEliminated())
-                .sorted(Comparator.comparingInt(Player::getPosition))
+                .sorted(Comparator.comparingInt(Player::getPosition).reversed())
                 .collect(Collectors.toList());
+    }
+
+    int mod(int x, int m) {
+        // Had to add this method to correctly compare negative numbers.
+        return ((x % m) + m) % m;
     }
 
     public enum Direction {
@@ -55,19 +71,28 @@ public class GameModel {
         while(steps > 0) {
             newPosition += (direction == Direction.FORWARD) ? 1 : -1;
             final int thisPosition = newPosition;
-            boolean occupied = players.stream().anyMatch(p -> p.getPosition() == thisPosition);
+            boolean occupied = players.stream().anyMatch(p -> mod(p.getPosition(), flightTrackLength) == mod(thisPosition, flightTrackLength));
             // Only decrease steps if the space is not occupied.
             if(!occupied) steps--;
         }
         player.setPosition(newPosition);
     }
 
-    public static int[] rollTwoDice() {
-        int[] dice = new int[2];
-        dice[0] = 1 + (int)(Math.random() * 6);
-        dice[1] = 1 + (int)(Math.random() * 6);
-        return dice;
+    public void checkPlayersStatus() {
+        if(players.isEmpty()) return;
+
+        int highestPosition = getSortedPlayers().getFirst().getPosition();
+        for(Player player : players) {
+            if(player.isEliminated()) continue;
+
+            boolean noCrew = player.getHumanCount() == 0;
+            boolean lapped = player.getPosition() < highestPosition - flightTrackLength;
+            // TODO: other conditions?
+
+            if(noCrew || lapped) player.setEliminated(true);
+        }
     }
+
 
     private void tellToListener(Integer from, Integer to) {
         PropertyChangeEvent evt = new PropertyChangeEvent(this,"Player added",from,to );

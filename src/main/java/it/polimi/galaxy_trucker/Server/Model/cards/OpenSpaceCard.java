@@ -30,7 +30,7 @@ public class OpenSpaceCard extends Card {
 
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         if(activatedEngines != batteryTiles.size()) throw new IllegalArgumentException("The number of activated engines does not match the number of batteries used.");
         int strength = (int)caller.getStrength(EngineTile.class, activatedEngines);
         if(strength == 0) {

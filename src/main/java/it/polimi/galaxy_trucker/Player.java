@@ -1,14 +1,10 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Meteor;
 import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
-
-import static it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile.Size.*;
 
 public class Player {
 
@@ -34,6 +30,10 @@ public class Player {
         this.credits = 0;
         this.position = 0;
         this.isEliminated = false;
+    }
+    public Player(String name, int[] profilePictureIds, ShipBoard shipBoard) {
+        this(name, profilePictureIds);
+        this.shipBoard = shipBoard;
     }
 
     // GETTERS AND SETTERS
@@ -79,10 +79,20 @@ public class Player {
     public void setCargoPool(List<BlockType> cargoPool) {
         this.cargoPool = cargoPool;
     }
+    public int getCargoHoldsValue() {
+        return shipBoard.getTotalHoldsValue();
+    }
 
     // DELEGATE METHODS
+
+    public int getTotalTileCount() {
+        return shipBoard.getTotalTileCount();
+    }
     public int getCrewCount() {
         return shipBoard.getTotalCrewCount();
+    }
+    public int getHumanCount() {
+        return shipBoard.getTotalHumanCount();
     }
     public int getExposedConnectorsCount() {
         return shipBoard.getExposedConnectorsCount();
@@ -102,9 +112,6 @@ public class Player {
     public double getStrength(Class<? extends ActivatableTile> tileClass, int doubleVertical) {
         return shipBoard.getStrength(tileClass, doubleVertical, 0);
     }
-    public boolean removeBatteryFrom(int x, int y) {
-        return shipBoard.removeBatteryFrom(x, y);
-    }
     public void removeBatteries(List<Point> coordinates) {
         shipBoard.removeBatteries(coordinates);
     }
@@ -123,19 +130,16 @@ public class Player {
     public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
         return shipBoard.hasExposedConnectorInPath(source, index);
     }
-    public BlockType loadCargoAt(int x, int y, int index, BlockType blockType) {
-        return shipBoard.loadCargoAt(x, y, index, blockType);
-    }
 
     // NEW METHODS
-    public void removeCrew(int amount) {
-        int crewToRemove = amount;
-        while(crewToRemove > 0 && getCrewCount() > 0) {
-            List<Point> cabinsPositions = shipBoard.getTilesPositions(CabinTile.class, tile -> ((CabinTile)tile).hasCrew()); // TODO: to client
+    public void ensureCrewRemovedAt(Point cabinCoords, int index) {
+        CrewType removedMember = shipBoard.removeCrewMemberAt(cabinCoords.x, cabinCoords.y, index);
+        if(removedMember == null) throw new IllegalArgumentException("Cabin tile does not have a crew member at index " + index + ".");
+    }
 
-            int chosenCabin = 0;            // TODO: from javafx
-            if(shipBoard.removeOneCrewMemberAt(cabinsPositions.get(chosenCabin).x, cabinsPositions.get(chosenCabin).y) != null) crewToRemove--;
-        }
+    public void ensureBatteryRemovedFrom(Point batteryCoords) {
+        boolean isBatteryRemoved = shipBoard.removeBatteryFrom(batteryCoords.x, batteryCoords.y);
+        if(!isBatteryRemoved) throw new IllegalArgumentException("Battery tile does not have any battery.");
     }
 
     public void swapCargo(int blockIndex, Point tileCoords, int containerIndex) {
@@ -143,20 +147,21 @@ public class Player {
         if(blockIndex < 0 || blockIndex >= cargoPool.size()) throw new IllegalArgumentException("Invalid block index.");
 
         BlockType selectedBlock = cargoPool.get(blockIndex);
-        BlockType replaced = loadCargoAt(tileCoords.x, tileCoords.y, containerIndex, selectedBlock);
+        BlockType replaced = shipBoard.loadCargoAt(tileCoords.x, tileCoords.y, containerIndex, selectedBlock);
 
         cargoPool.remove(blockIndex);
-        if (replaced != null) {
-            cargoPool.add(replaced);
-        }
+        if(replaced != null) cargoPool.add(replaced);
+    }
+
+    public void unloadCargo(Point tileCoords, int containerIndex) {
+        if(cargoPool == null) throw new RuntimeException("cargoPool has not been initialized.");
+
+        BlockType removed = shipBoard.unloadCargoAt(tileCoords.x, tileCoords.y, containerIndex);
+
+        if(removed != null) cargoPool.add(removed);
     }
 
     public void clearCargoPool() {
         this.cargoPool = null;
-    }
-
-    public void checkIfAlive() {
-        if(shipBoard.getTotalHumanCount() == 0) setEliminated(true);
-        // TODO
     }
 }

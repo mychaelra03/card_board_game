@@ -2,10 +2,8 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.cards.projectile.CannonShot;
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
 
 import java.awt.*;
 import java.util.*;
@@ -24,7 +22,6 @@ public class PiratesCard extends AbstractEnemy {
     private List<CannonShot> shotQueue;
     private Player punishedPlayer;
     private CannonShot currentShot;
-    private int currentPathIndex;
 
     public PiratesCard(
             @JsonProperty("id") int id,
@@ -61,10 +58,9 @@ public class PiratesCard extends AbstractEnemy {
             return;
         }
         this.currentShot = shotQueue.getFirst();
-        int[] dice = GameModel.rollTwoDice();
-        this.currentPathIndex = Projectile.diceSumToIndex(currentShot.getSource(), dice[0] + dice[1]);
+        currentShot.randomizePathIndex();
 
-        boolean isPlayerAtRisk = currentShot.evaluateDefense(punishedPlayer, currentPathIndex);
+        boolean isPlayerAtRisk = currentShot.evaluateDefense(punishedPlayer);
 
         if(isPlayerAtRisk) {
             setInputState(BATTERY_DECISION);
@@ -79,18 +75,18 @@ public class PiratesCard extends AbstractEnemy {
 
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
-        if(caller != punishedPlayer) throw new IllegalArgumentException("It is not " + caller.getName() + "'s turn. It is currently " + punishedPlayer.getName() + "'s turn.");
+        verifyCaller(caller, punishedPlayer);
 
-        if(!caller.removeBatteryFrom(batteryCoords.x, batteryCoords.y)) throw new IllegalArgumentException("No battery found at " + batteryCoords);
+        caller.ensureBatteryRemovedFrom(batteryCoords);
 
         setInputState(NONE);
         handleNextShot();
     }
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);
-        if(caller != punishedPlayer) throw new IllegalArgumentException("It is not " + caller.getName() + "'s turn. It is currently " + punishedPlayer.getName() + "'s turn.");
+        verifyCaller(caller, punishedPlayer);
 
-        caller.removeFirstTileInPath(currentShot.getSource(), currentPathIndex);
+        caller.removeFirstTileInPath(currentShot.getSource(), currentShot.getPathIndex());
 
         setInputState(NONE);
         handleNextShot();

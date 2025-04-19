@@ -3,10 +3,8 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.cards.projectile.CannonShot;
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.Server.Model.tiles.CannonTile;
 import it.polimi.galaxy_trucker.Server.Model.tiles.EngineTile;
 
@@ -69,10 +67,11 @@ public class CombatZoneCard extends Card {
     private List<Player> playerQueue;
     private Map<Player, Double> playerScores;
 
+    private int remainingCrewToGiveUp;
+
     private List<CannonShot> shotQueue;
     private Player punishedPlayer;
     private CannonShot currentShot;
-    private int currentPathIndex;
 
     @JsonCreator
     public CombatZoneCard(
@@ -120,9 +119,14 @@ public class CombatZoneCard extends Card {
         }
     }
 
+    private void handleNextRule() {
+        ruleQueue.removeFirst();
+        applyRule();
+    }
+
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         if(activatedEngines != batteryTiles.size()) throw new IllegalArgumentException("The number of activated engines does not match the number of batteries used.");
         double strength = caller.getStrength(EngineTile.class, activatedEngines);
         caller.removeBatteries(batteryTiles);
@@ -136,7 +140,7 @@ public class CombatZoneCard extends Card {
     }
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         if(verticalCannons + rotatedCannons != batteryTiles.size()) throw new IllegalArgumentException("The number of activated cannons does not match the number of batteries used.");
         double strength = caller.getStrength(CannonTile.class, verticalCannons, rotatedCannons);
         caller.removeBatteries(batteryTiles);
@@ -152,12 +156,19 @@ public class CombatZoneCard extends Card {
     private void applyPunishment() {
         verifyInputState(NONE);
 
-        Player worstPlayer = getWorstPlayer(board.getSortedPlayers(), currentRule.condition);
+        Player worstPlayer = getWorstPlayer(board.getSortedPlayers(), currentRule.getCondition());
 
         switch(currentRule.getPunishment()) {
-            case FLIGHT_DAYS -> board.movePlayer(worstPlayer, currentRule.punishmentValue, BACKWARD);
-            case CREW_LOSS -> worstPlayer.removeCrew(currentRule.punishmentValue);
-            case CARGO_LOSS -> worstPlayer.removeMostValuableCargo(currentRule.punishmentValue);
+            case FLIGHT_DAYS -> board.movePlayer(worstPlayer, currentRule.getPunishmentValue(), BACKWARD);
+            case CREW_LOSS -> {
+                if(currentRule.getPunishmentValue() > 0) {
+                    this.punishedPlayer = worstPlayer;
+                    this.remainingCrewToGiveUp = currentRule.getPunishmentValue();
+                    setInputState(CREW_DECISION);
+                    return;
+                }
+            }
+            case CARGO_LOSS -> worstPlayer.removeMostValuableCargo(currentRule.getPunishmentValue());
             case CANNON_SHOTS -> {
                 this.punishedPlayer = worstPlayer;
                 this.shotQueue = new LinkedList<>(Arrays.asList(currentRule.getCannonShots()));
@@ -168,9 +179,16 @@ public class CombatZoneCard extends Card {
         handleNextRule();
     }
 
-    private void handleNextRule() {
-        ruleQueue.removeFirst();
-        applyRule();
+    public void removeMemberFrom(Player caller, Point cabinCoords, int index) {
+        verifyInputState(CREW_DECISION);
+        verifyCaller(caller, punishedPlayer);
+        if(remainingCrewToGiveUp <= 0) throw new RuntimeException("No more crew members are required to be removed.");
+        caller.ensureCrewRemovedAt(cabinCoords, index);
+        remainingCrewToGiveUp--;
+        if(remainingCrewToGiveUp == 0) {
+            setInputState(NONE);
+            handleNextRule();
+        }
     }
 
     private void applyShot() {
@@ -180,16 +198,14 @@ public class CombatZoneCard extends Card {
             return;
         }
         this.currentShot = shotQueue.getFirst();
-        int[] dice = GameModel.rollTwoDice();
-        this.currentPathIndex = Projectile.diceSumToIndex(currentShot.getSource(), dice[0] + dice[1]);
+        currentShot.randomizePathIndex();
 
-        boolean isPlayerAtRisk = currentShot.evaluateDefense(punishedPlayer, currentPathIndex);
+        boolean isPlayerAtRisk = currentShot.evaluateDefense(punishedPlayer);
 
         if(isPlayerAtRisk) {
             setInputState(BATTERY_DECISION);
-            return;
         }
-        handleNextShot();
+        else handleNextShot();
     }
 
     private void handleNextShot() {
@@ -199,18 +215,18 @@ public class CombatZoneCard extends Card {
 
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
-        if(caller != punishedPlayer) throw new IllegalArgumentException("It is not " + caller.getName() + "'s turn. It is currently " + punishedPlayer.getName() + "'s turn.");
+        verifyCaller(caller, punishedPlayer);
 
-        if(!caller.removeBatteryFrom(batteryCoords.x, batteryCoords.y)) throw new IllegalArgumentException("No battery found at " + batteryCoords);
+        caller.ensureBatteryRemovedFrom(batteryCoords);
 
         setInputState(NONE);
         handleNextShot();
     }
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);
-        if(caller != punishedPlayer) throw new IllegalArgumentException("It is not " + caller.getName() + "'s turn. It is currently " + punishedPlayer.getName() + "'s turn.");
+        verifyCaller(caller, punishedPlayer);
 
-        caller.removeFirstTileInPath(currentShot.getSource(), currentPathIndex);
+        caller.removeFirstTileInPath(currentShot.getSource(), currentShot.getPathIndex());
 
         setInputState(NONE);
         handleNextShot();

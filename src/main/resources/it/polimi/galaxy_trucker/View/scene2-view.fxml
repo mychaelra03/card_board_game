@@ -86,17 +86,17 @@
       </Label>
       <ImageView fitHeight="297.0" fitWidth="180.0" layoutX="950.0" layoutY="-150.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../textures/cards/Group_LVL2_cards.png" />
+            <Image url="@../../../../textures/cards/card_group_level_2.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="297.0" fitWidth="180.0" layoutX="1188.0" layoutY="-150.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../textures/cards/Group_LVL2_cards.png" />
+            <Image url="@../../../../textures/cards/card_group_level_2.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="297.0" fitWidth="180.0" layoutX="712.0" layoutY="-150.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../textures/cards/Group_LVL2_cards.png" />
+            <Image url="@../../../../textures/cards/card_group_level_2.png" />
          </image>
       </ImageView>
    </children>

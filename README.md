@@ -30,27 +30,27 @@ The implementation features both a command-line interface (CLI) and a JavaFX gra
 
 | Functionality     | Status                  | 
 |-------------------|-------------------------|
-| Basic rules       | :construction:      |
-| Complete rules    | :ballot_box_with_check:      |
-| Socket connection | :ballot_box_with_check:      |
-| RMI connection    | :ballot_box_with_check:      |
-| CLI               | :construction:      |
-| GUI               | :construction:      |
-| Multiple games    | :ballot_box_with_check:      |
-| Persistence (*)   | :construction:      |
-| Resilience        | :construction:      |
-| Chat              | :ballot_box_with_check:      |
+| Basic rules       | :construction:          |
+| Complete rules    | :ballot_box_with_check: |
+| Socket connection | :ballot_box_with_check: |
+| RMI connection    | :ballot_box_with_check: |
+| CLI               | :construction:          |
+| GUI               | :construction:          |
+| Multiple games    | :ballot_box_with_check: |
+| Persistence (*)   | :construction:          |
+| Resilience        | :construction:          |
+| Chat              | :construction:          |
 
 (*) *For testing purposes.*
 
 **Legend**
 
-| Symbol | Functionality status |
-| --- | --- |
-| :white_check_mark: | Completed |
-| :ballot_box_with_check: | Planned, not started yet |
-| :construction: | Work in progress |
-| :x: | Not planned to be implemented |
+| Symbol                  | Functionality status          |
+|-------------------------|-------------------------------|
+| :white_check_mark:      | Completed                     |
+| :ballot_box_with_check: | Planned, not started yet      |
+| :construction:          | Work in progress              |
+| :x:                     | Not planned to be implemented |
 
 ### Game Description
 
@@ -77,7 +77,7 @@ This command will generate two jars: one for the client and one for the server i
 ## How to Run the Program
 
 You can run the program using the JAR files found in the release section of the repository. Download the JAR files for
-the server and client from the [releases](https://github.com/PiervitoCreanza/IS24-AM02/releases) page.
+the server and client from the [releases](https://github.com/Garolini/IS25-AM14/releases) page.
 
 ### Running the Server
 
@@ -122,9 +122,9 @@ java -jar client.jar [options]
 | --debug            | Start the client in debug mode.                                 |               |
 | -h, --help         | Print the help message.                                         |               |
 
--->
-## Future Scope
 
+## Future Scope
+-->
 
 
 ## Legal 🇬🇧

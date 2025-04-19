@@ -183,11 +183,6 @@ public class ShipBoard {
         if(!(tiles[y][x] instanceof CabinTile cabin)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
         return cabin.removeMember(index);
     }
-    public CrewType removeOneCrewMemberAt(int x, int y) {
-        if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
-        if(!(tiles[y][x] instanceof CabinTile cabin)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
-        return cabin.removeOneMember();
-    }
     public void applyEpidemicCard() {
         Set<CabinTile> infectedCabins = new HashSet<>();
 
@@ -267,10 +262,10 @@ public class ShipBoard {
         if(!(tiles[y][x] instanceof CargoTile cargo)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cargo.");
         return cargo.loadBlock(index, blockType);
     }
-    public BlockType removeCargoAt(int x, int y, int index) {
+    public BlockType unloadCargoAt(int x, int y, int index) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof CargoTile cargo)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cargo.");
-        return cargo.removeBlock(index);
+        return cargo.unloadBlock(index);
     }
     public int getTotalHoldsValue() {
         int count = 0;
@@ -309,7 +304,7 @@ public class ShipBoard {
         int remainingToRemove = quantity;
         for(BlockInfo cargo: cargoBlocks) {
             if(!(remainingToRemove > 0)) break;
-            cargo.tile.removeBlock(cargo.index);
+            cargo.tile.unloadBlock(cargo.index);
             remainingToRemove--;
         }
         if(remainingToRemove > 0) {
@@ -327,22 +322,30 @@ public class ShipBoard {
         }
     }
 
-    public List<Point> getTilesPositions(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
-        List<Point> positions = new ArrayList<>();
-        for(int y = 0; y < tiles.length; y++) {
-            for(int x = 0; x < tiles[0].length; x++) {
-                Tile tile = tiles[y][x];
-                if(tileClass.isInstance(tile) && filter.test(tile)) {
-                    positions.add(new Point(x, y));
-                }
-            }
-        }
-        return positions;
-    }
+//    public List<Point> getTilesPositions(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
+//        List<Point> positions = new ArrayList<>();
+//        for(int y = 0; y < tiles.length; y++) {
+//            for(int x = 0; x < tiles[0].length; x++) {
+//                Tile tile = tiles[y][x];
+//                if(tileClass.isInstance(tile) && filter.test(tile)) {
+//                    positions.add(new Point(x, y));
+//                }
+//            }
+//        }
+//        return positions;
+//    }
 
     public int getTileCount(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
-        List<Point> positions = getTilesPositions(tileClass, filter);
-        return positions.size();
+        int count = 0;
+        for(Tile[] row : tiles) {
+            for(Tile tile : row) {
+                if(tileClass.isInstance(tile) && filter.test(tile)) count++;
+            }
+        }
+        return count;
+    }
+    public int getTotalTileCount() {
+        return getTileCount(Tile.class, tile -> !(tile instanceof EmptyTile));
     }
 
     public boolean hasTileOnPath(Projectile.Source source, int index, Class<? extends Tile> tileClass, Predicate<Tile> filter) {

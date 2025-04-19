@@ -3,6 +3,9 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.Server.Model.tiles.CrewType;
+
+import java.awt.*;
 
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
@@ -13,6 +16,9 @@ public class SlaversCard extends AbstractEnemy {
 
     private final int rewardCredits;
     private final int crewLossOnDefeat;
+
+    private Player punishedPlayer;
+    private int remainingCrewToGiveUp;
 
     public SlaversCard(
             @JsonProperty("id") int id,
@@ -38,8 +44,24 @@ public class SlaversCard extends AbstractEnemy {
     @Override
     protected void applyPunishment(Player player) {
         verifyInputState(NONE);
-        player.removeCrew(crewLossOnDefeat);
-        handleNextPlayer();
+        if(crewLossOnDefeat > 0) {
+            this.punishedPlayer = player;
+            this.remainingCrewToGiveUp = crewLossOnDefeat;
+            setInputState(CREW_DECISION);
+        }
+        else handleNextPlayer();
+    }
+
+    public void removeMemberFrom(Player caller, Point cabinCoords, int index) {
+        verifyInputState(CREW_DECISION);
+        verifyCaller(caller, punishedPlayer);
+        if(remainingCrewToGiveUp <= 0) throw new RuntimeException("No more crew members are required to be removed.");
+        caller.ensureCrewRemovedAt(cabinCoords, index);
+        remainingCrewToGiveUp--;
+        if(remainingCrewToGiveUp == 0) {
+            setInputState(NONE);
+            handleNextPlayer();
+        }
     }
 
     @Override

@@ -3,7 +3,6 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.Player;
-import it.polimi.galaxy_trucker.Server.Model.PlayerUsername;
 import it.polimi.galaxy_trucker.Server.Model.tiles.BlockType;
 
 import java.awt.*;
@@ -48,7 +47,7 @@ public class PlanetsCard extends Card {
 
     public void choosePlanet(Player caller, int index) {
         verifyInputState(PLANET_SELECTION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         if(index < 0 || index >= planets.length) throw new IllegalArgumentException("Planet index out of bounds.");
         if(planetTaken[index]) throw new IllegalArgumentException("Planet " + index + " is already taken.");
         planetTaken[index] = true;
@@ -63,7 +62,7 @@ public class PlanetsCard extends Card {
 
     public void refusePlanet(Player caller) {
         verifyInputState(PLANET_SELECTION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         playerQueue.removeFirst();
         if(playerQueue.isEmpty()) {
             setInputState(NONE);
@@ -87,14 +86,21 @@ public class PlanetsCard extends Card {
 
     public void placeCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
-        if(!acceptedPlayers.contains(caller)) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+        verifyPlayerInList(caller, acceptedPlayers, "Player " + caller.getName() + " has no active cargo session.");
 
         caller.swapCargo(blockIndex, tileCoords, containerIndex);
     }
 
+    public void unloadCargo(Player caller, Point tileCoords, int containerIndex) {
+        verifyInputState(CARGO_DECISION);
+        verifyPlayerInList(caller, acceptedPlayers, "Player " + caller.getName() + " has no active cargo session.");
+
+        caller.unloadCargo(tileCoords, containerIndex);
+    }
+
     public void confirmDone(Player caller) {
         verifyInputState(CARGO_DECISION);
-        if(!acceptedPlayers.contains(caller)) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+        verifyPlayerInList(caller, acceptedPlayers, "Player " + caller.getName() + " has no active cargo session.");
         acceptedPlayers.remove(caller);
         caller.clearCargoPool();
         if(acceptedPlayers.isEmpty()) {

@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.Server.Model.cards.projectile;
 
+import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.ShipBoard;
 
@@ -16,6 +17,7 @@ public abstract class Projectile {
 
     private final Size size;
     private final Source source;
+    private Integer pathIndex;
 
     public enum Source {
         UP(0), DOWN(2), LEFT(3), RIGHT(1);
@@ -35,23 +37,41 @@ public abstract class Projectile {
         this.size = size;
         this.source = source;
     }
+    public Projectile(Size size, Source source, int pathIndex) {
+        this(size, source);
+        this.pathIndex = pathIndex;
+    }
 
     public Size getSize() {
         return size;
     }
-
     public Source getSource() {
         return source;
     }
 
-    public abstract boolean evaluateDefense(Player player, int pathIndex);
+    public int getPathIndex() {
+        return pathIndex;
+    }
 
-    public static int diceSumToIndex(Source source, int diceSum) {
-        if(source == Projectile.Source.UP || source == Projectile.Source.DOWN) {
-            return diceSum - 4;
-        } else if(source == Projectile.Source.LEFT || source == Projectile.Source.RIGHT) {
-            return diceSum - 5;
-        }
-        throw new IllegalArgumentException("Invalid source: " + source);
+    public abstract boolean evaluateDefense(Player player);
+
+    private static int rollDie() {
+        return 1 + (int)(Math.random() * 6);
+    }
+
+    public void randomizePathIndex() {
+        // If the value has been coded in (like in tests), it doesn't override it.
+        if(pathIndex != null) return;
+        int firstDie = rollDie();
+        int secondDie = rollDie();
+        int diceSum = firstDie + secondDie;
+
+        this.pathIndex = switch (source) {
+            case UP, DOWN -> diceSum - 4;
+            case LEFT, RIGHT -> diceSum - 5;
+        };
+
+        // if(diceRollListener != null) diceRollListener.onDiceRolled(firstDie, secondDie);
+        // TODO: dice listener
     }
 }

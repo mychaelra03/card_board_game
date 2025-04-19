@@ -42,16 +42,23 @@ public class SmugglersCard extends AbstractEnemy {
         setInputState(CARGO_DECISION);
     }
 
-    public void placeCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
+    public void loadCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
-        if(caller != rewardedPlayer) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+        verifyCaller(caller, rewardedPlayer);
 
         caller.swapCargo(blockIndex, tileCoords, containerIndex);
     }
 
+    public void unloadCargo(Player caller, Point tileCoords, int containerIndex) {
+        verifyInputState(CARGO_DECISION);
+        verifyCaller(caller, rewardedPlayer);
+
+        caller.unloadCargo(tileCoords, containerIndex);
+    }
+
     public void confirmDone(Player caller) {
         verifyInputState(CARGO_DECISION);
-        if(caller != rewardedPlayer) throw new IllegalArgumentException("Player " + caller.getName() + " has no active cargo session.");
+        verifyCaller(caller, rewardedPlayer);
         caller.clearCargoPool();
         setInputState(FINISHED);
     }

@@ -1,7 +1,7 @@
 {
     "learningFlight": [
         {
-            "id": 2,
+            "id": 0,
             "level": 1,
             "cardType": "smugglers",
             "rewardCargo": [
@@ -14,17 +14,17 @@
             "positionCost": 1
         },
         {
-            "id": 4,
+            "id": 1,
             "level": 1,
             "cardType": "starDust"
         },
         {
-            "id": 5,
+            "id": 2,
             "level": 1,
             "cardType": "openSpace"
         },
         {
-            "id": 9,
+            "id": 3,
             "level": 1,
             "cardType": "meteorSwarm",
             "meteors": [
@@ -43,7 +43,7 @@
             ]
         },
         {
-            "id": 13,
+            "id": 4,
             "level": 1,
             "cardType": "planets",
             "planets": [
@@ -63,7 +63,7 @@
             "positionCost": 2
         },
         {
-            "id": 16,
+            "id": 5,
             "level": 1,
             "cardType": "combatZone",
             "combatRules": [
@@ -97,7 +97,7 @@
             ]
         },
         {
-            "id": 18,
+            "id": 6,
             "level": 1,
             "cardType": "abandonedShip",
             "rewardCredits": 4,
@@ -105,7 +105,7 @@
             "positionCost": 1
         },
         {
-            "id": 19,
+            "id": 7,
             "level": 1,
             "cardType": "abandonedStation",
             "rewardCargo": [
@@ -118,7 +118,7 @@
     ],
     "levelOne": [
         {
-            "id": 1,
+            "id": 8,
             "level": 1,
             "cardType": "slavers",
             "rewardCredits": 5,
@@ -127,7 +127,7 @@
             "positionCost": 1
         },
         {
-            "id": 3,
+            "id": 9,
             "level": 1,
             "cardType": "pirates",
             "rewardCredits": 4,
@@ -149,22 +149,22 @@
             "positionCost": 1
         },
         {
-            "id": 6,
-            "level": 1,
-            "cardType": "openSpace"
-        },
-        {
-            "id": 7,
-            "level": 1,
-            "cardType": "openSpace"
-        },
-        {
-            "id": 8,
-            "level": 1,
-            "cardType": "openSpace"
-        },
-        {
             "id": 10,
+            "level": 1,
+            "cardType": "openSpace"
+        },
+        {
+            "id": 11,
+            "level": 1,
+            "cardType": "openSpace"
+        },
+        {
+            "id": 12,
+            "level": 1,
+            "cardType": "openSpace"
+        },
+        {
+            "id": 13,
             "level": 1,
             "cardType": "meteorSwarm",
             "meteors": [
@@ -191,7 +191,7 @@
             ]
         },
         {
-            "id": 11,
+            "id": 14,
             "level": 1,
             "cardType": "meteorSwarm",
             "meteors": [
@@ -210,7 +210,7 @@
             ]
         },
         {
-            "id": 12,
+            "id": 15,
             "level": 1,
             "cardType": "planets",
             "planets": [
@@ -240,7 +240,7 @@
             "positionCost": 3
         },
         {
-            "id": 14,
+            "id": 16,
             "level": 1,
             "cardType": "planets",
             "planets": [
@@ -258,7 +258,7 @@
             "positionCost": 3
         },
         {
-            "id": 15,
+            "id": 17,
             "level": 1,
             "cardType": "planets",
             "planets": [
@@ -278,7 +278,7 @@
             "positionCost": 1
         },
         {
-            "id": 17,
+            "id": 18,
             "level": 1,
             "cardType": "abandonedShip",
             "rewardCredits": 3,
@@ -286,7 +286,7 @@
             "positionCost": 1
         },
         {
-            "id": 20,
+            "id": 19,
             "level": 1,
             "cardType": "abandonedStation",
             "rewardCargo": [
@@ -299,7 +299,7 @@
     ],
     "levelTwo": [
         {
-            "id": 21,
+            "id": 0,
             "level": 2,
             "cardType": "slavers",
             "rewardCredits": 8,
@@ -308,7 +308,7 @@
             "positionCost": 2
         },
         {
-            "id": 22,
+            "id": 1,
             "level": 2,
             "cardType": "smugglers",
             "rewardCargo": [
@@ -321,7 +321,7 @@
             "positionCost": 1
         },
         {
-            "id": 23,
+            "id": 2,
             "level": 2,
             "cardType": "pirates",
             "rewardCredits": 7,
@@ -343,32 +343,32 @@
             "positionCost": 2
         },
         {
-            "id": 24,
+            "id": 3,
             "level": 2,
             "cardType": "starDust"
         },
         {
-            "id": 25,
+            "id": 4,
             "level": 2,
             "cardType": "epidemic"
         },
         {
-            "id": 26,
+            "id": 5,
             "level": 2,
             "cardType": "openSpace"
         },
         {
-            "id": 27,
+            "id": 6,
             "level": 2,
             "cardType": "openSpace"
         },
         {
-            "id": 28,
+            "id": 7,
             "level": 2,
             "cardType": "openSpace"
         },
         {
-            "id": 29,
+            "id": 8,
             "level": 2,
             "cardType": "meteorSwarm",
             "meteors": [
@@ -395,7 +395,7 @@
             ]
         },
         {
-            "id": 30,
+            "id": 9,
             "level": 2,
             "cardType": "meteorSwarm",
             "meteors": [
@@ -418,7 +418,7 @@
             ]
         },
         {
-            "id": 31,
+            "id": 10,
             "level": 2,
             "cardType": "meteorSwarm",
             "meteors": [
@@ -445,7 +445,7 @@
             ]
         },
         {
-            "id": 32,
+            "id": 11,
             "level": 2,
             "cardType": "planets",
             "planets": [
@@ -472,7 +472,7 @@
             "positionCost": 4
         },
         {
-            "id": 33,
+            "id": 12,
             "level": 2,
             "cardType": "planets",
             "planets": [
@@ -490,7 +490,7 @@
             "positionCost": 3
         },
         {
-            "id": 34,
+            "id": 13,
             "level": 2,
             "cardType": "planets",
             "planets": [
@@ -514,7 +514,7 @@
             "positionCost": 2
         },
         {
-            "id": 35,
+            "id": 14,
             "level": 2,
             "cardType": "planets",
             "planets": [
@@ -538,7 +538,7 @@
             "positionCost": 3
         },
         {
-            "id": 36,
+            "id": 15,
             "level": 2,
             "cardType": "combatZone",
             "combatRules": [
@@ -580,7 +580,7 @@
             ]
         },
         {
-            "id": 37,
+            "id": 16,
             "level": 2,
             "cardType": "abandonedShip",
             "rewardCredits": 6,
@@ -588,7 +588,7 @@
             "positionCost": 1
         },
         {
-            "id": 38,
+            "id": 17,
             "level": 2,
             "cardType": "abandonedShip",
             "rewardCredits": 8,
@@ -596,7 +596,7 @@
             "positionCost": 2
         },
         {
-            "id": 39,
+            "id": 18,
             "level": 2,
             "cardType": "abandonedStation",
             "rewardCargo": [
@@ -607,7 +607,7 @@
             "positionCost": 1
         },
         {
-            "id": 40,
+            "id": 19,
             "level": 2,
             "cardType": "abandonedStation",
             "rewardCargo": [

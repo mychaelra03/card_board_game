@@ -1,13 +1,9 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 import org.junit.jupiter.api.Test;
 
 import java.awt.Point;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 
 import static it.polimi.galaxy_trucker.BoardType.*;
@@ -23,39 +19,45 @@ public class ShipBoardTest {
     private static final Connector[] FULL_DOUBLE_CONNECTORS = {DOUBLE, DOUBLE, DOUBLE, DOUBLE};
     private static final Connector[] FULL_SINGLE_CONNECTORS = {SINGLE, SINGLE, SINGLE, SINGLE};
     private static final Connector[] FULL_NONE_CONNECTORS = {NONE, NONE, NONE, NONE};
+
     @Test
-    void initializationBoard1() {
-        ShipBoard ship = new ShipBoard(LEARNING);
-        Tile[][] tiles = ship.getTiles();
-        for (int y = 0; y < tiles.length; y++) {
-            for (int x = 0; x < tiles[y].length; x++) {
-                if (ship.isInsideShip(x, y)) {
-                    if(x == 3 && y == 2) assertInstanceOf(StartingCabinTile.class, tiles[y][x], "Tile should be StartingCabinTile after initialization.");
-                    else assertInstanceOf(EmptyTile.class, tiles[y][x], "Tile should be EmptyTile after initialization.");
+    void initializationBoard() {
+        ShipBoard ship1 = new ShipBoard(LEARNING);
+        Tile[][] tiles1 = ship1.getTiles();
+        for (int y = 0; y < tiles1.length; y++) {
+            for (int x = 0; x < tiles1[y].length; x++) {
+                if (ship1.isInsideShip(x, y)) {
+                    if(x == 3 && y == 2) assertInstanceOf(StartingCabinTile.class, tiles1[y][x], "Tile should be StartingCabinTile after initialization.");
+                    else assertInstanceOf(EmptyTile.class, tiles1[y][x], "Tile should be EmptyTile after initialization.");
+                }
+            }
+        }
+        ShipBoard ship2 = new ShipBoard(LEARNING);
+        Tile[][] tiles2 = ship2.getTiles();
+        for (int y = 0; y < tiles2.length; y++) {
+            for (int x = 0; x < tiles2[y].length; x++) {
+                if (ship2.isInsideShip(x, y)) {
+                    if(x == 3 && y == 2) assertInstanceOf(StartingCabinTile.class, tiles2[y][x], "Tile should be StartingCabinTile after initialization.");
+                    else assertInstanceOf(EmptyTile.class, tiles2[y][x], "Tile should be EmptyTile after initialization.");
                 }
             }
         }
     }
 
     @Test
-    void initializationBoard2() {
-        ShipBoard ship = new ShipBoard(LEVEL_TWO);
-        Tile[][] tiles = ship.getTiles();
-        for (int y = 0; y < tiles.length; y++) {
-            for (int x = 0; x < tiles[y].length; x++) {
-                if (ship.isInsideShip(x, y)) {
-                    if(x == 3 && y == 2) assertInstanceOf(StartingCabinTile.class, tiles[y][x], "Tile should be StartingCabinTile after initialization.");
-                    else assertInstanceOf(EmptyTile.class, tiles[y][x], "Tile should be EmptyTile after initialization.");
-                }
-            }
-        }
-    }
-
-    @Test
-    void isInsideShipType1() {
-        ShipBoard ship = new ShipBoard(LEARNING);
-        assertTrue(ship.isInsideShip(3, 2), "Coordinate (3,2) should be inside the ship for type 1");
-        assertFalse(ship.isInsideShip(0, 0), "Coordinate (0,0) should be outside the ship for type 1");
+    void isInsideShip() {
+        ShipBoard learningShip = new ShipBoard(LEARNING);
+        assertFalse(learningShip.isInsideShip(0, -1), "Coordinate (0,-1) should be outside the learning ship.");
+        assertTrue(learningShip.isInsideShip(3, 2), "Coordinate (3,2) should be inside the learning ship.");
+        assertFalse(learningShip.isInsideShip(2, 0), "Coordinate (2,0) should be outside the learning ship.");
+        assertTrue(learningShip.isInsideShip(3, 0), "Coordinate (3,0) should be inside the learning ship.");
+        assertFalse(learningShip.isInsideShip(0, 0), "Coordinate (0,0) should be outside the learning ship.");
+        ShipBoard levelTwoShip = new ShipBoard(LEVEL_TWO);
+        assertFalse(levelTwoShip.isInsideShip(-1, 0), "Coordinate (-1,0) should be outside the level two ship.");
+        assertTrue(levelTwoShip.isInsideShip(3, 2), "Coordinate (3,2) should be inside the level two ship.");
+        assertTrue(levelTwoShip.isInsideShip(2, 0), "Coordinate (2,0) should be inside the level two ship.");
+        assertFalse(levelTwoShip.isInsideShip(3, 0), "Coordinate (3,0) should be outside the level two ship.");
+        assertFalse(levelTwoShip.isInsideShip(0, 0), "Coordinate (0,0) should be outside the level two ship.");
     }
 
     @Test
@@ -81,12 +83,8 @@ public class ShipBoardTest {
         // Checks if it generates all 152 cards
         TileFactory tileFactory = TileFactory.getInstance();
         for (int id = 0; id < 152; id++) {
-            try {
-                Tile tile = tileFactory.getTile(id);
-                assertNotNull(tile, "Tile with ID " + id + " should not be null.");
-            } catch (Exception e) {
-                fail("TileFactory threw an exception for ID " + id + ": " + e.getMessage());
-            }
+            Tile tile = tileFactory.getTile(id);
+            assertNotNull(tile, "Tile with ID " + id + " should not be null.");
         }
     }
 
@@ -232,7 +230,7 @@ public class ShipBoardTest {
         assertEquals(3, ship.getTotalHoldsValue(), "Cargo value should be 3.");
         ship.loadCargoAt(2, 2, 2, BlockType.BLUE);
         assertEquals(4, ship.getTotalHoldsValue(), "Cargo value should be 4.");
-        assertEquals(BlockType.YELLOW, ship.removeCargoAt(2,2,0), "Should return the removed hold.");
+        assertEquals(BlockType.YELLOW, ship.unloadCargoAt(2,2,0), "Should return the removed hold.");
     }
 
     @Test
@@ -435,41 +433,6 @@ public class ShipBoardTest {
     }
 
     @Test
-    void getTilesPositions() {
-        ShipBoard ship = new ShipBoard(LEVEL_TWO);
-        ship.setTile(2, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
-        ship.setTile(1, 2, new CabinTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
-        ship.setTile(0, 2, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
-        ship.setCrewTypeAt(1, 2, CrewType.BROWN_ALIEN);
-        ship.setTile(2, 1, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 0);
-        ship.setTile(4, 1, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 0);
-        ship.setTile(3, 1, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 2), 0);
-        ship.removeBatteryFrom(3, 1);
-        ship.removeBatteryFrom(3, 1);
-        ship.setTile(3, 3, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 2), 0);
-        ship.setTile(4, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 1);
-        ship.setTile(4, 4, new EngineTile(0 ,FULL_UNIVERSAL_CONNECTORS, false), 0);
-        List<Point> startingCabinPositions = List.of(new Point(3, 2));
-        List<Point> cabinPositions = List.of(new Point(1, 2), new Point(2, 2), new Point(3, 2));
-        List<Point> alienCabinPositions = List.of(new Point(1, 2));
-        List<Point> cannonPositions = List.of(new Point(2, 1), new Point(4, 1), new Point(4, 3));
-        List<Point> doubleCannonPositions = List.of(new Point(4, 1), new Point(4, 3));
-        List<Point> rotatedCannonPositions = List.of(new Point(4, 3));
-        List<Point> batteriesPositions = List.of(new Point(3, 1), new Point(3, 3));
-        List<Point> nonEmptyBatteriesPositions = List.of(new Point(3, 3));
-        List<Point> enginePositions = List.of(new Point(4, 4));
-        assertEquals(startingCabinPositions, ship.getTilesPositions(StartingCabinTile.class, tile -> true), "Positions should match.");
-        assertEquals(cabinPositions, ship.getTilesPositions(CabinTile.class, tile -> true), "Positions should match.");
-        assertEquals(alienCabinPositions, ship.getTilesPositions(CabinTile.class, tile -> ((CabinTile)tile).hasAlien(CrewType.BROWN_ALIEN)), "Positions should match.");
-        assertEquals(cannonPositions, ship.getTilesPositions(CannonTile.class, tile -> true), "Positions should match.");
-        assertEquals(doubleCannonPositions, ship.getTilesPositions(CannonTile.class, tile -> ((CannonTile)tile).isDouble()), "Positions should match.");
-        assertEquals(rotatedCannonPositions, ship.getTilesPositions(CannonTile.class, tile -> tile.getRotation() != 0), "Positions should match.");
-        assertEquals(batteriesPositions, ship.getTilesPositions(BatteriesTile.class, tile -> true), "Positions should match.");
-        assertEquals(nonEmptyBatteriesPositions, ship.getTilesPositions(BatteriesTile.class, tile -> ((BatteriesTile)tile).getStoredBatteries() > 0), "Positions should match.");
-        assertEquals(enginePositions, ship.getTilesPositions(EngineTile.class, tile -> true), "Positions should match.");
-    }
-
-    @Test
     void removeFirstTileInPath() {
         ShipBoard ship = new ShipBoard(LEVEL_TWO);
         ship.setTile(2, 2, new StructuralTile(0, FULL_UNIVERSAL_CONNECTORS), 0);
@@ -544,8 +507,7 @@ public class ShipBoardTest {
         ship.setTile(1, 3, new StructuralTile(0, new Connector[]{NONE, SINGLE, NONE, NONE}), 0);
         ship.setTile(1, 4, new StructuralTile(0, new Connector[]{NONE, NONE, UNIVERSAL, NONE}), 0);     // not connected
 
-        Set<Point> invalidPoints = new HashSet<>();
-        invalidPoints = Set.of(new Point(2,1), new Point(2,2), new Point(3,2), new Point(5,2),
+        Set<Point> invalidPoints = Set.of(new Point(2,1), new Point(2,2), new Point(3,2), new Point(5,2),
                 new Point(3,3), new Point(4,3), new Point(4,4), new Point(5,4), new Point(1,4));
         assertEquals(invalidPoints, ship.getInvalidTiles(), "Invalid tiles should match.");
     }

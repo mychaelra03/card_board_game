@@ -47,18 +47,15 @@ public class CargoTile extends Tile {
     public BlockType loadBlock(int index, BlockType newBlock) {
         // if the slot is empty, it adds the block and returns null
         // if there is already a block, it switches them and returns the block that was inside
-        if (type == CargoType.NORMAL && newBlock == BlockType.RED) {
-            throw new IllegalArgumentException("Blue cargo cannot hold RED blocks.");
-        }
-        if (index < 0 || index >= containers.length) {
-            throw new IllegalArgumentException("Invalid container index");
-        }
+        if(type == CargoType.NORMAL && newBlock == BlockType.RED) throw new IllegalStateException("Blue cargo cannot hold RED blocks.");
+        if(index < 0 || index >= containers.length) throw new IllegalArgumentException("Invalid container index");
+
         BlockType previousBlock = containers[index];
         containers[index] = newBlock;
         return previousBlock;
     }
 
-    public BlockType removeBlock(int index) {
+    public BlockType unloadBlock(int index) {
         return loadBlock(index, null);
     }
 

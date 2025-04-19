@@ -3,7 +3,6 @@ package it.polimi.galaxy_trucker;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Server.Model.cards.*;
-import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,11 +40,11 @@ public class CardFactory {
             for (Iterator<String> iterator = root.fieldNames(); iterator.hasNext(); ) {
                 String groupName = iterator.next();
                 JsonNode cardsArray = root.get(groupName);
-                if (!cardsArray.isArray()) {
+                if(!cardsArray.isArray()) {
                     throw new IllegalArgumentException("Group " + groupName + " must contain an array of cards.");
                 }
                 List<JsonNode> cardList = new ArrayList<>();
-                for (JsonNode cardNode : cardsArray) {
+                for(JsonNode cardNode : cardsArray) {
                     if (!cardNode.has("id") || !cardNode.has("cardType")) {
                         throw new IllegalArgumentException("Card is missing required fields: " + cardNode);
                     }
@@ -54,12 +53,17 @@ public class CardFactory {
                 groupMap.put(groupName, cardList);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error reading JSON file at " + path, e);
+            throw new IllegalStateException("Error reading JSON file at " + path, e);
+        }
+        if(groupMap.containsKey("learningFlight")) {
+            if(!groupMap.containsKey("levelOne")) groupMap.put("levelOne", new ArrayList<>());
+            groupMap.get("levelOne").addAll(groupMap.get("learningFlight"));
         }
         return groupMap;
     }
 
-    public List<Card> getDeck(BoardType deckType) {
+    public List<Card> generateDeck(BoardType deckType, GameModel gameBoard) {
+        if(gameBoard.getBoardType() != deckType) throw new IllegalArgumentException("The deck type doesn't match the board type.");
         List<Card> result = new ArrayList<>();
         List<JsonNode> cardsNodes = cardsByGroup.get(deckType.toString());
 
@@ -69,55 +73,61 @@ public class CardFactory {
         List<JsonNode> cardsNodesCopy = new ArrayList<>(cardsNodes);
         Collections.shuffle(cardsNodesCopy, random);
         for(int i = 0; i < 8; i++) {
-            result.add(createCard(cardsNodesCopy.get(i)));
+            result.add(createCard(cardsNodesCopy.get(i), gameBoard));
         }
-        if(deckType == BoardType.LEARNING) return result;
+        if(deckType == BoardType.LEARNING || deckType == BoardType.LEVEL_ONE) return result;
 
-        // Combine level 1 cards from "levelOne" and "learningFlight".
-        List<JsonNode> levelOneNodes = new ArrayList<>();
-        if(cardsByGroup.containsKey("levelOne")) {
-            levelOneNodes.addAll(cardsByGroup.get("levelOne"));
+        // If deck is level 2, adds 4 level 1 cards.
+        List<JsonNode> level1Nodes = cardsByGroup.get("levelOne");
+        if(level1Nodes == null || level1Nodes.size() < 4) {
+            throw new IllegalArgumentException("Not enough level 1 cards available. Required: 4, available: " + ((level1Nodes == null)? 0 : level1Nodes.size()));
         }
-        if(cardsByGroup.containsKey("learningFlight")) {
-            levelOneNodes.addAll(cardsByGroup.get("learningFlight"));
-        }
-        if(levelOneNodes.size() < 4) {
-            throw new IllegalArgumentException("Not enough level 1 cards available. Required: 4, available: " + levelOneNodes.size());
-        }
-        Collections.shuffle(levelOneNodes, random);
+        List<JsonNode> level1NodesCopy = new ArrayList<>(level1Nodes);
+        Collections.shuffle(level1NodesCopy, random);
         for(int i = 0; i < 4; i++) {
-            result.add(createCard(levelOneNodes.get(i)));
+            result.add(createCard(level1NodesCopy.get(i), gameBoard));
         }
 
         return result;
     }
 
-    private static final Map<String, Class<? extends Card>> CARD_MAP = new HashMap<>();
-    static {
-        CARD_MAP.put("abandonedShip", AbandonedShipCard.class);
-        CARD_MAP.put("abandonedStation", AbandonedStationCard.class);
-        CARD_MAP.put("combatZone", CombatZoneCard.class);
-        CARD_MAP.put("epidemic", EpidemicCard.class);
-        CARD_MAP.put("meteorSwarm", MeteorSwarmCard.class);
-        CARD_MAP.put("openSpace", OpenSpaceCard.class);
-        CARD_MAP.put("pirates", PiratesCard.class);
-        CARD_MAP.put("planets", PlanetsCard.class);
-        CARD_MAP.put("slavers", SlaversCard.class);
-        CARD_MAP.put("smugglers", SmugglersCard.class);
-        CARD_MAP.put("starDust", StarDustCard.class);
+    public Card generateCard(BoardType deckType, int cardId) {
+        // Returns a specific card. Used for testing.
+        for(JsonNode cardNode : cardsByGroup.get(deckType.toString())) {
+            if(cardNode.has("id") && cardNode.get("id").asInt() == cardId) {
+                return createCard(cardNode, null);
+            }
+        }
+        throw new IllegalArgumentException("Card with ID " + cardId + " not found.");
     }
 
-    private Card createCard(JsonNode cardNode) {
+    private static final Map<String, Class<? extends Card>> CARD_MAP = Map.ofEntries(
+        Map.entry("abandonedShip", AbandonedShipCard.class),
+        Map.entry("abandonedStation", AbandonedStationCard.class),
+        Map.entry("combatZone", CombatZoneCard.class),
+        Map.entry("epidemic", EpidemicCard.class),
+        Map.entry("meteorSwarm", MeteorSwarmCard.class),
+        Map.entry("openSpace", OpenSpaceCard.class),
+        Map.entry("pirates", PiratesCard.class),
+        Map.entry("planets", PlanetsCard.class),
+        Map.entry("slavers", SlaversCard.class),
+        Map.entry("smugglers", SmugglersCard.class),
+        Map.entry("starDust", StarDustCard.class)
+    );
+
+    private Card createCard(JsonNode cardNode, GameModel gameBoard) {
         // Instantiates a Card from its JSON definition.
 
         String cardType = cardNode.get("cardType").asText();
 
         Class<? extends Card> cardClass = CARD_MAP.get(cardType);
-        if (cardClass == null) {
-            throw new IllegalArgumentException("Unknown type in card " + cardNode.get("id") + ": " + cardType);
-        }
+
+        if(cardClass == null) throw new IllegalArgumentException("Unknown type in card " + cardNode.get("id") + ": " + cardType);
+
         try {
-            return mapper.readValue(cardNode.toString(), cardClass);
+            Card card = mapper.readValue(cardNode.toString(), cardClass);
+            card.assignBoard(gameBoard);
+            return card;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

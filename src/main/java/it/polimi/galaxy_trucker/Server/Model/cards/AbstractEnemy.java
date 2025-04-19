@@ -54,7 +54,7 @@ public abstract class AbstractEnemy extends Card {
 
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         if(verticalCannons + rotatedCannons != batteryTiles.size()) throw new IllegalArgumentException("The number of activated cannons does not match the number of batteries used.");
         double strength = caller.getStrength(CannonTile.class, verticalCannons, rotatedCannons);
         caller.removeBatteries(batteryTiles);
@@ -70,7 +70,7 @@ public abstract class AbstractEnemy extends Card {
 
     public void acceptReward(Player caller) {
         verifyInputState(REWARD_DECISION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         board.movePlayer(caller, positionCost, BACKWARD);
         playerQueue.clear();
         setInputState(NONE);
@@ -78,7 +78,7 @@ public abstract class AbstractEnemy extends Card {
     }
     public void refuseReward(Player caller) {
         verifyInputState(REWARD_DECISION);
-        validatePlayerTurn(caller, playerQueue);
+        verifyPlayerTurn(caller, playerQueue);
         playerQueue.clear();
         setInputState(FINISHED);
     }

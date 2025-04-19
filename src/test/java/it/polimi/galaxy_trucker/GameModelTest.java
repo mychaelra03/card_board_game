@@ -12,17 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameModelTest {
 
     @Test
-    void testCardFactory() {
-        //FIXME
-        CardFactory cardFactory = CardFactory.getInstance();
-        List<Card> levelTwoDeck = cardFactory.getDeck(LEVEL_TWO);
-        List<Card> levelTwoDeck2 = cardFactory.getDeck(LEVEL_TWO);
-        List<Card> learningDeck = cardFactory.getDeck(LEARNING);
-        List<Card> learningDeck2 = cardFactory.getDeck(LEARNING);
-        System.out.println();
-    }
-
-    @Test
     void addPlayer() {
     }
 
