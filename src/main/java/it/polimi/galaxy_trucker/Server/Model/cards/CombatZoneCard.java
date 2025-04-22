@@ -12,7 +12,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.GameModel.Direction.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.CombatZoneCard.CombatRule.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
@@ -159,24 +158,26 @@ public class CombatZoneCard extends Card {
         Player worstPlayer = getWorstPlayer(board.getSortedPlayers(), currentRule.getCondition());
 
         switch(currentRule.getPunishment()) {
-            case FLIGHT_DAYS -> board.movePlayer(worstPlayer, currentRule.getPunishmentValue(), BACKWARD);
-            case CREW_LOSS -> {
-                if(currentRule.getPunishmentValue() > 0) {
-                    this.punishedPlayer = worstPlayer;
-                    this.remainingCrewToGiveUp = currentRule.getPunishmentValue();
-                    setInputState(CREW_DECISION);
-                    return;
-                }
+            case FLIGHT_DAYS -> {
+                board.movePlayerBackward(worstPlayer, currentRule.getPunishmentValue());
+                handleNextRule();
             }
-            case CARGO_LOSS -> worstPlayer.removeMostValuableCargo(currentRule.getPunishmentValue());
+            case CREW_LOSS -> {
+                if(currentRule.getPunishmentValue() <= 0) break;
+                this.punishedPlayer = worstPlayer;
+                this.remainingCrewToGiveUp = currentRule.getPunishmentValue();
+                setInputState(CREW_DECISION);
+            }
+            case CARGO_LOSS -> {
+                worstPlayer.removeMostValuableCargo(currentRule.getPunishmentValue());
+                handleNextRule();
+            }
             case CANNON_SHOTS -> {
                 this.punishedPlayer = worstPlayer;
                 this.shotQueue = new LinkedList<>(Arrays.asList(currentRule.getCannonShots()));
                 applyShot();
-                return;
             }
         }
-        handleNextRule();
     }
 
     public void removeMemberFrom(Player caller, Point cabinCoords, int index) {
@@ -185,7 +186,7 @@ public class CombatZoneCard extends Card {
         if(remainingCrewToGiveUp <= 0) throw new RuntimeException("No more crew members are required to be removed.");
         caller.ensureCrewRemovedAt(cabinCoords, index);
         remainingCrewToGiveUp--;
-        if(remainingCrewToGiveUp == 0) {
+        if(remainingCrewToGiveUp == 0 || punishedPlayer.getCrewCount() == 0) {
             setInputState(NONE);
             handleNextRule();
         }

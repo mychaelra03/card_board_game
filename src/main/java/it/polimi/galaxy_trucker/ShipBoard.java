@@ -66,11 +66,12 @@ public class ShipBoard {
         placeTile(x, y, tile, rotation);
     }
     private void placeTile(int x, int y, Tile tile, int rotation) {
+        if(tile instanceof EmptyTile || tile instanceof StartingCabinTile) throw new IllegalArgumentException("Cannot manually place tile type: " + tile.getTileType());
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         if(tiles[y][x].getClass() != EmptyTile.class) throw new IllegalArgumentException("Tile occupied.");
         tiles[y][x] = tile;
         tiles[y][x].setRotation(rotation);
-        if((tile instanceof CabinTile && !(tile instanceof StartingCabinTile)) || tile instanceof AlienSupportTile) updateAlienSupport();
+        if(tile instanceof CabinTile || tile instanceof AlienSupportTile) updateAlienSupport();
     }
 
     public void removeTile(int x, int y) {
@@ -595,6 +596,7 @@ public class ShipBoard {
                 removeGroup(groups.get(index));
             }
             if(groupsWithHumans.size() > 1) {
+                // TODO
                 int groupToKeep = chooseGroupToKeep(groupsWithHumans);
                 for(int index : groupsWithHumans) {
                     if(index != groupToKeep) {

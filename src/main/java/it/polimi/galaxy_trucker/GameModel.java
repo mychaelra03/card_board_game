@@ -15,14 +15,13 @@ public class GameModel {
     private final List<Card> deck;
     private final int flightTrackLength;
 
-    public GameModel(BoardType boardType, List<Player> players) {
-        this.boardType = boardType;
-        this.players = players;
-        this.deck = CardFactory.getInstance().generateDeck(boardType, this);
-        this.flightTrackLength = boardType.getFlightTrackLength();
-    }
+    private static final int MAX_PLAYERS = 4;
+
     public GameModel(BoardType boardType) {
-        this(boardType, new ArrayList<>());
+        this.boardType = boardType;
+        this.players = new ArrayList<>();
+        this.deck = CardFactory.getInstance().generateDeck(boardType);
+        this.flightTrackLength = boardType.getFlightTrackLength();
     }
 
     public BoardType getBoardType() {
@@ -33,20 +32,33 @@ public class GameModel {
     }
 
     public boolean addPlayer(Player player){
-        if(players.size() < 4) {
-            Integer prevNumPlayers = players.size();
-            players.add(player);
-            tellToListener(prevNumPlayers, players.size());
-            return true;
-        }
-        return false;
+        if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
+        if (players.size() >= MAX_PLAYERS) return false;
+
+        int prevSize = players.size();
+        players.add(player);
+        assignColor(player, players.size() - 1);
+        tellToListener(prevSize, players.size());
+        return true;
     }
 
-    public boolean removePlayer(Player player) {
-        Integer prevNumPlayers = players.size();
-        boolean playerRemoved = players.remove(player);
-        tellToListener(prevNumPlayers, players.size());
-        return playerRemoved;
+    public void removePlayer(Player player) {
+        int prevSize = players.size();
+        if(!players.remove(player)) throw new IllegalArgumentException("Player is not in this game.");
+        updatePlayersColor();
+        tellToListener(prevSize, players.size());
+    }
+
+    private void assignColor(Player player, int index) {
+        Player.Color[] colors = Player.Color.values();
+        if(index < 0 || index >= colors.length) throw new IllegalArgumentException("Invalid color index: " + index);
+        player.setColor(colors[index]);
+    }
+
+    private void updatePlayersColor() {
+        for (int i = 0; i < players.size(); i++) {
+            assignColor(players.get(i), i);
+        }
     }
 
     public List<Player> getSortedPlayers() {
@@ -58,27 +70,40 @@ public class GameModel {
                 .collect(Collectors.toList());
     }
 
-    int mod(int x, int m) {
+    private int mod(int x, int m) {
         // Had to add this method to correctly compare negative numbers.
         return ((x % m) + m) % m;
     }
-
-    public enum Direction {
-        FORWARD, BACKWARD
+    private boolean isPositionOccupied(Player movingPlayer, int position) {
+        return players.stream()
+                .filter(p -> p != movingPlayer)
+                .anyMatch(p -> mod(p.getPosition(), flightTrackLength) == mod(position, flightTrackLength));
     }
-    public void movePlayer(Player player, int steps, Direction direction) {
+
+    public void setPlayerPosition(Player player, int position) {
+        if(player.isEliminated()) throw new IllegalStateException("Player " + player.getName() + " is eliminated.");
+        if(isPositionOccupied(player, position)) throw new IllegalArgumentException("Position is occupied");
+        player.setPosition(position);
+    }
+
+    private void movePlayer(Player player, int steps, boolean forward) {
         int newPosition = player.getPosition();
         while(steps > 0) {
-            newPosition += (direction == Direction.FORWARD) ? 1 : -1;
+            newPosition += forward? 1 : -1;
             final int thisPosition = newPosition;
-            boolean occupied = players.stream().anyMatch(p -> mod(p.getPosition(), flightTrackLength) == mod(thisPosition, flightTrackLength));
             // Only decrease steps if the space is not occupied.
-            if(!occupied) steps--;
+            if(!isPositionOccupied(player, thisPosition)) steps--;
         }
-        player.setPosition(newPosition);
+        setPlayerPosition(player, newPosition);
+    }
+    public void movePlayerForward(Player player, int steps) {
+        movePlayer(player, steps, true);
+    }
+    public void movePlayerBackward(Player player, int steps) {
+        movePlayer(player, steps, false);
     }
 
-    public void checkPlayersStatus() {
+    public void updatePlayersStatus() {
         if(players.isEmpty()) return;
 
         int highestPosition = getSortedPlayers().getFirst().getPosition();
@@ -95,8 +120,10 @@ public class GameModel {
 
 
     private void tellToListener(Integer from, Integer to) {
-        PropertyChangeEvent evt = new PropertyChangeEvent(this,"Player added",from,to );
-        listener.propertyChange(evt);
+        if(listener != null) {
+            PropertyChangeEvent evt = new PropertyChangeEvent(this, "Player added", from, to);
+            listener.propertyChange(evt);
+        }
     }
 
     private PropertyChangeListener listener;

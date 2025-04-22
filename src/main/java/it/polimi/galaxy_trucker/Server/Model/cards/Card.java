@@ -31,11 +31,6 @@ public abstract class Card {
         this.level = level;
     }
 
-    public void assignBoard(GameModel board) {
-        if(this.board != null) throw new IllegalStateException("Card is already assigned to a game board.");
-        this.board = board;
-    }
-
     public int getId() {
         return id;
     }
@@ -43,8 +38,10 @@ public abstract class Card {
         return level;
     }
 
-    public final void activate() {
-        if(board == null) throw new IllegalStateException("Card has not been assigned to a GameModel.");
+    public final void activate(GameModel board) {
+        if(board == null) throw new IllegalArgumentException("Invalid board.");
+        if(this.board != null) throw new IllegalStateException("Card has already been activated.");
+        this.board = board;
         onActivate();
     }
     protected abstract void onActivate();

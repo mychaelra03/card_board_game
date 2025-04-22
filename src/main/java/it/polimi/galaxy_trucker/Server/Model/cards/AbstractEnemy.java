@@ -6,7 +6,6 @@ import it.polimi.galaxy_trucker.Server.Model.tiles.CannonTile;
 import java.awt.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.GameModel.Direction.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 public abstract class AbstractEnemy extends Card {
@@ -40,15 +39,16 @@ public abstract class AbstractEnemy extends Card {
             return;
         }
         Player currentPlayer = playerQueue.getFirst();
-        if(currentPlayer.getMaxStrength(CannonTile.class) < requiredCannonPower) {
-            applyPunishment(currentPlayer);
-        } else {
-            setInputState(CANNON_SELECTION);
-        }
+
+        if(currentPlayer.getMaxStrength(CannonTile.class) < requiredCannonPower) applyPunishment(currentPlayer);
+        else if(currentPlayer.getMinStrength(CannonTile.class) > requiredCannonPower) setInputState(REWARD_DECISION);
+
+        else setInputState(CANNON_SELECTION);
     }
 
     protected void handleNextPlayer() {
         playerQueue.removeFirst();
+        setInputState(NONE);
         handlePlayer();
     }
 
@@ -71,7 +71,7 @@ public abstract class AbstractEnemy extends Card {
     public void acceptReward(Player caller) {
         verifyInputState(REWARD_DECISION);
         verifyPlayerTurn(caller, playerQueue);
-        board.movePlayer(caller, positionCost, BACKWARD);
+        board.movePlayerBackward(caller, positionCost);
         playerQueue.clear();
         setInputState(NONE);
         giveReward(caller);

@@ -62,8 +62,7 @@ public class CardFactory {
         return groupMap;
     }
 
-    public List<Card> generateDeck(BoardType deckType, GameModel gameBoard) {
-        if(gameBoard.getBoardType() != deckType) throw new IllegalArgumentException("The deck type doesn't match the board type.");
+    public List<Card> generateDeck(BoardType deckType) {
         List<Card> result = new ArrayList<>();
         List<JsonNode> cardsNodes = cardsByGroup.get(deckType.toString());
 
@@ -73,7 +72,7 @@ public class CardFactory {
         List<JsonNode> cardsNodesCopy = new ArrayList<>(cardsNodes);
         Collections.shuffle(cardsNodesCopy, random);
         for(int i = 0; i < 8; i++) {
-            result.add(createCard(cardsNodesCopy.get(i), gameBoard));
+            result.add(createCard(cardsNodesCopy.get(i)));
         }
         if(deckType == BoardType.LEARNING || deckType == BoardType.LEVEL_ONE) return result;
 
@@ -85,7 +84,7 @@ public class CardFactory {
         List<JsonNode> level1NodesCopy = new ArrayList<>(level1Nodes);
         Collections.shuffle(level1NodesCopy, random);
         for(int i = 0; i < 4; i++) {
-            result.add(createCard(level1NodesCopy.get(i), gameBoard));
+            result.add(createCard(level1NodesCopy.get(i)));
         }
 
         return result;
@@ -95,7 +94,7 @@ public class CardFactory {
         // Returns a specific card. Used for testing.
         for(JsonNode cardNode : cardsByGroup.get(deckType.toString())) {
             if(cardNode.has("id") && cardNode.get("id").asInt() == cardId) {
-                return createCard(cardNode, null);
+                return createCard(cardNode);
             }
         }
         throw new IllegalArgumentException("Card with ID " + cardId + " not found.");
@@ -115,7 +114,7 @@ public class CardFactory {
         Map.entry("starDust", StarDustCard.class)
     );
 
-    private Card createCard(JsonNode cardNode, GameModel gameBoard) {
+    private Card createCard(JsonNode cardNode) {
         // Instantiates a Card from its JSON definition.
 
         String cardType = cardNode.get("cardType").asText();
@@ -126,7 +125,6 @@ public class CardFactory {
 
         try {
             Card card = mapper.readValue(cardNode.toString(), cardClass);
-            card.assignBoard(gameBoard);
             return card;
         } catch (IOException e) {
             throw new RuntimeException(e);

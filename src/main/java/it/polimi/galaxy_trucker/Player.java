@@ -9,7 +9,7 @@ import java.util.List;
 public class Player {
 
     public enum Color{
-        BLUE, RED, YELLOW, GREEN
+        BLUE, RED, GREEN, YELLOW
     }
 
     private final String name;
@@ -61,7 +61,7 @@ public class Player {
     public int getCredits() {
         return credits;
     }
-    public void setPosition(int position) {
+    protected void setPosition(int position) {
         this.position = position;
     }
     public int getPosition() {
@@ -105,6 +105,9 @@ public class Player {
     }
     public double getMaxStrength(Class<? extends ActivatableTile> tileClass) {
         return shipBoard.getMaxStrength(tileClass);
+    }
+    public double getMinStrength(Class<? extends ActivatableTile> tileClass) {
+        return shipBoard.getMinStrength(tileClass);
     }
     public double getStrength(Class<? extends ActivatableTile> tileClass, int doubleVertical, int doubleRotated) {
         return shipBoard.getStrength(tileClass, doubleVertical, doubleRotated);

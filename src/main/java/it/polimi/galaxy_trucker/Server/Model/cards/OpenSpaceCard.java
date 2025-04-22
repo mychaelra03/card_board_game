@@ -8,7 +8,6 @@ import it.polimi.galaxy_trucker.Server.Model.tiles.EngineTile;
 import java.awt.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.GameModel.Direction.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -38,7 +37,7 @@ public class OpenSpaceCard extends Card {
             return;
         }
         caller.removeBatteries(batteryTiles);
-        board.movePlayer(caller, strength, FORWARD);
+        board.movePlayerForward(caller, strength);
         playerQueue.removeFirst();
 
         if(playerQueue.isEmpty()) {

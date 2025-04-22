@@ -2,10 +2,8 @@ package it.polimi.galaxy_trucker.Server.Model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
 import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Meteor;
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
 
 import java.awt.*;
 import java.util.*;
@@ -48,14 +46,14 @@ public class MeteorSwarmCard extends Card {
         this.currentMeteor = meteorQueue.getFirst();
         currentMeteor.randomizePathIndex();
 
-
-        this.playersAtRisk = new HashSet<>(players);
+        this.playersAtRisk = new HashSet<>();
         for(Player player : players) {
             if(currentMeteor.evaluateDefense(player)) {
                 playersAtRisk.add(player);
                 setInputState(BATTERY_DECISION);
             }
         }
+
         handleNextMeteorIfReady();
     }
 

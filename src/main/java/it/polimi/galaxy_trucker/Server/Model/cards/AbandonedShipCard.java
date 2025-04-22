@@ -7,7 +7,6 @@ import it.polimi.galaxy_trucker.Player;
 import java.awt.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.GameModel.Direction.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -50,7 +49,7 @@ public class AbandonedShipCard extends Card {
         verifyPlayerTurn(caller, playerQueue);
         if(caller.getCrewCount() <= crewToGiveUp) throw new IllegalStateException("Caller should have been skipped.");
         caller.giveCredits(rewardCredits);
-        board.movePlayer(caller, positionCost, BACKWARD);
+        board.movePlayerBackward(caller, positionCost);
         playerQueue.clear();
         if(crewToGiveUp > 0) {
             this.rewardedPlayer = caller;

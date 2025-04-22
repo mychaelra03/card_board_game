@@ -58,7 +58,7 @@ public class SlaversCard extends AbstractEnemy {
         if(remainingCrewToGiveUp <= 0) throw new RuntimeException("No more crew members are required to be removed.");
         caller.ensureCrewRemovedAt(cabinCoords, index);
         remainingCrewToGiveUp--;
-        if(remainingCrewToGiveUp == 0) {
+        if(remainingCrewToGiveUp == 0 || punishedPlayer.getCrewCount() == 0) {
             setInputState(NONE);
             handleNextPlayer();
         }

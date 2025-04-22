@@ -9,7 +9,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.GameModel.Direction.BACKWARD;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -78,7 +77,7 @@ public class PlanetsCard extends Card {
         }
         for(Player player : board.getSortedPlayers().reversed()) {
             if(acceptedPlayers.contains(player)) {
-                board.movePlayer(player, positionCost, BACKWARD);
+                board.movePlayerBackward(player, positionCost);
             }
         }
         setInputState(CARGO_DECISION);

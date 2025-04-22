@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.GameModel.Direction.BACKWARD;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -50,7 +49,7 @@ public class AbandonedStationCard extends Card {
     public void accept(Player caller) {
         verifyInputState(REWARD_DECISION);
         verifyPlayerTurn(caller, playerQueue);
-        board.movePlayer(caller, positionCost, BACKWARD);
+        board.movePlayerBackward(caller, positionCost);
         this.rewardedPlayer = caller;
         caller.setCargoPool(new ArrayList<>(Arrays.asList(rewardCargo)));
         playerQueue.clear();

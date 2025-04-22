@@ -10,6 +10,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class Scene1Controller {
 
@@ -60,9 +61,7 @@ public class Scene1Controller {
 //            throw new RuntimeException(e);
 //        }
 
-
-        SceneSwitch sceneSwitch = new SceneSwitch();
-        sceneSwitch.switchScene(scene1AnchorPane,"/it/polimi/galaxy_trucker/View/scene2-view.fxml");
+        SceneSwitch.switchScene(scene1AnchorPane,"/it/polimi/galaxy_trucker/View/scene2-view.fxml");
     }
 
     private Stage stage;
