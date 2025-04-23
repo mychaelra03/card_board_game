@@ -1,8 +1,6 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
 import it.polimi.galaxy_trucker.Client.VirtualServer;
-import it.polimi.galaxy_trucker.Client.VirtualServerAware;
-import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
@@ -25,14 +23,13 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.effect.InnerShadow;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
 public class Scene2Controller {
 
 
-    public static final String TILESPATH = "/textures/tiles2/";
+    public static final String TILESPATH = "/textures/tiles/";
     public static final double TAILHEIGHT = 83.5;
 
 

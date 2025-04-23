@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
 import it.polimi.galaxy_trucker.Client.ClientMain;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
-import it.polimi.galaxy_trucker.Client.VirtualServerAware;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,7 +16,7 @@ import static it.polimi.galaxy_trucker.Client.Controller.Scene2.Scene2Controller
 
 public class TileManager    {
 
-    public static final String TILESPATH = "/textures/tiles2/";
+    public static final String TILESPATH = "/textures/tiles/";
     private double startX,startY,previousX,previousY,previousRotate;
     private final double DRAG_LIMIT = 2; //limit to distinguish a click from a drag
 
