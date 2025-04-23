@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import static it.polimi.galaxy_trucker.BoardType.*;
 import static it.polimi.galaxy_trucker.DefaultShipBoards.defaultShipBoard;
+import static it.polimi.galaxy_trucker.Player.PlayerState.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameModelTest {
@@ -119,7 +120,7 @@ class GameModelTest {
         assertThrows(IllegalArgumentException.class, () -> gameModel.setPlayerPosition(player1, 7), "Position 7 should be occupied.");
         assertEquals(10, player1.getPosition(), "player1 should still be at position 10.");
         
-        player3.setEliminated(true);
+        player3.setState(ELIMINATED);
         assertThrows(IllegalStateException.class, () -> gameModel.setPlayerPosition(player3, 0), "player3 should be eliminated.");
     }
 
@@ -190,28 +191,28 @@ class GameModelTest {
         gameModel.addPlayer(player3);
         gameModel.addPlayer(player4);
 
-        assertFalse(player1.isEliminated(), "player1 should not be eliminated.");
-        assertFalse(player2.isEliminated(), "player2 should not be eliminated.");
-        assertFalse(player3.isEliminated(), "player3 should not be eliminated.");
-        assertFalse(player4.isEliminated(), "player4 should not be eliminated.");
-        
+        assertNotEquals(ELIMINATED, player1.getState(), "player1 should not be eliminated.");
+        assertNotEquals(ELIMINATED, player2.getState(), "player2 should not be eliminated.");
+        assertNotEquals(ELIMINATED, player3.getState(), "player3 should not be eliminated.");
+        assertNotEquals(ELIMINATED, player4.getState(), "player4 should not be eliminated.");
+
         gameModel.updatePlayersStatus();
-        assertFalse(player1.isEliminated(), "player1 should still not be eliminated.");
-        assertFalse(player2.isEliminated(), "player2 should still not be eliminated.");
-        assertFalse(player3.isEliminated(), "player3 should still not be eliminated.");
-        assertFalse(player4.isEliminated(), "player4 should still not be eliminated.");
+        assertNotEquals(ELIMINATED, player1.getState(), "player1 should still not be eliminated.");
+        assertNotEquals(ELIMINATED, player2.getState(), "player2 should still not be eliminated.");
+        assertNotEquals(ELIMINATED, player3.getState(), "player3 should still not be eliminated.");
+        assertNotEquals(ELIMINATED, player4.getState(), "player4 should still not be eliminated.");
 
         // make player2 more than 24 spaces behind player3
         gameModel.setPlayerPosition(player1, 12);
         gameModel.setPlayerPosition(player2, -15);
         gameModel.setPlayerPosition(player3, 15);
         gameModel.setPlayerPosition(player4, 1);
-        
+
         gameModel.updatePlayersStatus();
-        assertFalse(player1.isEliminated(), "player1 should still not be eliminated.");
-        assertTrue(player2.isEliminated(), "player2 should now be eliminated (lapped).");
-        assertFalse(player3.isEliminated(), "player3 should still not be eliminated.");
-        assertFalse(player4.isEliminated(), "player4 should still not be eliminated.");
+        assertNotEquals(ELIMINATED, player1.getState(), "player1 should still not be eliminated.");
+        assertEquals(ELIMINATED, player2.getState(), "player2 should now be eliminated (lapped).");
+        assertNotEquals(ELIMINATED, player3.getState(), "player3 should still not be eliminated.");
+        assertNotEquals(ELIMINATED, player4.getState(), "player4 should still not be eliminated.");
 
         gameModel.setPlayerPosition(player1, 0);
         gameModel.setPlayerPosition(player3, 2);
@@ -224,11 +225,11 @@ class GameModelTest {
         player4.ensureCrewRemovedAt(new Point(4,2), 1);
         assertEquals(0, player4.getHumanCount(), "player4's human count should be 0");
         assertEquals(1, player4.getCrewCount(), "player4's crew count should be 1 (purple alien)");
-        
+
         gameModel.updatePlayersStatus();
-        assertFalse(player1.isEliminated(), "player1 should still not be eliminated.");
-        assertTrue(player2.isEliminated(), "player2 should still be eliminated.");
-        assertFalse(player3.isEliminated(), "player3 should still not be eliminated.");
-        assertTrue(player4.isEliminated(), "player4 should now be eliminated (0 crew members).");
+        assertNotEquals(ELIMINATED, player1.getState(), "player1 should still not be eliminated.");
+        assertEquals(ELIMINATED, player2.getState(), "player2 should still be eliminated.");
+        assertNotEquals(ELIMINATED, player3.getState(), "player3 should still not be eliminated.");
+        assertEquals(ELIMINATED, player4.getState(), "player4 should now be eliminated (0 crew members).");
     }
 }

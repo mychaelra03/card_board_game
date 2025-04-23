@@ -8,6 +8,7 @@ import it.polimi.galaxy_trucker.Server.Model.tiles.EngineTile;
 import java.awt.*;
 import java.util.List;
 
+import static it.polimi.galaxy_trucker.Player.PlayerState.*;
 import static it.polimi.galaxy_trucker.Server.Model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -33,7 +34,7 @@ public class OpenSpaceCard extends Card {
         if(activatedEngines != batteryTiles.size()) throw new IllegalArgumentException("The number of activated engines does not match the number of batteries used.");
         int strength = (int)caller.getStrength(EngineTile.class, activatedEngines);
         if(strength == 0) {
-            caller.setEliminated(true);
+            caller.setState(ELIMINATED);
             return;
         }
         caller.removeBatteries(batteryTiles);

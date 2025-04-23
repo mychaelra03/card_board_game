@@ -14,8 +14,6 @@ public class ShipBoard {
     private final BoardType shipType;
     private int removedTiles;
 
-    // TODO: 2 private tiles spaces
-
     public ShipBoard(BoardType shipType) {
         this.tiles = new Tile[5][7];
         this.privateTiles = new Integer[2];
@@ -41,6 +39,9 @@ public class ShipBoard {
     }
     public Integer[] getPrivateTiles() {
         return privateTiles;
+    }
+    public int getRemovedTiles() {
+        return removedTiles;
     }
 
     public BoardType getShipType() {
@@ -79,8 +80,8 @@ public class ShipBoard {
 
         updateAlienSupport();
         // Checks if the removal of this tile left other tiles not connected to the ship.
-        checkConnectivity();
         removedTiles++;
+        checkConnectivity();
     }
 
     public void pushPrivateTile(int index, int tileId) {
@@ -219,10 +220,8 @@ public class ShipBoard {
     }
 
     public double getMinStrength(Class<? extends ActivatableTile> tileClass) {
-        // TODO: should the game let the player decide if they want to activate more cannons even when the single ones are enough?
         return getStrength(tileClass, 0, 0);
     }
-
     public double getMaxStrength(Class<? extends ActivatableTile> tileClass) {
         int batteries = getTotalBatteriesCount();
 
@@ -562,47 +561,40 @@ public class ShipBoard {
 //        return false;
 //    }
 
+    List<List<Point>> groupsToChooseFrom;
+
     private void checkConnectivity() {
         // It uses a flood fill search to divide all the tiles in groups.
-        // If there are more than one groups, it automatically removes the ones without humans
-        // and let the player decide which one with humans to keep.
+        // If there are more than one group, it automatically removes the ones without humans
+        // and lets the player decide which one (with humans) to keep.
         boolean[][] visited = new boolean[tiles.length][tiles[0].length];
-        List<List<Point>> groups = new ArrayList<>();
 
+        List<List<Point>> groupsWithHumans = new ArrayList<>();
+        List<List<Point>> groupsWithoutHumans = new ArrayList<>();
         for(int y = 0; y < tiles.length; y++) {
             for(int x = 0; x < tiles[0].length; x++) {
                 if(!visited[y][x] && !(tiles[y][x] instanceof EmptyTile)) {
                     List<Point> group = new ArrayList<>();
                     floodFill(x, y, visited, group);
-                    groups.add(group);
+                    if(groupHasHumans(group)) {
+                        groupsWithHumans.add(group);
+                    } else {
+                        groupsWithoutHumans.add(group);
+                    }
                 }
             }
         }
-        if(groups.size() < 2) return;
+        if(groupsWithHumans.size() + groupsWithoutHumans.size() <= 1) return;
 
-        List<Integer> groupsWithHumans = new ArrayList<>();
-        List<Integer> groupsWithoutHumans = new ArrayList<>();
-        for(int i = 0; i < groups.size(); i++) {
-            if(groupHasHumans(groups.get(i))) {
-                groupsWithHumans.add(i);
-            } else {
-                groupsWithoutHumans.add(i);
-            }
-        }
         // If there are both groups with crew and without humans, it removes the ones without.
         // It doesn't always delete the empty groups because if the last humans are removed, it would delete the ship.
         if(!groupsWithHumans.isEmpty()) {
-            for(Integer index : groupsWithoutHumans) {
-                removeGroup(groups.get(index));
+            for(List<Point> group : groupsWithoutHumans) {
+                removeGroup(group);
             }
             if(groupsWithHumans.size() > 1) {
-                // TODO
-                int groupToKeep = chooseGroupToKeep(groupsWithHumans);
-                for(int index : groupsWithHumans) {
-                    if(index != groupToKeep) {
-                        removeGroup(groups.get(index));
-                    }
-                }
+                groupsToChooseFrom = groupsWithHumans;
+
             }
         }
     }
@@ -642,8 +634,14 @@ public class ShipBoard {
         }
     }
 
-    private int chooseGroupToKeep(List<Integer> groupsWithCrew) {
-        // Lets the player choose which group of tiles to remove.
-        return groupsWithCrew.getFirst();   // TODO
+    public void chooseGroupToKeep(int index) {
+        // Lets the player choose which group of tiles to keep.
+        if(index < 0 || index >= groupsToChooseFrom.size()) throw new IllegalArgumentException("index out of bounds.");
+        List<Point> groupToKeep = groupsToChooseFrom.get(index);
+        for(List<Point> group : groupsToChooseFrom) {
+            if(group != groupToKeep) {
+                removeGroup(group);
+            }
+        }
     }
 }

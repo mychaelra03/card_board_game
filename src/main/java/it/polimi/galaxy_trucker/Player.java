@@ -8,8 +8,14 @@ import java.util.List;
 
 public class Player {
 
-    public enum Color{
+    public enum Color {
         BLUE, RED, GREEN, YELLOW
+    }
+    public enum PlayerState {
+        IDLE,
+        BUILDING_SHIP,
+        RESOLVING_CARD,
+        ELIMINATED
     }
 
     private final String name;
@@ -18,7 +24,7 @@ public class Player {
     private ShipBoard shipBoard;
     private int credits;
     private int position;
-    private boolean isEliminated;
+    private PlayerState playerState;
 
     private List<BlockType> cargoPool;
 
@@ -29,7 +35,6 @@ public class Player {
         this.shipBoard = null;
         this.credits = 0;
         this.position = 0;
-        this.isEliminated = false;
     }
     public Player(String name, int[] profilePictureIds, ShipBoard shipBoard) {
         this(name, profilePictureIds);
@@ -67,11 +72,11 @@ public class Player {
     public int getPosition() {
         return position;
     }
-    public void setEliminated(boolean eliminated) {
-        this.isEliminated = eliminated;
+    public PlayerState getState() {
+        return playerState;
     }
-    public boolean isEliminated() {
-        return isEliminated;
+    public void setState(PlayerState state) {
+        this.playerState = state;
     }
     public List<BlockType> getCargoPool() {
         return cargoPool;
