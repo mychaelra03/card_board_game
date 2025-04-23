@@ -1,14 +1,35 @@
 package it.polimi.galaxy_trucker.Client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import it.polimi.galaxy_trucker.Client.Network.MessageSender;
+
+import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class VirtualServer {
+    DataInputStream in = null;
     PrintWriter out = null;
-    BufferedReader in = null;
+
+    ClientThread clientThread;
+    private UpdateUICallBack updateUICallBack;
+    private final Queue<String> messageQueue = new LinkedList<>();
+
+
+    private static VirtualServer instance;
+
+    private VirtualServer() {
+
+    }
+    public static VirtualServer getInstance() {
+        if(instance == null){
+            instance = new VirtualServer();
+        }
+        return instance;
+    }
+
 
     void start(){
         String hostName = "localhost";
@@ -27,20 +48,54 @@ public class VirtualServer {
         BufferedReader stdIn = null;
         try{
             out = new PrintWriter(socket.getOutputStream(),true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            in = new DataInputStream(socket.getInputStream());
             stdIn = new BufferedReader(new InputStreamReader(System.in));
         }catch (IOException e) {
             System.err.println(e.toString() + " " + hostName);
             System.exit(1);
         }
 
-        ClientThread clientThread = new ClientThread(in);
+        this.clientThread = new ClientThread(in,this);
+        clientThread.setUpdateUICallBack(this.updateUICallBack);
         clientThread.start();
 
     }
 
-    public void sendCmd(String cmd){
-        out.println(cmd);
+    public void sendCmd(Object obj){
+
+        MessageSender sender = new MessageSender(out);
+        sender.send(obj);
 
     }
+
+
+    public void sendPlacedTileData(Integer col, Integer row, String id, int rot) {
+
+        out.write(col);
+        out.write(row);
+        out.write(id);
+        out.write(rot);
+        out.flush();
+        System.out.println("data sent to server");
+
+    }
+
+    public void setUpdateUICallBack(UpdateUICallBack updateUICallBack) throws JsonProcessingException {
+        this.updateUICallBack = updateUICallBack;
+
+        while (!messageQueue.isEmpty()) {
+            updateUICallBack.process(messageQueue.poll());
+        }
+    }
+
+    public void handleMessageFromServer(String msg) throws JsonProcessingException {
+        if(updateUICallBack != null){
+            updateUICallBack.process(msg);
+        } else {
+            System.err.println("UiCallback not set yet. Queuing: " + msg);
+            messageQueue.add(msg);
+        }
+    }
+
+
 }

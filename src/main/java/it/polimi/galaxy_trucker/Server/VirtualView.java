@@ -1,51 +1,64 @@
 package it.polimi.galaxy_trucker.Server;
 
-import java.beans.PropertyChangeEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
+
+import java.io.*;
 import java.net.Socket;
+import java.util.*;
 
 public class VirtualView implements Runnable {
     BufferedReader in = null;
     PrintWriter out = null;
     Socket clientSocket = null;
     Controller controller = null;
-    ModelListener listener;
+    ArrayList<VirtualView> clients = new ArrayList<VirtualView>();
 
-    public VirtualView(Socket clientSocket, Controller controller) {
+    public VirtualView(Socket clientSocket, Controller controller, ArrayList<VirtualView> clients) {
         this.clientSocket = clientSocket;
         this.controller = controller;
+        this.clients = clients;
 
-        CallBack callBack = (PropertyChangeEvent evt) -> {
-            String debugStr= evt.getPropertyName() + ": " + evt.getOldValue() + " -> " + evt.getNewValue();
-            out.println(debugStr);
-        };
-
-        this.listener = new ModelListener(callBack);
-        controller.setListener(this.listener);
+//        CallBack callBack = ( evt) -> {
+//            for(VirtualView client : clients) {
+//                client.out.println(evt.getNewValue());
+//
+//            }
+//        };
 
 
         try{
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out = new PrintWriter(clientSocket.getOutputStream(),true);
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    void networkEventLoop(){
-        String uN,c = "";
-        try{
-            while(clientSocket.isConnected()){
-                uN = in.readLine();
-                c = in.readLine();
-                String player = this.controller.processCmd(uN,c);
-                System.out.println(player);
+    public void sendPlayerAdded(PlayersInfoMessage players) throws JsonProcessingException {
 
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(players);
+
+        this.out.println(json);
+        System.out.println(json);
+    }
+
+
+    public void broadcastMessage(String message) {
+
+        clients.forEach(client -> {client.out.println(message);});
+    }
+
+    void networkEventLoop(){
+        String line;
+        try{
+            while((line = in.readLine()) != null ){
+                this.controller.processCmd(this,line);
             }
             System.out.println("done");
+            this.controller.clientDisconnect(this);
         }catch (IOException e){
             e.printStackTrace();
         }

@@ -1,26 +1,42 @@
 package it.polimi.galaxy_trucker.Server.Model;
 
-import it.polimi.galaxy_trucker.Client.ClientMain;
-import it.polimi.galaxy_trucker.Client.LanguageManager;
+import it.polimi.galaxy_trucker.Client.VirtualServer;
+import it.polimi.galaxy_trucker.Client.VirtualServerAware;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
+
+import java.util.Objects;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class SceneSwitch {
-    public static void switchScene(AnchorPane container, String fxmlFile) throws IOException {
-        URL resource = ClientMain.class.getResource(fxmlFile);
+    private static Stage primaryStage;
+    private static VirtualServer virtualServer;
 
-        if(resource == null) throw new IOException("FXML file not found: " + fxmlFile);
+    public static void setVirtualServer(VirtualServer vs) {
+        virtualServer = vs;
+    }
 
-        ResourceBundle bundle = LanguageManager.getBundle();
-        FXMLLoader loader = new FXMLLoader(resource);
-        loader.setResources(bundle);
-        AnchorPane nextAnchorPane = loader.load();
+    public static void setStage(Stage stage) {
+        primaryStage = stage;
+    }
 
-        container.getChildren().setAll(nextAnchorPane);
+    public static void switchScene( String fxmlFile ) throws IOException {
+
+        FXMLLoader fxmlLoader = new FXMLLoader(Objects.requireNonNull(SceneSwitch.class.getResource(fxmlFile)));
+        Parent root = fxmlLoader.load();
+
+        Object controller = fxmlLoader.getController();
+
+        if(controller instanceof VirtualServerAware aware) {
+            aware.setVirtualServer(VirtualServer.getInstance());
+        }
+
+        Scene newScene = new Scene(root);
+        primaryStage.setScene(newScene);
+        primaryStage.show();
+
     }
 }

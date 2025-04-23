@@ -28,6 +28,8 @@ public class Player {
 
     private List<BlockType> cargoPool;
 
+    private int chosenPlanet;
+
     public Player(String name, int[] profilePictureIds) {
         this.name = name;
         this.profilePictureIds = profilePictureIds;
@@ -45,14 +47,14 @@ public class Player {
     public String getName() {
         return name;
     }
-    public int[] getProfilePictureIds() {
-        return profilePictureIds;
-    }
     public void setColor(Color color) {
         this.color = color;
     }
-    public Color getColor() {
-        return color;
+    public String getColor() {
+        return color.toString();
+    }
+    public int[] getProfilePictureIds() {
+        return profilePictureIds;
     }
     public void setNewShipBoard(BoardType shipType) {
         this.shipBoard = new ShipBoard(shipType);

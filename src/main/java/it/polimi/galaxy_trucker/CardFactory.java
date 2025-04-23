@@ -22,6 +22,7 @@ public class CardFactory {
         this.mapper = new ObjectMapper();
         this.random = new Random();
         this.cardsByGroup = loadJson(jsonFilePath);
+
     }
 
     public static CardFactory getInstance() {
@@ -29,6 +30,7 @@ public class CardFactory {
         if(instance == null) {
             instance = new CardFactory(PATH + "public/cards.json");
         }
+
         return instance;
     }
 

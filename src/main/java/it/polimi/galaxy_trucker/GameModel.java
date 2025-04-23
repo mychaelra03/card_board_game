@@ -1,9 +1,9 @@
 package it.polimi.galaxy_trucker;
 
+import it.polimi.galaxy_trucker.Common.PlayerInfo;
+import it.polimi.galaxy_trucker.Server.Event.*;
 import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -43,18 +43,16 @@ public class GameModel {
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
         if (players.size() >= 4) return false;
 
-        int prevSize = players.size();
         players.add(player);
         assignColor(player, players.size() - 1);
-        tellToListener(prevSize, players.size());
+        eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
         return true;
     }
 
     public void removePlayer(Player player) {
-        int prevSize = players.size();
         if(!players.remove(player)) throw new IllegalArgumentException("Player is not in this game.");
         updatePlayersColor();
-        tellToListener(prevSize, players.size());
+        eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
     }
 
     private void assignColor(Player player, int index) {
@@ -67,6 +65,12 @@ public class GameModel {
         for(int i = 0; i < players.size(); i++) {
             assignColor(players.get(i), i);
         }
+    }
+
+    private List<PlayerInfo> getPlayerInfo(){
+        return players.stream()
+                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor()))
+                .collect(Collectors.toList());
     }
 
     public List<Player> getSortedPlayers() {
@@ -88,6 +92,13 @@ public class GameModel {
                 .filter(p -> p != movingPlayer)
                 .anyMatch(p -> mod(p.getPosition(), flightTrackLength) == mod(position, flightTrackLength));
     }
+    public Card getCurrentCard() {
+        return deck.getFirst();
+    }
+    public List<Player> getPlayers() {
+        return players;
+    }
+
 
     public void setPlayerPosition(Player player, int position) {
         if(player.getState() == ELIMINATED) throw new IllegalStateException("Player " + player.getName() + " is eliminated.");
@@ -136,16 +147,10 @@ public class GameModel {
         }
     }
 
-    private void tellToListener(Integer from, Integer to) {
-        if(listener != null) {
-            PropertyChangeEvent evt = new PropertyChangeEvent(this, "Player added", from, to);
-            listener.propertyChange(evt);
-        }
-    }
 
-    private PropertyChangeListener listener;
+    private final EventDispatcher eventDispatcher = new EventDispatcher();
 
-    public void setListener(PropertyChangeListener listener) {
-        this.listener = listener;
+    public <T extends EventModel> void addEventListener(Class<T> eventType, ModelEventListener<T> listener) {
+        eventDispatcher.addListener(eventType, listener);
     }
 }

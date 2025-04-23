@@ -1,6 +1,8 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene2;
 
 import it.polimi.galaxy_trucker.Client.ClientMain;
+import it.polimi.galaxy_trucker.Client.VirtualServer;
+import it.polimi.galaxy_trucker.Client.VirtualServerAware;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -13,9 +15,9 @@ import java.util.Objects;
 
 import static it.polimi.galaxy_trucker.Client.Controller.Scene2.Scene2Controller.*;
 
-public class TileManager {
+public class TileManager    {
 
-    public static final String TILESPATH = "/textures/tiles/";
+    public static final String TILESPATH = "/textures/tiles2/";
     private double startX,startY,previousX,previousY,previousRotate;
     private final double DRAG_LIMIT = 2; //limit to distinguish a click from a drag
 
@@ -23,7 +25,10 @@ public class TileManager {
     private GridPane gridPane;
     private AnchorPane scene2AnchorPane;
 
+    private VirtualServer virtualServer = VirtualServer.getInstance();
+
     public ClientMain client = new ClientMain();
+
 
 
 
@@ -82,7 +87,7 @@ public class TileManager {
             if (!isDragging[0]) {
 
 
-                Image image = new Image(Objects.requireNonNull(getClass().getResource(TILESPATH + "tile_" + imageView.getId() + ".jpg")).toExternalForm());
+                Image image = new Image(Objects.requireNonNull(getClass().getResource(TILESPATH + "tile_" + imageView.getId() + ".png")).toExternalForm());
                 imageView.setImage(image);
                 imageView.toFront();
 
@@ -126,8 +131,12 @@ public class TileManager {
                 //we remove the rectangle of the gridpane in the position of the imageView placed, not allowing it to be clicked anymore.
                 removeRectFromGridPane(gridPane,col,row);
 
-               // client.sendPlacedTileData(col,row, placedImageView.getId(), (int) (((placedImageView.getRotate()%360+360)%360)/90));
 
+
+//                if(placedImageView != null){
+//
+//                    this.virtualServer.sendPlacedTileData(col,row, placedImageView.getId(), (int) (((placedImageView.getRotate()%360+360)%360)/90));
+//                }
             }
         });
 
