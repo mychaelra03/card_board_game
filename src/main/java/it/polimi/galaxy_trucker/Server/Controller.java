@@ -3,18 +3,13 @@ package it.polimi.galaxy_trucker.Server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.Client.Network.MessageSender;
 import it.polimi.galaxy_trucker.Common.ChatMessage;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
-import it.polimi.galaxy_trucker.Server.Event.EventModel;
-import it.polimi.galaxy_trucker.Server.Event.PlayerAddedEvent;
-import it.polimi.galaxy_trucker.ServerCliChat.ClientHandler;
+import it.polimi.galaxy_trucker.Server.Event.PlayerJoinLeaveEvent;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,18 +20,19 @@ public class Controller {
     public Controller(GameModel gameModel) {
         this.gameModel = gameModel;
 
-        gameModel.addEventListener(PlayerAddedEvent.class, (event) -> {
+        gameModel.addEventListener(PlayerJoinLeaveEvent.class, (event) -> {
             try {
-                this.handlePlayerAdded(event);
+                this.handlePlayerJoinLeave(event);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         });
+
     }
 
-    public void handlePlayerAdded(PlayerAddedEvent event) throws JsonProcessingException {
+    public void handlePlayerJoinLeave(PlayerJoinLeaveEvent event) throws JsonProcessingException {
         for( VirtualView vw : playerMap.keySet() ) {
-            vw.sendPlayerAdded(new PlayersInfoMessage(event.getPlayerInfoList()));
+            vw.sendPlayerAdded(new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername()));
         }
     }
 
@@ -51,6 +47,7 @@ public class Controller {
 
                 PlayerInfo playerInfo = mapper.convertValue(cmd, PlayerInfo.class);
                 Player player = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
+
                 playerMap.put(virtualView, player);
                 gameModel.addPlayer(player);
                 break;
@@ -66,6 +63,7 @@ public class Controller {
 
 
 
+
     }
 
 //    void choosePlanet(int chosenPlanet) {
@@ -74,7 +72,9 @@ public class Controller {
 //
 
 
-
+    public void clientDisconnect(VirtualView virtualView){
+        this.gameModel.removePlayer(playerMap.get(virtualView));
+    }
 
 
 

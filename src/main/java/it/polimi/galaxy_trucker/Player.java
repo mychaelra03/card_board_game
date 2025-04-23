@@ -57,8 +57,8 @@ public class Player {
     public void setColor(Color color) {
         this.color = color;
     }
-    public Color getColor() {
-        return color;
+    public String getColor() {
+        return color.toString();
     }
     public void setNewShipBoard(BoardType shipType) {
         this.shipBoard = new ShipBoard(shipType);

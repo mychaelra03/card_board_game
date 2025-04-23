@@ -1,6 +1,8 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene1;
+import it.polimi.galaxy_trucker.Client.ClientSession;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
 import it.polimi.galaxy_trucker.Client.VirtualServerAware;
+import it.polimi.galaxy_trucker.Common.ChatMessage;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
 import javafx.fxml.FXML;
@@ -8,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -40,6 +44,8 @@ public class Scene1Controller implements VirtualServerAware {
     private static final int MAX_BODIES = 9;
     private static final int MAX_ACCESSORIES = 8;
 
+
+
     @FXML
     public void initialize() {
 
@@ -57,6 +63,15 @@ public class Scene1Controller implements VirtualServerAware {
                 validateName();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
+            }
+        });
+        scene1AnchorPane.setOnKeyPressed(event -> {
+            if(event.getCode() == KeyCode.ENTER) {
+                try {
+                    validateName();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -111,13 +126,23 @@ public class Scene1Controller implements VirtualServerAware {
             profilePicIds[0] = bodyIndex;
             profilePicIds[1] = accessoryIndex;
 
-            PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds);
+            PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null);
 
             this.virtualServer.sendCmd(playerInfo);
+            ClientSession.setUsername(username);
+            ClientSession.setProfilePicIds(profilePicIds);
             SceneSwitch sceneSwitch = new SceneSwitch();
             sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
         }
     }
+
+//
+//    @FXML
+//    private void onEnterKeyPressed(KeyEvent event) throws IOException {
+//        if(event.getCode() == KeyCode.ENTER) {
+//            validateName();
+//        }
+//    }
 
 }
 

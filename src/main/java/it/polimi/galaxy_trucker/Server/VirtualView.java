@@ -2,11 +2,8 @@ package it.polimi.galaxy_trucker.Server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
-import it.polimi.galaxy_trucker.Player;
 
-import java.beans.PropertyChangeEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -40,10 +37,12 @@ public class VirtualView implements Runnable {
     }
 
     public void sendPlayerAdded(PlayersInfoMessage players) throws JsonProcessingException {
+
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(players);
 
-            this.out.println(json);
+        this.out.println(json);
+        System.out.println(json);
     }
 
 
@@ -59,6 +58,7 @@ public class VirtualView implements Runnable {
                 this.controller.processCmd(this,line);
             }
             System.out.println("done");
+            this.controller.clientDisconnect(this);
         }catch (IOException e){
             e.printStackTrace();
         }
