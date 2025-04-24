@@ -32,6 +32,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 import java.text.MessageFormat;
@@ -151,16 +152,15 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     TextFlow usernameText = new TextFlow(username);
                     usernameText.setPrefHeight(Region.USE_COMPUTED_SIZE);
                     usernameText.setMaxHeight(Region.USE_PREF_SIZE);
+                    usernameText.setTextAlignment(TextAlignment.LEFT);
                     if(playerInfo.getUsername().equals(ClientSession.getUsername())){
                         Text user = new Text(" (" + LanguageManager.get("text.you") + ")");
                         user.setFill(Color.GRAY);
                         usernameText.getChildren().add(user);
                     }
 
-
                     double radius = PROFILE_PIC_SIZE / 2;
                     Circle backgroundCircle = new Circle(avatarPic1.getX() + PROFILE_PIC_SIZE / 2, avatarPic1.getY() + PROFILE_PIC_SIZE / 2, radius);
-
 
                     backgroundCircle.setFill(Paint.valueOf(playerInfo.getColor()));
                     backgroundCircle.setStroke(Color.BLACK);
@@ -185,10 +185,10 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     // Add both avatars to the StackPane
                     stackPane.getChildren().addAll(backgroundCircle, avatarPic1, avatarPic2);
 
-
                     HBox hBox = new HBox();
-
-                    hBox.getChildren().addAll(stackPane, usernameLabel, spacer);
+                    hBox.getChildren().addAll(stackPane, usernameText, spacer);
+                    hBox.setAlignment(Pos.CENTER_LEFT);
+                    hBox.setSpacing(10);
 
 
                     if (playerInfo.isAdmin()){
@@ -236,20 +236,10 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                         }
                     }
 
-
-
-
                     playerList.setSpacing(10);
                     playerList.setPadding(new Insets(10, 5, 10, 5));
 
                     playerList.getChildren().add(hBox);
-
-                    hBox.getChildren().addAll(stackPane, usernameText);
-                    hBox.setAlignment(Pos.CENTER_LEFT);
-                    hBox.setSpacing(10);
-
-
-
                 }
                 break;
             case "chatMessage":
@@ -281,8 +271,6 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Connection lost. You have been kicked!", ButtonType.OK);
                 alert.showAndWait();
-
-
 
 
                 break;

@@ -40,15 +40,6 @@ public class Controller {
 
     }
 
-//    public VirtualView getVirtualViewByPlayer(Player targetPlayer) {
-//        for (Map.Entry<VirtualView, Player> entry : playerMap.entrySet()) {
-//            if (entry.getValue().equals(targetPlayer)) {
-//                return entry.getKey(); // 🎯 Found the matching VirtualView
-//            }
-//        }
-//        return null; // not found
-//    }
-
     public VirtualView getVirtualViewByPlayer(Player targetPlayer) {
         for (Map.Entry<VirtualView, Player> entry : playerMap.entrySet()) {
             System.out.println("Comparing: " + entry.getValue().getName() + " with " + targetPlayer.getName());
@@ -123,7 +114,7 @@ public class Controller {
                 break;
 
             case "kickPlayer":
-
+                System.out.println("KICKING PLAYER");
                 PlayerInfo kickedPlayerInfo = mapper.convertValue(cmd, PlayerInfo.class);
                 Player kickedPlayer = new Player(kickedPlayerInfo.getUsername(), kickedPlayerInfo.getProfilePicIds());
 
@@ -131,9 +122,9 @@ public class Controller {
                 VirtualView viewToKick = getVirtualViewByPlayer(kickedPlayer);
                 viewToKick.close();
            //     clientDisconnect(viewToKick);
-                playerMap.remove(kickedPlayer);
-                this.gameModel.removePlayer(kickedPlayer);
 
+                playerMap.entrySet().removeIf(entry -> entry.getValue().getName().equals(kickedPlayer.getName()));
+                this.gameModel.removePlayer(kickedPlayer);
                 break;
 
                 case "promotePlayer":

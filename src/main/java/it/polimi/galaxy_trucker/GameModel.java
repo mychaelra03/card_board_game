@@ -58,10 +58,10 @@ public class GameModel {
 
                 eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(),p.getName()));
                 eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(p)));
-
+                return;
             }
         }
-
+        throw new IllegalArgumentException("Player " + player.getName() + "not found.");
     }
 
     private void assignFirstAvailableColor(Player player) {
@@ -77,9 +77,6 @@ public class GameModel {
             }
         }
         throw new IllegalStateException("No available colors.");
-    }
-    private PlayerInfo getPlayerInfo(Player player) {
-        return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor(),player.isAdmin());
     }
 
     public void setNewAdmin(String username) {
@@ -164,11 +161,13 @@ public class GameModel {
             throw new IllegalStateException("Expected state: " + expectedState + ". Current state: " + gameState + ".");
         }
     }
-
-    private List<PlayerInfo> getPlayerInfo() {
+    private List<PlayerInfo> getPlayersInfo(){
         return players.stream()
-                .map(p -> new PlayerInfo(p.getName(), p.getProfilePictureIds(), p.getColor().toString()))
+                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor().toString(),p.isAdmin()))
                 .collect(Collectors.toList());
+    }
+    private PlayerInfo getPlayerInfo(Player player) {
+        return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor().toString(),player.isAdmin());
     }
 
     private final EventDispatcher eventDispatcher = new EventDispatcher();

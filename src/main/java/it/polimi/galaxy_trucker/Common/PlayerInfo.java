@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.polimi.galaxy_trucker.Player;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PlayerInfo implements GameMessage{
+public class PlayerInfo implements GameMessage {
     private String username;
     private int[] profilePicIds;
     private String color;
