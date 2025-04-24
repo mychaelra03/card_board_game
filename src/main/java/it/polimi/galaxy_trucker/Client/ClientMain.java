@@ -26,7 +26,7 @@ public class ClientMain extends Application {
         stage.setResizable(false);
         stage.show();
 
-        virtualServer.start();
+        //virtualServer.start();
     }
 
     public static void main(String[] args) throws IOException {

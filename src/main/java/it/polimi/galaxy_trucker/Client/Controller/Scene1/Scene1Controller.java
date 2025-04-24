@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Random;
 
 public class Scene1Controller implements VirtualServerAware {
 
@@ -35,16 +37,17 @@ public class Scene1Controller implements VirtualServerAware {
 
     @FXML private Button leftBodyBtn, rightBodyBtn;
     @FXML private Button leftAccessoryBtn, rightAccessoryBtn;
+    @FXML private Button randomizeButton, options;
     @FXML private Button playButton;
 
     @FXML private TextField nameField;
     @FXML private Label errorLabel;
 
-    private static int bodyIndex = 0;
-    private static int accessoryIndex = 0;
     private static final int MAX_BODIES = 9;
     private static final int MAX_ACCESSORIES = 8;
 
+    private static int bodyIndex = 0;
+    private static int accessoryIndex = 0;
 
 
     @FXML
@@ -52,13 +55,13 @@ public class Scene1Controller implements VirtualServerAware {
 
         System.out.println(getClass().getResource("/textures/background.png"));
 
-        bodyView.setImage(loadBodyImage(bodyIndex));
-        accessoryView.setImage(loadAccessoryImage(accessoryIndex));
+        randomizeSkin();
 
         leftBodyBtn.setOnAction(e -> updateBody(-1));
         rightBodyBtn.setOnAction(e -> updateBody(1));
         leftAccessoryBtn.setOnAction(e -> updateAccessory(-1));
         rightAccessoryBtn.setOnAction(e -> updateAccessory(1));
+        randomizeButton.setOnAction(e -> randomizeSkin());
         playButton.setOnAction(e -> {
             try {
                 validateName();
@@ -88,7 +91,7 @@ public class Scene1Controller implements VirtualServerAware {
     }
 
     private Image loadImage(String path) {
-        return new Image(getClass().getResourceAsStream(path));
+        return new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
     }
 
     private Image loadBodyImage(int index) {
@@ -109,12 +112,20 @@ public class Scene1Controller implements VirtualServerAware {
         accessoryView.setImage(loadAccessoryImage(accessoryIndex));
     }
 
+    private void randomizeSkin() {
+        Random random = new Random();
+        bodyIndex = random.nextInt(MAX_BODIES);
+        accessoryIndex = random.nextInt(MAX_ACCESSORIES);
+        bodyView.setImage(loadBodyImage(bodyIndex));
+        accessoryView.setImage(loadAccessoryImage(accessoryIndex));
+    }
+
     private void validateName() throws IOException {
         String name = usernameTextField.getText().trim();
         if (name.isEmpty() || name.length() > 12) {
             errorLabel.setText("Name must be between 1 and 12 characters.");
             errorLabel.setVisible(true);
-        } else if(false) { // check for duplicate names.
+        } else if(false) { // TODO: check for duplicate names.
             errorLabel.setText("There is already a player named \""+ name +"\" in the lobby.");
             errorLabel.setVisible(true);
         } else {
@@ -123,17 +134,15 @@ public class Scene1Controller implements VirtualServerAware {
 
             System.out.println(bodyIndex + " " + accessoryIndex + " " + username);
 
-            int[] profilePicIds = new int[2];
-            profilePicIds[0] = bodyIndex;
-            profilePicIds[1] = accessoryIndex;
+            int[] profilePicIds = new int[]{bodyIndex, accessoryIndex};
 
             PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null);
 
+            virtualServer.start();
             this.virtualServer.sendCmd(playerInfo);
             ClientSession.setUsername(username);
             ClientSession.setProfilePicIds(profilePicIds);
-            SceneSwitch sceneSwitch = new SceneSwitch();
-            sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
+            SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
         }
     }
 

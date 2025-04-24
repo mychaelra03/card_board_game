@@ -55,7 +55,8 @@ public class Controller {
             case "chatMessage":
 
                 ChatMessage chatMessage = mapper.convertValue(cmd, ChatMessage.class);
-                ChatMessage chatMessageUsername = new ChatMessage(this.playerMap.get(virtualView).getName(), chatMessage.getMessage());
+                ChatMessage chatMessageUsername = new ChatMessage(this.playerMap.get(virtualView).getName(), this.playerMap.get(virtualView).getColor().toString(), chatMessage.getMessage());
+                System.out.println(this.playerMap.get(virtualView).getColor());
                 String messageInfo = mapper.writeValueAsString(chatMessageUsername);
 
                 virtualView.broadcastMessage(messageInfo);

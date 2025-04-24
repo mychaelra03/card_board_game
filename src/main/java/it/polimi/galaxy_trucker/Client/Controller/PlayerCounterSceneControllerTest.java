@@ -3,10 +3,7 @@ package it.polimi.galaxy_trucker.Client.Controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.Client.ClientSession;
-import it.polimi.galaxy_trucker.Client.UpdateUICallBack;
-import it.polimi.galaxy_trucker.Client.VirtualServer;
-import it.polimi.galaxy_trucker.Client.VirtualServerAware;
+import it.polimi.galaxy_trucker.Client.*;
 import it.polimi.galaxy_trucker.Common.ChatMessage;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
@@ -15,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -26,7 +25,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,23 +38,22 @@ import java.util.Objects;
 
 public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
-    @FXML
-    private Label playerCounterLabel;
+    @FXML private Label playerCounterLabel;
 
-    @FXML
-    private AnchorPane anchorPaneLobby;
+    @FXML private AnchorPane anchorPaneLobby;
 
-    @FXML
-    private VBox playerList;
+    @FXML private VBox playerList;
 
-    @FXML
-    private TextField chatTextField;
+    @FXML private Button prevMapButton;
+    @FXML private Button nextMapButton;
 
-    @FXML
-    private ScrollPane chatScrollPane;
+    @FXML private Button readyButton;
 
-    @FXML
-    private VBox chatVbox;
+    @FXML private TextField chatTextField;
+
+    @FXML private ScrollPane chatScrollPane;
+
+    @FXML private VBox chatVbox;
 
     private static final double PROFILE_PIC_SIZE = 50;
 
@@ -92,16 +94,18 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                 if (playersInfo.size() > Integer.parseInt(playerCounterLabel.getText())) {
 
-                    Label playerEnteredLabel = new Label(playersInfoMessage.getUsername() + " joined the lobby");
-                    playerEnteredLabel.setStyle("-fx-text-fill: green;");
+                    String joinMsg = MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername());
+                    Label playerEnteredLabel = new Label(joinMsg);
+                    playerEnteredLabel.setTextFill(Color.GREEN);
                     playerEnteredLabel.setPrefWidth(chatScrollPane.getWidth());
                     playerEnteredLabel.setAlignment(Pos.CENTER);
 
                     chatVbox.getChildren().add(playerEnteredLabel);
                 } else {
 
-                    Label playerLeftLabel = new Label(playersInfoMessage.getUsername() + " left the lobby");
-                    playerLeftLabel.setStyle("-fx-text-fill: red;");
+                    String leftMsg = MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername());
+                    Label playerLeftLabel = new Label(leftMsg);
+                    playerLeftLabel.setTextFill(Color.RED);
                     playerLeftLabel.setPrefWidth(chatScrollPane.getWidth());
                     playerLeftLabel.setAlignment(Pos.CENTER);
 
@@ -126,11 +130,14 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     avatarPic2.setFitHeight(PROFILE_PIC_SIZE);
                     avatarPic2.setFitWidth(PROFILE_PIC_SIZE);
 
-                    Label usernameLabel = new Label();
-                    usernameLabel.setText(playerInfo.getUsername());
-                    if (playerInfo.getUsername().equals(ClientSession.getUsername())){
-
-                       usernameLabel.setStyle("-fx-text-fill: green;");
+                    Text username = new Text(playerInfo.getUsername());
+                    TextFlow usernameText = new TextFlow(username);
+                    usernameText.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                    usernameText.setMaxHeight(Region.USE_PREF_SIZE);
+                    if(playerInfo.getUsername().equals(ClientSession.getUsername())){
+                        Text user = new Text(" (" + LanguageManager.get("text.you") + ")");
+                        user.setFill(Color.GRAY);
+                        usernameText.getChildren().add(user);
                     }
 
 
@@ -163,7 +170,7 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                     playerList.getChildren().add(hBox);
 
-                    hBox.getChildren().addAll(stackPane, usernameLabel);
+                    hBox.getChildren().addAll(stackPane, usernameText);
                     hBox.setAlignment(Pos.CENTER_LEFT);
                     hBox.setSpacing(10);
 
@@ -175,24 +182,27 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                 break;
             case "chatMessage":
 
-
                 ChatMessage chatMessage = mapper.readValue(cmd, ChatMessage.class);
 
-
-
-                Label messageLabel = new Label();
-                messageLabel.setPrefWidth(chatVbox.getWidth());
-                messageLabel.setText(chatMessage.getSender() + ": " + chatMessage.getMessage());
-
-                chatVbox.getChildren().add(messageLabel);
-                if (chatMessage.getSender().equals(ClientSession.getUsername())) {
-                    messageLabel.setStyle("-fx-text-fill: darkgreen;");
-                    messageLabel.setAlignment(Pos.CENTER_RIGHT);
+                Label sender = new Label(chatMessage.getSender() + ": ");
+                sender.setStyle("-fx-font-weight: bold");
+                sender.setMinWidth(Region.USE_PREF_SIZE);
+                sender.setTextFill(Paint.valueOf(chatMessage.getColor()));
+                Label message = new Label(chatMessage.getMessage());
+                message.setWrapText(true);
+                message.setMinHeight(Region.USE_PREF_SIZE);
+                HBox messageBox = new HBox(sender, message);
+                messageBox.setFillHeight(true);
+                messageBox.setAlignment(Pos.TOP_LEFT);
+                if(chatMessage.getSender().equals(ClientSession.getUsername())) {
+                    sender.setText(LanguageManager.get("text.you") + ": ");
+                    message.setTextFill(Color.GRAY);
+                    sender.setTextFill(Color.BLACK);
+                    //messageBox.setAlignment(Pos.TOP_RIGHT);
                 }
+                chatVbox.getChildren().add(messageBox);
 
-                chatScrollPane.setVvalue(1.0);
-
-
+                Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
         }
     }
 
@@ -207,7 +217,7 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
         chatScrollPane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         chatVbox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
 
-
+        prevMapButton.setOnAction(e -> {});
 
     }
 

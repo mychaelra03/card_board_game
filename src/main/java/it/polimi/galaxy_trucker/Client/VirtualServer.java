@@ -30,8 +30,7 @@ public class VirtualServer {
         return instance;
     }
 
-
-    void start(){
+    public void start() {
         String hostName = "localhost";
         int portNumber = 8080;
 
@@ -68,7 +67,6 @@ public class VirtualServer {
 
     }
 
-
     public void sendPlacedTileData(Integer col, Integer row, String id, int rot) {
 
         out.write(col);
@@ -96,6 +94,4 @@ public class VirtualServer {
             messageQueue.add(msg);
         }
     }
-
-
 }

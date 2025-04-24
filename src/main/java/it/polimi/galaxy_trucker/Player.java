@@ -50,8 +50,8 @@ public class Player {
     public void setColor(Color color) {
         this.color = color;
     }
-    public String getColor() {
-        return color.toString();
+    public Color getColor() {
+        return color;
     }
     public int[] getProfilePictureIds() {
         return profilePictureIds;

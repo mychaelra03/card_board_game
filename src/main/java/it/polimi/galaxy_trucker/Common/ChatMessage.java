@@ -2,10 +2,12 @@ package it.polimi.galaxy_trucker.Common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.Player;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatMessage implements GameMessage {
     private String sender;
+    private String color;
     private String message;
 
     public ChatMessage() {}
@@ -15,13 +17,18 @@ public class ChatMessage implements GameMessage {
         this.sender = null;
     }
 
-    public ChatMessage(String sender, String message) {
+    public ChatMessage(String sender, String color, String message) {
         this.sender = sender;
+        this.color = color;
         this.message = message;
     }
 
-
-
+    public String getSender() {
+        return sender;
+    }
+    public String getColor() {
+        return color;
+    }
     public String getMessage() {
         return message;
     }
@@ -30,9 +37,4 @@ public class ChatMessage implements GameMessage {
     public String getType() {
         return "chatMessage";
     }
-
-    public String getSender() {
-        return sender;
-    }
-
 }

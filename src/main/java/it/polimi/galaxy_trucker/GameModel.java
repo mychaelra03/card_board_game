@@ -4,9 +4,7 @@ import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Server.Event.*;
 import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.polimi.galaxy_trucker.GameModel.GameState.*;
@@ -44,33 +42,29 @@ public class GameModel {
         if (players.size() >= 4) return false;
 
         players.add(player);
-        assignColor(player, players.size() - 1);
+        assignFirstAvailableColor(player);
         eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
         return true;
     }
 
     public void removePlayer(Player player) {
         if(!players.remove(player)) throw new IllegalArgumentException("Player is not in this game.");
-        updatePlayersColor();
         eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
     }
 
-    private void assignColor(Player player, int index) {
-        Player.Color[] colors = Player.Color.values();
-        if(index < 0 || index >= colors.length) throw new IllegalArgumentException("Invalid color index: " + index);
-        player.setColor(colors[index]);
-    }
-
-    private void updatePlayersColor() {
-        for(int i = 0; i < players.size(); i++) {
-            assignColor(players.get(i), i);
+    private void assignFirstAvailableColor(Player player) {
+        Set<Player.Color> takenColors = new HashSet<>();
+        for(Player p : players) {
+            takenColors.add(p.getColor());
         }
-    }
 
-    private List<PlayerInfo> getPlayerInfo(){
-        return players.stream()
-                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor()))
-                .collect(Collectors.toList());
+        for(Player.Color color : Player.Color.values()) {
+            if(!takenColors.contains(color)) {
+                player.setColor(color);
+                return;
+            }
+        }
+        throw new IllegalStateException("No available colors.");
     }
 
     public List<Player> getSortedPlayers() {
@@ -147,6 +141,11 @@ public class GameModel {
         }
     }
 
+    private List<PlayerInfo> getPlayerInfo(){
+        return players.stream()
+                .map(p -> new PlayerInfo(p.getName(), p.getProfilePictureIds(), p.getColor().toString()))
+                .collect(Collectors.toList());
+    }
 
     private final EventDispatcher eventDispatcher = new EventDispatcher();
 

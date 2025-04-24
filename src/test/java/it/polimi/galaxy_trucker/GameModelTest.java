@@ -58,17 +58,17 @@ class GameModelTest {
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
         Player player4 = new Player("Test Player 4", new int[]{0, 0});
         gameModel.addPlayer(player1);
-        assertEquals("BLUE", player1.getColor(), "player1 color should be BLUE.");
+        assertEquals(Player.Color.BLUE, player1.getColor(), "player1 color should be BLUE.");
         gameModel.addPlayer(player2);
-        assertEquals("RED", player2.getColor(), "player2 color should be RED.");
+        assertEquals(Player.Color.RED, player2.getColor(), "player2 color should be RED.");
         gameModel.addPlayer(player3);
-        assertEquals("GREEN", player3.getColor(), "player3 color should be GREEN.");
+        assertEquals(Player.Color.GREEN, player3.getColor(), "player3 color should be GREEN.");
         gameModel.addPlayer(player4);
-        assertEquals("YELLOW", player4.getColor(), "player4 color should be YELLOW.");
+        assertEquals(Player.Color.YELLOW, player4.getColor(), "player4 color should be YELLOW.");
         gameModel.removePlayer(player1);
-        assertEquals("BLUE", player2.getColor(), "player2 color should be BLUE.");
-        assertEquals("RED", player3.getColor(), "player3 color should be RED.");
-        assertEquals("GREEN", player4.getColor(), "player4 color should be GREEN.");
+        assertEquals(Player.Color.RED, player2.getColor(), "player2 color should still be RED.");
+        assertEquals(Player.Color.GREEN, player3.getColor(), "player3 color should still be GREEN.");
+        assertEquals(Player.Color.YELLOW, player4.getColor(), "player4 color should still be YELLOW.");
     }
 
     @Test

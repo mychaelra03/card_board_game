@@ -7,7 +7,7 @@ public class LanguageManager {
 
     private static final String LANG_PATH = "it.polimi.galaxy_trucker.lang";
 
-    private static Locale currentLocale = Locale.ENGLISH;
+    private static Locale currentLocale = Locale.ITALIAN;
     private static ResourceBundle bundle = ResourceBundle.getBundle(LANG_PATH + ".messages", currentLocale);
 
     public static void setLocale(Locale locale) {

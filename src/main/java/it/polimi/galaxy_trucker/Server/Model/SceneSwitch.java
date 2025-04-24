@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.Server.Model;
 
+import it.polimi.galaxy_trucker.Client.LanguageManager;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
 import it.polimi.galaxy_trucker.Client.VirtualServerAware;
 import javafx.fxml.FXMLLoader;
@@ -8,8 +9,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
+import java.net.URL;
 import java.util.Objects;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 public class SceneSwitch {
     private static Stage primaryStage;
@@ -23,20 +26,22 @@ public class SceneSwitch {
         primaryStage = stage;
     }
 
-    public static void switchScene( String fxmlFile ) throws IOException {
+    public static void switchScene(String fxmlFile) throws IOException {
+        URL resource = SceneSwitch.class.getResource(fxmlFile);
+        if (resource == null) throw new IOException("FXML file not found: " + fxmlFile);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(Objects.requireNonNull(SceneSwitch.class.getResource(fxmlFile)));
+        ResourceBundle bundle = LanguageManager.getBundle();
+
+        FXMLLoader fxmlLoader = new FXMLLoader(resource, bundle);
         Parent root = fxmlLoader.load();
 
         Object controller = fxmlLoader.getController();
-
-        if(controller instanceof VirtualServerAware aware) {
+        if (controller instanceof VirtualServerAware aware) {
             aware.setVirtualServer(VirtualServer.getInstance());
         }
 
         Scene newScene = new Scene(root);
         primaryStage.setScene(newScene);
         primaryStage.show();
-
     }
 }
