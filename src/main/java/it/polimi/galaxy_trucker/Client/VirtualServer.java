@@ -94,4 +94,8 @@ public class VirtualServer {
             messageQueue.add(msg);
         }
     }
+
+    public void handleServerDisconnect(){
+        updateUICallBack.disconnect();
+    }
 }

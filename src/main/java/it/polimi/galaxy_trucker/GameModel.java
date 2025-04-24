@@ -43,13 +43,25 @@ public class GameModel {
 
         players.add(player);
         assignFirstAvailableColor(player);
-        eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
+        if (players.size() == 1) player.setAdmin(true);
+        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(),player.getName()));
         return true;
     }
 
     public void removePlayer(Player player) {
-        if(!players.remove(player)) throw new IllegalArgumentException("Player is not in this game.");
-        eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
+
+        Iterator<Player> iterator = players.iterator();
+        while (iterator.hasNext()) {
+            Player p = iterator.next();
+            if(p.getName().equals(player.getName())) {
+                iterator.remove();
+
+                eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(),p.getName()));
+                eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(p)));
+
+            }
+        }
+
     }
 
     private void assignFirstAvailableColor(Player player) {
@@ -66,6 +78,18 @@ public class GameModel {
         }
         throw new IllegalStateException("No available colors.");
     }
+    private PlayerInfo getPlayerInfo(Player player) {
+        return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor(),player.isAdmin());
+    }
+
+    public void setNewAdmin(String username) {
+        for (Player p : players) {
+            p.setAdmin(username.equals(p.getName()));
+        }
+
+        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), username));
+    }
+
 
     public List<Player> getSortedPlayers() {
         // Returns a sorted list of the non eliminated players.
@@ -141,7 +165,7 @@ public class GameModel {
         }
     }
 
-    private List<PlayerInfo> getPlayerInfo(){
+    private List<PlayerInfo> getPlayerInfo() {
         return players.stream()
                 .map(p -> new PlayerInfo(p.getName(), p.getProfilePictureIds(), p.getColor().toString()))
                 .collect(Collectors.toList());

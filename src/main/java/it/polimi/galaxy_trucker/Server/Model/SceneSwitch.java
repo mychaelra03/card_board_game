@@ -4,6 +4,7 @@ import it.polimi.galaxy_trucker.Client.LanguageManager;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
 import it.polimi.galaxy_trucker.Client.VirtualServerAware;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -43,5 +44,10 @@ public class SceneSwitch {
         Scene newScene = new Scene(root);
         primaryStage.setScene(newScene);
         primaryStage.show();
+    }
+
+    public static void closeScene(Node someNodeInTheScene) {
+        Stage stage = (Stage) someNodeInTheScene.getScene().getWindow();
+        stage.close();
     }
 }

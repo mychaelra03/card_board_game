@@ -13,7 +13,7 @@
 <AnchorPane fx:id="anchorPaneLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../CSS/scrollbar.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.Client.Controller.PlayerCounterSceneControllerTest">
    <children>
       <Label fx:id="playerCounterLabel" layoutX="29.0" layoutY="20.0" text="0" />
-      <VBox fx:id="playerList" layoutX="10.0" layoutY="42.0" prefHeight="300.0" prefWidth="181.0" style="-fx-border-color: black; -fx-border-radius: 5;" />
+      <VBox fx:id="playerList" layoutX="10.0" layoutY="42.0" prefHeight="300.0" prefWidth="214.0" style="-fx-border-color: black; -fx-border-radius: 5;" />
       <VBox layoutX="61.0" layoutY="485.0" prefHeight="200.0" prefWidth="354.0" style="-fx-border-radius: 23;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
          <children>
             <ScrollPane fx:id="chatScrollPane" opacity="0.46" prefHeight="200.0" prefWidth="200.0">

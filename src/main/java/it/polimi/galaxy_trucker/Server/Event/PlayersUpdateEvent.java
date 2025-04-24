@@ -4,11 +4,11 @@ import it.polimi.galaxy_trucker.Common.PlayerInfo;
 
 import java.util.List;
 
-public class PlayerJoinLeaveEvent extends EventModel {
+public class PlayersUpdateEvent extends EventModel {
     public final List<PlayerInfo> playerInfoList;
     public final String username;
 
-    public PlayerJoinLeaveEvent(List<PlayerInfo> playerInfoList, String username) {
+    public PlayersUpdateEvent(List<PlayerInfo> playerInfoList, String username) {
         this.playerInfoList = playerInfoList;
         this.username = username;
     }

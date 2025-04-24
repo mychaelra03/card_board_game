@@ -8,6 +8,7 @@ import java.util.List;
 public class PlayersInfoMessage implements GameMessage {
     private  List<PlayerInfo> players;
     private String username;
+    private String type = "playersInfo";
 
 
    public PlayersInfoMessage(){}
@@ -25,8 +26,14 @@ public class PlayersInfoMessage implements GameMessage {
         return username;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String getType() {
-        return "playersInfo";
+        return type;
     }
+
+
 }

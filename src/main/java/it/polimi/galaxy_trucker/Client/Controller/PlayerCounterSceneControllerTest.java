@@ -7,7 +7,9 @@ import it.polimi.galaxy_trucker.Client.*;
 import it.polimi.galaxy_trucker.Common.ChatMessage;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
+import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -17,6 +19,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -30,6 +35,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.text.MessageFormat;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,6 +98,15 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                 List<PlayerInfo> playersInfo = playersInfoMessage.getPlayers();
 
 
+                boolean isCurrentUserAdmin = false;
+
+                for (PlayerInfo p : playersInfo) {
+                    if (p.getUsername().equals(ClientSession.getUsername())) {
+                        isCurrentUserAdmin = p.isAdmin();
+                        break;
+                    }
+                }
+
                 if (playersInfo.size() > Integer.parseInt(playerCounterLabel.getText())) {
 
                     String joinMsg = MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername());
@@ -101,7 +116,9 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     playerEnteredLabel.setAlignment(Pos.CENTER);
 
                     chatVbox.getChildren().add(playerEnteredLabel);
-                } else {
+                } else if (playersInfo.size() == Integer.parseInt(playerCounterLabel.getText())) {
+
+                }else {
 
                     String leftMsg = MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername());
                     Label playerLeftLabel = new Label(leftMsg);
@@ -160,9 +177,66 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     clip2.setCenterY(avatarPic2.getFitHeight() / 2);
                     avatarPic2.setClip(clip2);
 
+                    Region spacer = new Region();
+                    HBox.setHgrow(spacer, Priority.ALWAYS);
+
                     StackPane stackPane = new StackPane();
 
+                    // Add both avatars to the StackPane
+                    stackPane.getChildren().addAll(backgroundCircle, avatarPic1, avatarPic2);
+
+
                     HBox hBox = new HBox();
+
+                    hBox.getChildren().addAll(stackPane, usernameLabel, spacer);
+
+
+                    if (playerInfo.isAdmin()){
+                        ImageView adminCrown = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/crownIcon.png"))));
+                        adminCrown.setFitHeight(15);
+                        adminCrown.setFitWidth(15);
+                        HBox.setMargin(adminCrown, new Insets(0, 20, 0, 0));
+                        hBox.getChildren().add(adminCrown);
+                    }
+
+                    if (isCurrentUserAdmin) {
+
+                        if (!playerInfo.isAdmin()){
+                            ImageView dotsMenu = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/dotsMenuIcon.png"))));
+                            dotsMenu.setFitHeight(15);
+                            dotsMenu.setFitWidth(4);
+                            dotsMenu.setCursor(Cursor.HAND);
+
+                            dotsMenu.setOnMouseClicked(event -> {
+
+                                ContextMenu contextMenu = new ContextMenu();
+
+                                MenuItem kick = new MenuItem("Kick");
+                                MenuItem promote = new MenuItem("Promote");
+
+                                kick.setOnAction(e -> {
+                                    //TODO
+                                    playerInfo.setType("kickPlayer");
+                                    this.virtualServer.sendCmd(playerInfo);
+                                });
+
+                                promote.setOnAction(e -> {
+                                    //TODO
+                                    playerInfo.setType("promotePlayer");
+                                    this.virtualServer.sendCmd(playerInfo);
+                                });
+
+                                contextMenu.getItems().addAll(kick, promote);
+
+                                contextMenu.show(dotsMenu, event.getScreenX(), event.getScreenY());
+                            });
+
+                            HBox.setMargin(dotsMenu, new Insets(0, 27, 0, 0));
+                            hBox.getChildren().add(dotsMenu);
+                        }
+                    }
+
+
 
 
                     playerList.setSpacing(10);
@@ -174,8 +248,6 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     hBox.setAlignment(Pos.CENTER_LEFT);
                     hBox.setSpacing(10);
 
-                    // Add both avatars to the StackPane
-                    stackPane.getChildren().addAll(backgroundCircle, avatarPic1, avatarPic2);
 
 
                 }
@@ -203,6 +275,22 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                 chatVbox.getChildren().add(messageBox);
 
                 Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
+                break;
+
+            case "playerKicked":
+
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Connection lost. You have been kicked!", ButtonType.OK);
+                alert.showAndWait();
+
+
+
+
+                break;
+
+            case "newAdmin":
+
+
+
         }
     }
 
@@ -232,6 +320,23 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                 System.out.println("Callback received: " + answer);
                 safeUpdateView(answer);
             }
+
+            @Override
+            public void disconnect() {
+
+                Platform.runLater(() -> {
+                    SceneSwitch sceneSwitch = new SceneSwitch();
+                    //SceneSwitch.closeScene(playerList);
+                    try {
+                        sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/hello-view.fxml");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+            }
+
+
         });
     }
 
@@ -245,6 +350,15 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
         }
     }
 
+    // TODO:  - Admin (first player) ------->  DONE
+    //        - Admin associated privileges :
+    //              + kick players (icon 3 dots :  -------> DONE
+    //                                          - pass Admin privileges
+    //                                          - kick player ------->  DONE
+    //                              )
+    //              + choose map
+    //              + start game on players Ready
+    //
 
 
 

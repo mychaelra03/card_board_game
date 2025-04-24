@@ -1,8 +1,6 @@
 package it.polimi.galaxy_trucker.Common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.Player;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatMessage implements GameMessage {
