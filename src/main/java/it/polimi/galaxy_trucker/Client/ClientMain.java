@@ -1,16 +1,10 @@
 package it.polimi.galaxy_trucker.Client;
 
-import it.polimi.galaxy_trucker.Client.Controller.Scene1.Scene1Controller;
-import it.polimi.galaxy_trucker.GameLogic;
 import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.Locale;
 
 
 public class ClientMain extends Application {
@@ -31,10 +25,5 @@ public class ClientMain extends Application {
 
     public static void main(String[] args) throws IOException {
         launch();
-    }
-
-    VirtualServer virtualServer;
-    public ClientMain(){
-        this.virtualServer = VirtualServer.getInstance();
     }
 }

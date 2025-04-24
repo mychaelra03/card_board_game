@@ -117,9 +117,7 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     playerEnteredLabel.setAlignment(Pos.CENTER);
 
                     chatVbox.getChildren().add(playerEnteredLabel);
-                } else if (playersInfo.size() == Integer.parseInt(playerCounterLabel.getText())) {
-
-                }else {
+                } else {
 
                     String leftMsg = MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername());
                     Label playerLeftLabel = new Label(leftMsg);
@@ -135,18 +133,18 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                 for (PlayerInfo playerInfo : playersInfo) {
 
-                    ImageView avatarPic1 = new ImageView();
-                    ImageView avatarPic2 = new ImageView();
-                    Image image1 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/characters/character_" + playerInfo.getProfilePicIds()[0] + ".png")));
-                    Image image2 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/characters/hand_" + playerInfo.getProfilePicIds()[1] + ".png")));
+                    ImageView profilePicBody = new ImageView();
+                    ImageView profilePicAcc = new ImageView();
+                    Image bodyImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/characters/character_" + playerInfo.getProfilePicIds()[0] + ".png")));
+                    Image accessoryImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/characters/hand_" + playerInfo.getProfilePicIds()[1] + ".png")));
 
-                    avatarPic1.setImage(image1);
-                    avatarPic1.setFitHeight(PROFILE_PIC_SIZE);
-                    avatarPic1.setFitWidth(PROFILE_PIC_SIZE);
+                    profilePicBody.setImage(bodyImage);
+                    profilePicBody.setFitHeight(PROFILE_PIC_SIZE);
+                    profilePicBody.setFitWidth(PROFILE_PIC_SIZE);
 
-                    avatarPic2.setImage(image2);
-                    avatarPic2.setFitHeight(PROFILE_PIC_SIZE);
-                    avatarPic2.setFitWidth(PROFILE_PIC_SIZE);
+                    profilePicAcc.setImage(accessoryImage);
+                    profilePicAcc.setFitHeight(PROFILE_PIC_SIZE);
+                    profilePicAcc.setFitWidth(PROFILE_PIC_SIZE);
 
                     Text username = new Text(playerInfo.getUsername());
                     TextFlow usernameText = new TextFlow(username);
@@ -160,35 +158,35 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     }
 
                     double radius = PROFILE_PIC_SIZE / 2;
-                    Circle backgroundCircle = new Circle(avatarPic1.getX() + PROFILE_PIC_SIZE / 2, avatarPic1.getY() + PROFILE_PIC_SIZE / 2, radius);
+                    Circle profilePicBackground = new Circle(radius);
 
-                    backgroundCircle.setFill(Paint.valueOf(playerInfo.getColor()));
-                    backgroundCircle.setStroke(Color.BLACK);
-                    backgroundCircle.setStrokeWidth(1);
+                    profilePicBackground.setFill(Paint.valueOf(playerInfo.getColor()));
+                    profilePicBackground.setStroke(Color.BLACK);
+                    profilePicBackground.setStrokeWidth(1);
 
                     // Add a circle clip to the first avatar image to make it circular
-                    Circle clip = new Circle(radius);
-                    clip.setCenterX(avatarPic1.getFitWidth() / 2); // Center the clip within the ImageView
-                    clip.setCenterY(avatarPic1.getFitHeight() / 2);
-                    avatarPic1.setClip(clip);
+                    Circle bodyClip = new Circle(radius);
+                    bodyClip.setCenterX(profilePicBody.getFitWidth() / 2); // Center the clip within the ImageView
+                    bodyClip.setCenterY(profilePicBody.getFitHeight() / 2);
+                    profilePicBody.setClip(bodyClip);
 
-                    Circle clip2 = new Circle(radius);
-                    clip2.setCenterX(avatarPic2.getFitWidth() / 2); // Center the clip within the ImageView
-                    clip2.setCenterY(avatarPic2.getFitHeight() / 2);
-                    avatarPic2.setClip(clip2);
+                    Circle accClip = new Circle(radius);
+                    accClip.setCenterX(profilePicAcc.getFitWidth() / 2); // Center the clip within the ImageView
+                    accClip.setCenterY(profilePicAcc.getFitHeight() / 2);
+                    profilePicAcc.setClip(accClip);
 
                     Region spacer = new Region();
                     HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                    StackPane stackPane = new StackPane();
+                    StackPane profilePicture = new StackPane();
 
                     // Add both avatars to the StackPane
-                    stackPane.getChildren().addAll(backgroundCircle, avatarPic1, avatarPic2);
+                    profilePicture.getChildren().addAll(profilePicBackground, profilePicBody, profilePicAcc);
 
-                    HBox hBox = new HBox();
-                    hBox.getChildren().addAll(stackPane, usernameText, spacer);
-                    hBox.setAlignment(Pos.CENTER_LEFT);
-                    hBox.setSpacing(10);
+                    HBox playerBox = new HBox();
+                    playerBox.getChildren().addAll(profilePicture, usernameText, spacer);
+                    playerBox.setAlignment(Pos.CENTER_LEFT);
+                    playerBox.setSpacing(10);
 
 
                     if (playerInfo.isAdmin()){
@@ -196,7 +194,7 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                         adminCrown.setFitHeight(15);
                         adminCrown.setFitWidth(15);
                         HBox.setMargin(adminCrown, new Insets(0, 20, 0, 0));
-                        hBox.getChildren().add(adminCrown);
+                        playerBox.getChildren().add(adminCrown);
                     }
 
                     if (isCurrentUserAdmin) {
@@ -232,14 +230,14 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                             });
 
                             HBox.setMargin(dotsMenu, new Insets(0, 27, 0, 0));
-                            hBox.getChildren().add(dotsMenu);
+                            playerBox.getChildren().add(dotsMenu);
                         }
                     }
 
                     playerList.setSpacing(10);
                     playerList.setPadding(new Insets(10, 5, 10, 5));
 
-                    playerList.getChildren().add(hBox);
+                    playerList.getChildren().add(playerBox);
                 }
                 break;
             case "chatMessage":
