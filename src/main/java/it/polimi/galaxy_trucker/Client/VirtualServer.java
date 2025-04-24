@@ -97,5 +97,7 @@ public class VirtualServer {
         }
     }
 
-
+    public void handleServerDisconnect(){
+        updateUICallBack.disconnect();
+    }
 }

@@ -25,6 +25,7 @@ public class Player {
     private int credits;
     private int position;
     private PlayerState playerState;
+    private boolean admin;
 
     private List<BlockType> cargoPool;
 
@@ -37,6 +38,7 @@ public class Player {
         this.shipBoard = null;
         this.credits = 0;
         this.position = 0;
+        this.admin = false;
     }
     public Player(String name, int[] profilePictureIds, ShipBoard shipBoard) {
         this(name, profilePictureIds);
@@ -141,6 +143,14 @@ public class Player {
         return shipBoard.hasExposedConnectorInPath(source, index);
     }
 
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
     // NEW METHODS
     public void ensureCrewRemovedAt(Point cabinCoords, int index) {
         CrewType removedMember = shipBoard.removeCrewMemberAt(cabinCoords.x, cabinCoords.y, index);
@@ -174,4 +184,5 @@ public class Player {
     public void clearCargoPool() {
         this.cargoPool = null;
     }
+
 }

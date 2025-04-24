@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ChatMessage implements GameMessage {
     private String sender;
     private String message;
+    private String type = "chatMessage";
 
     public ChatMessage() {}
 
@@ -26,10 +27,15 @@ public class ChatMessage implements GameMessage {
         return message;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String getType() {
-        return "chatMessage";
+        return type;
     }
+
 
     public String getSender() {
         return sender;

@@ -8,7 +8,8 @@ import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
-import it.polimi.galaxy_trucker.Server.Event.PlayerJoinLeaveEvent;
+import it.polimi.galaxy_trucker.Server.Event.PlayersUpdateEvent;
+import it.polimi.galaxy_trucker.Server.Event.PlayerKickedEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,19 +21,67 @@ public class Controller {
     public Controller(GameModel gameModel) {
         this.gameModel = gameModel;
 
-        gameModel.addEventListener(PlayerJoinLeaveEvent.class, (event) -> {
+        gameModel.addEventListener(PlayersUpdateEvent.class, (event) -> {
             try {
-                this.handlePlayerJoinLeave(event);
+                this.handlePlayersUpdate(event);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         });
 
+        gameModel.addEventListener(PlayerKickedEvent.class, (event) -> {
+            try{
+                this.handlePlayerKicked(event);
+            } catch (JsonProcessingException e){
+                throw new RuntimeException(e);
+            }
+        });
+
+
     }
 
-    public void handlePlayerJoinLeave(PlayerJoinLeaveEvent event) throws JsonProcessingException {
+//    public VirtualView getVirtualViewByPlayer(Player targetPlayer) {
+//        for (Map.Entry<VirtualView, Player> entry : playerMap.entrySet()) {
+//            if (entry.getValue().equals(targetPlayer)) {
+//                return entry.getKey(); // 🎯 Found the matching VirtualView
+//            }
+//        }
+//        return null; // not found
+//    }
+
+    public VirtualView getVirtualViewByPlayer(Player targetPlayer) {
+        for (Map.Entry<VirtualView, Player> entry : playerMap.entrySet()) {
+            System.out.println("Comparing: " + entry.getValue().getName() + " with " + targetPlayer.getName());
+            if (entry.getValue().getName().equals(targetPlayer.getName())) {
+                return entry.getKey();
+            }
+        }
+        System.out.println("No VirtualView found for player: " + targetPlayer.getName());
+        return null;
+    }
+
+
+    private void handlePlayerKicked(PlayerKickedEvent event) throws JsonProcessingException {
+            PlayerInfo playerInfo = event.getPlayerInfo();
+            playerInfo.setType("playerKicked");
+
+        Player kickedPlayer = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
+
+        VirtualView viewToKick = getVirtualViewByPlayer(kickedPlayer);
+
+        if (viewToKick != null) {
+            viewToKick.sendPlayerKicked(playerInfo);
+            viewToKick.close();
+        } else {
+            System.out.println("No VirtualView found for: " + playerInfo.getUsername());
+        }
+    }
+
+    public void handlePlayersUpdate(PlayersUpdateEvent event) throws JsonProcessingException {
         for( VirtualView vw : playerMap.keySet() ) {
-            vw.sendPlayerAdded(new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername()));
+            PlayersInfoMessage playersInfoMessage =new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername());
+
+            vw.sendPlayerAdded(playersInfoMessage);
         }
     }
 
@@ -48,8 +97,19 @@ public class Controller {
                 PlayerInfo playerInfo = mapper.convertValue(cmd, PlayerInfo.class);
                 Player player = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
 
+
+                System.out.println("Putting player: " + player.getName() + " with VirtualView: " + virtualView);
+                System.out.println("VirtualView hash: " + virtualView.hashCode());
+                playerMap.forEach((vw, p) -> {
+                    System.out.println("Current map -> VirtualView: " + vw + " | Player: " + p.getName());
+                });
+
                 playerMap.put(virtualView, player);
                 gameModel.addPlayer(player);
+
+                System.out.println(playerMap.size());
+
+
                 break;
 
             case "chatMessage":
@@ -59,24 +119,35 @@ public class Controller {
                 String messageInfo = mapper.writeValueAsString(chatMessageUsername);
 
                 virtualView.broadcastMessage(messageInfo);
+                break;
+
+            case "kickPlayer":
+
+                PlayerInfo kickedPlayerInfo = mapper.convertValue(cmd, PlayerInfo.class);
+                Player kickedPlayer = new Player(kickedPlayerInfo.getUsername(), kickedPlayerInfo.getProfilePicIds());
+
+
+                VirtualView viewToKick = getVirtualViewByPlayer(kickedPlayer);
+                viewToKick.close();
+           //     clientDisconnect(viewToKick);
+                playerMap.remove(kickedPlayer);
+                this.gameModel.removePlayer(kickedPlayer);
+
+                break;
+
+                case "promotePlayer":
+
+                    PlayerInfo promotedPlayerInfo = mapper.convertValue(cmd, PlayerInfo.class);
+                    Player promotedPlayer = new Player(promotedPlayerInfo.getUsername(), promotedPlayerInfo.getProfilePicIds());
+
+                    gameModel.setNewAdmin(promotedPlayer.getName());
+
         }
 
-
-
-
     }
-
-//    void choosePlanet(int chosenPlanet) {
-//        if(chosenPlanet < -1 || chosenPlanet >= ((PlanetsCard)gameModel.getCurrentCard()).getPlanetTaken().length) throw new IllegalArgumentException("Planet number out of bounds");
-//    }
-//
-
 
     public void clientDisconnect(VirtualView virtualView){
         this.gameModel.removePlayer(playerMap.get(virtualView));
     }
-
-
-
 
 }

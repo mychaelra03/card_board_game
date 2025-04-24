@@ -127,11 +127,13 @@ public class Scene1Controller implements VirtualServerAware {
             profilePicIds[0] = bodyIndex;
             profilePicIds[1] = accessoryIndex;
 
-            PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null);
+            PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null,false);
 
             this.virtualServer.sendCmd(playerInfo);
+
             ClientSession.setUsername(username);
             ClientSession.setProfilePicIds(profilePicIds);
+
             SceneSwitch sceneSwitch = new SceneSwitch();
             sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
         }

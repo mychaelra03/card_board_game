@@ -2,10 +2,12 @@ package it.polimi.galaxy_trucker.Server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 
 public class VirtualView implements Runnable {
@@ -45,6 +47,14 @@ public class VirtualView implements Runnable {
         System.out.println(json);
     }
 
+    public void sendPlayerKicked(PlayerInfo playerInfo) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(playerInfo);
+
+        this.out.println(json);
+        System.out.println(json);
+    }
+
 
     public void broadcastMessage(String message) {
 
@@ -59,13 +69,33 @@ public class VirtualView implements Runnable {
             }
             System.out.println("done");
             this.controller.clientDisconnect(this);
-        }catch (IOException e){
-            e.printStackTrace();
+        } catch (SocketException e) {
+            System.out.println("Client disconnected: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error reading from client: " + e.getMessage());
+        } finally {
+            close();
         }
     }
 
     @Override
     public void run() {
         networkEventLoop();
+    }
+
+
+    public void close() {
+        try {
+            if (clientSocket != null && !clientSocket.isClosed()) {
+                clientSocket.close(); // Closes the connection to the client
+            }
+
+            if (in != null) in.close();  // Input stream
+            if (out != null) out.close(); // Output stream
+
+            System.out.println("Client connection closed.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

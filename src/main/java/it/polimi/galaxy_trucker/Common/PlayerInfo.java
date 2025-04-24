@@ -8,13 +8,16 @@ public class PlayerInfo implements GameMessage{
     private String username;
     private int[] profilePicIds;
     private String color;
+    private boolean admin;
+    private String type = "playerInfo";
 
     public PlayerInfo() {}
 
-    public PlayerInfo(String username, int[] profilePicIds, String color) {
+    public PlayerInfo(String username, int[] profilePicIds, String color, boolean admin) {
         this.username = username;
         this.profilePicIds = profilePicIds;
         this.color = color;
+        this.admin = admin;
     }
 
     public String getUsername() {
@@ -37,8 +40,22 @@ public class PlayerInfo implements GameMessage{
         return color;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String getType() {
-        return "playerInfo";
+        return type;
     }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+
 }

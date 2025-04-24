@@ -6,6 +6,7 @@ import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,15 +45,39 @@ public class GameModel {
         if (players.size() >= 4) return false;
 
         players.add(player);
+        if (players.size() == 1) player.setAdmin(true);
         assignColor(player, players.size() - 1);
-        eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
+        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(),player.getName()));
         return true;
     }
 
     public void removePlayer(Player player) {
-        if(!players.remove(player)) throw new IllegalArgumentException("Player is not in this game.");
-        updatePlayersColor();
-        eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayerInfo(),player.getName()));
+
+//        Player playerToRemove;
+//        for (Player p : players ) {
+//            if (p.getName().equals(player.getName())) {
+//                playerToRemove = p;
+//
+//                if(!players.remove(playerToRemove)) throw new IllegalArgumentException("Player is not in this game.");
+//                updatePlayersColor();
+//                eventDispatcher.fireEvent(new PlayerJoinLeaveEvent(getPlayersInfo(),player.getName()));
+//                eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(playerToRemove)));
+//            }
+//        }
+
+        Iterator<Player> iterator = players.iterator();
+        while (iterator.hasNext()) {
+            Player p = iterator.next();
+            if (p.getName().equals(player.getName())) {
+                iterator.remove();
+
+                updatePlayersColor();
+                eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(),p.getName()));
+                eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(p)));
+
+            }
+        }
+
     }
 
     private void assignColor(Player player, int index) {
@@ -67,11 +92,23 @@ public class GameModel {
         }
     }
 
-    private List<PlayerInfo> getPlayerInfo(){
+    private List<PlayerInfo> getPlayersInfo(){
         return players.stream()
-                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor()))
+                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor(),p.isAdmin()))
                 .collect(Collectors.toList());
     }
+    private PlayerInfo getPlayerInfo(Player player) {
+        return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor(),player.isAdmin());
+    }
+
+    public void setNewAdmin(String username) {
+        for (Player p : players) {
+            p.setAdmin(username.equals(p.getName()));
+        }
+
+        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), username));
+    }
+
 
     public List<Player> getSortedPlayers() {
         // Returns a sorted list of the non eliminated players.

@@ -10,14 +10,16 @@ import it.polimi.galaxy_trucker.Client.VirtualServerAware;
 import it.polimi.galaxy_trucker.Common.ChatMessage;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
+import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -27,6 +29,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,6 +84,7 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
         String type = node.get("type").asText();
 
 
+
         switch (type) {
             case "playersInfo":
 
@@ -90,6 +94,15 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                 List<PlayerInfo> playersInfo = playersInfoMessage.getPlayers();
 
 
+                boolean isCurrentUserAdmin = false;
+
+                for (PlayerInfo p : playersInfo) {
+                    if (p.getUsername().equals(ClientSession.getUsername())) {
+                        isCurrentUserAdmin = p.isAdmin();
+                        break;
+                    }
+                }
+
                 if (playersInfo.size() > Integer.parseInt(playerCounterLabel.getText())) {
 
                     Label playerEnteredLabel = new Label(playersInfoMessage.getUsername() + " joined the lobby");
@@ -98,7 +111,9 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     playerEnteredLabel.setAlignment(Pos.CENTER);
 
                     chatVbox.getChildren().add(playerEnteredLabel);
-                } else {
+                } else if (playersInfo.size() == Integer.parseInt(playerCounterLabel.getText())) {
+
+                }else {
 
                     Label playerLeftLabel = new Label(playersInfoMessage.getUsername() + " left the lobby");
                     playerLeftLabel.setStyle("-fx-text-fill: red;");
@@ -112,6 +127,7 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
 
                 for (PlayerInfo playerInfo : playersInfo) {
+
 
                     ImageView avatarPic1 = new ImageView();
                     ImageView avatarPic2 = new ImageView();
@@ -153,9 +169,66 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     clip2.setCenterY(avatarPic2.getFitHeight() / 2);
                     avatarPic2.setClip(clip2);
 
+                    Region spacer = new Region();
+                    HBox.setHgrow(spacer, Priority.ALWAYS);
+
                     StackPane stackPane = new StackPane();
 
+                    // Add both avatars to the StackPane
+                    stackPane.getChildren().addAll(backgroundCircle, avatarPic1, avatarPic2);
+
+
                     HBox hBox = new HBox();
+
+                    hBox.getChildren().addAll(stackPane, usernameLabel, spacer);
+
+
+                    if (playerInfo.isAdmin()){
+                        ImageView adminCrown = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/crownIcon.png"))));
+                        adminCrown.setFitHeight(15);
+                        adminCrown.setFitWidth(15);
+                        HBox.setMargin(adminCrown, new Insets(0, 20, 0, 0));
+                        hBox.getChildren().add(adminCrown);
+                    }
+
+                    if (isCurrentUserAdmin) {
+
+                        if (!playerInfo.isAdmin()){
+                            ImageView dotsMenu = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/dotsMenuIcon.png"))));
+                            dotsMenu.setFitHeight(15);
+                            dotsMenu.setFitWidth(4);
+                            dotsMenu.setCursor(Cursor.HAND);
+
+                            dotsMenu.setOnMouseClicked(event -> {
+
+                                ContextMenu contextMenu = new ContextMenu();
+
+                                MenuItem kick = new MenuItem("Kick");
+                                MenuItem promote = new MenuItem("Promote");
+
+                                kick.setOnAction(e -> {
+                                    //TODO
+                                    playerInfo.setType("kickPlayer");
+                                    this.virtualServer.sendCmd(playerInfo);
+                                });
+
+                                promote.setOnAction(e -> {
+                                    //TODO
+                                    playerInfo.setType("promotePlayer");
+                                    this.virtualServer.sendCmd(playerInfo);
+                                });
+
+                                contextMenu.getItems().addAll(kick, promote);
+
+                                contextMenu.show(dotsMenu, event.getScreenX(), event.getScreenY());
+                            });
+
+                            HBox.setMargin(dotsMenu, new Insets(0, 27, 0, 0));
+                            hBox.getChildren().add(dotsMenu);
+                        }
+                    }
+
+
 
 
                     playerList.setSpacing(10);
@@ -163,12 +236,9 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                     playerList.getChildren().add(hBox);
 
-                    hBox.getChildren().addAll(stackPane, usernameLabel);
                     hBox.setAlignment(Pos.CENTER_LEFT);
                     hBox.setSpacing(10);
 
-                    // Add both avatars to the StackPane
-                    stackPane.getChildren().addAll(backgroundCircle, avatarPic1, avatarPic2);
 
 
                 }
@@ -177,7 +247,6 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
 
                 ChatMessage chatMessage = mapper.readValue(cmd, ChatMessage.class);
-
 
 
                 Label messageLabel = new Label();
@@ -192,9 +261,25 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                 chatScrollPane.setVvalue(1.0);
 
+                break;
+
+            case "playerKicked":
+
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Connection lost. You have been kicked!", ButtonType.OK);
+                alert.showAndWait();
+
+
+
+
+                break;
+
+            case "newAdmin":
+
+
 
         }
     }
+
 
     @FXML
     public void initialize() {
@@ -222,6 +307,23 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                 System.out.println("Callback received: " + answer);
                 safeUpdateView(answer);
             }
+
+            @Override
+            public void disconnect() {
+
+                Platform.runLater(() -> {
+                    SceneSwitch sceneSwitch = new SceneSwitch();
+                    //SceneSwitch.closeScene(playerList);
+                    try {
+                        sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/hello-view.fxml");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+            }
+
+
         });
     }
 
@@ -235,6 +337,15 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
         }
     }
 
+    // TODO:  - Admin (first player) ------->  DONE
+    //        - Admin associated privileges :
+    //              + kick players (icon 3 dots :  -------> DONE
+    //                                          - pass Admin privileges
+    //                                          - kick player ------->  DONE
+    //                              )
+    //              + choose map
+    //              + start game on players Ready
+    //
 
 
 

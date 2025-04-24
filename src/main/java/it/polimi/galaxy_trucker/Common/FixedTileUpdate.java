@@ -7,6 +7,7 @@ public class FixedTileUpdate implements GameMessage {
     int y;
     int rotation;
     String id;
+    String type = "fixedTile";
 
     public FixedTileUpdate() {}
 
@@ -49,8 +50,14 @@ public class FixedTileUpdate implements GameMessage {
         this.id = id;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String getType() {
-        return "fixedTile";
+        return type;
     }
+
+
 }

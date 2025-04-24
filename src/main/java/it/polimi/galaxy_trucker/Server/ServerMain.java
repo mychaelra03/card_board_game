@@ -12,6 +12,7 @@ public class ServerMain {
     static int portNumber = 8080;
     static ArrayList<VirtualView> clients = new ArrayList<>();
     static GameModel gameModel = new GameModel(BoardType.LEVEL_TWO);
+    static Controller controller = new Controller(gameModel);
 
     public static void main(String[] args) {
 
@@ -35,7 +36,6 @@ public class ServerMain {
                 e.printStackTrace();
             }
             System.out.println("Accepted");
-            Controller controller = new Controller(gameModel);
             VirtualView virtualView = new VirtualView(clientSocket, controller, clients);
             Thread t = new Thread(virtualView);
             clients.add(virtualView);
