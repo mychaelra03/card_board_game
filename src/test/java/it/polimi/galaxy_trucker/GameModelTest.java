@@ -17,18 +17,20 @@ class GameModelTest {
     void addPlayer() {
         GameModel gameModel = new GameModel(LEVEL_TWO);
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
+        Player player1b = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
         Player player4 = new Player("Test Player 4", new int[]{0, 0});
         Player player5 = new Player("Test Player 5", new int[]{0, 0});
-        assertTrue(gameModel.addPlayer(player1), "playershould have successfully added.");
-        assertTrue(gameModel.addPlayer(player2), "playershould have successfully added.");
-        assertTrue(gameModel.addPlayer(player3), "playershould have successfully added.");
-        assertTrue(gameModel.addPlayer(player4), "playershould have successfully added.");
-        assertFalse(gameModel.addPlayer(player5), "Lobby should be full.");
+        gameModel.addPlayer(player1);
+        gameModel.addPlayer(player2);
+        gameModel.addPlayer(player3);
+        gameModel.addPlayer(player4);
+        assertThrows(IllegalStateException.class, () -> gameModel.addPlayer(player5), "Lobby should be full.");
         gameModel.removePlayer(player3);
         assertThrows(IllegalArgumentException.class, () -> gameModel.addPlayer(player1), "playeris already in the game.");
-        assertTrue(gameModel.addPlayer(player5), "playershould have successfully added.");
+        assertThrows(IllegalStateException.class, () -> gameModel.addPlayer(player1b), "There should be already a player with that name.");
+        gameModel.addPlayer(player5);
     }
 
     @Test
@@ -37,7 +39,6 @@ class GameModelTest {
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
-        Player player4 = new Player("Test Player 4", new int[]{0, 0});
         assertThrows(IllegalArgumentException.class, () -> gameModel.removePlayer(player1), "player1 is not in the game yet.");
         gameModel.addPlayer(player1);
         gameModel.addPlayer(player2);

@@ -19,8 +19,6 @@ public class ClientMain extends Application {
         stage.setTitle("Galaxy Trucker");
         stage.setResizable(false);
         stage.show();
-
-        //virtualServer.start();
     }
 
     public static void main(String[] args) throws IOException {

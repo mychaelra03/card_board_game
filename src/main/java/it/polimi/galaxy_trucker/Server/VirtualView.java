@@ -29,7 +29,6 @@ public class VirtualView implements Runnable {
 //            }
 //        };
 
-
         try{
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -44,7 +43,6 @@ public class VirtualView implements Runnable {
         String json = mapper.writeValueAsString(players);
 
         this.out.println(json);
-        System.out.println(json);
     }
 
     public void sendPlayerKicked(PlayerInfo playerInfo) throws JsonProcessingException {
@@ -72,7 +70,7 @@ public class VirtualView implements Runnable {
         } catch (SocketException e) {
             System.out.println("Client disconnected: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("Error reading from client: " + e.getMessage());
+            System.err.println("Error reading from client: " + e.getMessage());
         } finally {
             close();
         }

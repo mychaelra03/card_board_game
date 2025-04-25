@@ -1,6 +1,5 @@
 package it.polimi.galaxy_trucker.Client;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.SocketException;
@@ -17,16 +16,17 @@ public class ClientThread extends Thread {
     public void run() {
         System.out.println("ClientThread started");
 
-
         try {
             while (true) {
                 String msg = reader.readLine();
+                System.out.println("RECEIVED MESSAGE: " + msg);
                 if (msg == null) {
                     System.out.println("Client disconnected normally.");
                     virtualServer.handleServerDisconnect();
                     break;
                 }
-                virtualServer.handleMessageFromServer( msg);
+                virtualServer.handleMessageFromServer(msg);
+                //virtualServer.handleMessageFromServer(msg);
             }
         } catch (SocketException e) {
             System.out.println("Client forcibly disconnected.");

@@ -6,7 +6,6 @@ import it.polimi.galaxy_trucker.Client.Network.MessageSender;
 import java.io.*;
 import java.net.Socket;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 public class VirtualServer {
@@ -16,7 +15,6 @@ public class VirtualServer {
     ClientThread clientThread;
     private UpdateUICallBack updateUICallBack;
     private final Queue<String> messageQueue = new LinkedList<>();
-
 
     private static VirtualServer instance;
 
@@ -30,7 +28,7 @@ public class VirtualServer {
         return instance;
     }
 
-    public void start(String hostName, int portNumber) throws IOException {
+    public void attemptConnection(String hostName, int portNumber) throws IOException {
 
         Socket socket = new Socket(hostName, portNumber);
 
@@ -56,31 +54,34 @@ public class VirtualServer {
 
     }
 
-    public void sendPlacedTileData(Integer col, Integer row, String id, int rot) {
-
-        out.write(col);
-        out.write(row);
-        out.write(id);
-        out.write(rot);
-        out.flush();
-        System.out.println("data sent to server");
-
-    }
-
-    public void setUpdateUICallBack(UpdateUICallBack updateUICallBack) throws JsonProcessingException {
-        this.updateUICallBack = updateUICallBack;
-
-        while (!messageQueue.isEmpty()) {
-            updateUICallBack.process(messageQueue.poll());
+    public void handleMessageFromServer(String msg) {
+        UpdateUICallBack callBack;
+        synchronized(this) {
+            callBack = updateUICallBack;
+            if (callBack == null) {
+                messageQueue.add(msg);
+            }
+        }
+        if (callBack != null) {
+            dispatchToUI(callBack, msg);
         }
     }
 
-    public void handleMessageFromServer(String msg) throws JsonProcessingException {
-        if(updateUICallBack != null){
-            updateUICallBack.process(msg);
-        } else {
-            System.err.println("UiCallback not set yet. Queuing: " + msg);
-            messageQueue.add(msg);
+    public synchronized void setUpdateUICallBack(UpdateUICallBack newCallBack) {
+        this.updateUICallBack = newCallBack;
+        if (newCallBack != null) {
+            while (!messageQueue.isEmpty()) {
+                String queued = messageQueue.poll();
+                dispatchToUI(newCallBack, queued);
+            }
+        }
+    }
+
+    private void dispatchToUI(UpdateUICallBack cb, String msg) {
+        try {
+            cb.process(msg);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 

@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker;
 
+import it.polimi.galaxy_trucker.Common.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Server.Event.*;
 import it.polimi.galaxy_trucker.Server.Model.cards.Card;
@@ -36,16 +37,29 @@ public class GameModel {
         return deck;
     }
 
-    public boolean addPlayer(Player player) {
+    public LobbyJoinResponse.JoinStatus canAddPlayer(Player player) {
         verifyGameState(WAITING_FOR_PLAYERS);
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
-        if (players.size() >= 4) return false;
+        if(players.size() >= 4) return LobbyJoinResponse.JoinStatus.LOBBY_FULL;
+
+        boolean nameTaken = players.stream().anyMatch(p -> p.getName().equalsIgnoreCase(player.getName()));
+        if(nameTaken) return LobbyJoinResponse.JoinStatus.NAME_TAKEN;
+
+        return LobbyJoinResponse.JoinStatus.SUCCESS;
+    }
+
+
+    public void addPlayer(Player player) {
+        verifyGameState(WAITING_FOR_PLAYERS);
+        if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
+        LobbyJoinResponse.JoinStatus canAddPlayer = canAddPlayer(player);
+        if(canAddPlayer != LobbyJoinResponse.JoinStatus.SUCCESS) throw new IllegalStateException("Can't add player :" + canAddPlayer);
 
         players.add(player);
         assignFirstAvailableColor(player);
         if (players.size() == 1) player.setAdmin(true);
-        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(),player.getName()));
-        return true;
+
+        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
     }
 
     public void removePlayer(Player player) {

@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.Server.Model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import it.polimi.galaxy_trucker.Client.LanguageManager;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
 import it.polimi.galaxy_trucker.Client.VirtualServerAware;
@@ -44,7 +45,7 @@ public class SceneSwitch {
                 aware.setVirtualServer(VirtualServer.getInstance());
             }
         } catch (IOException e) {
-            System.out.println("Error while switching scenes: " + e.getMessage());
+            System.err.println("Error while switching scenes: " + e.getMessage());
             return;
         }
 

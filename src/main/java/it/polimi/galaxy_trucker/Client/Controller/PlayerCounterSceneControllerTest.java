@@ -69,26 +69,24 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
     private UpdateUICallBack updateUICallBack;
 
     private void safeUpdateView(String cmd) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        updateView(cmd);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    updateView(cmd);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
-            });
+            }
+        });
     }
 
     private void updateView(String cmd) throws JsonProcessingException {
-
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(cmd);
 
         String type = node.get("type").asText();
-
 
         switch (type) {
             case "playersInfo":
@@ -210,8 +208,8 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                                 ContextMenu contextMenu = new ContextMenu();
 
-                                MenuItem kick = new MenuItem("Kick");
-                                MenuItem promote = new MenuItem("Promote");
+                                MenuItem kick = new MenuItem(LanguageManager.get("menu_item.kick"));
+                                MenuItem promote = new MenuItem(LanguageManager.get("menu_item.promote"));
 
                                 kick.setOnAction(e -> {
                                     //TODO
@@ -294,18 +292,17 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
         prevMapButton.setOnAction(e -> {});
 
+        //Platform.runLater(this::updateView);
     }
 
     @Override
-    public void setVirtualServer(VirtualServer virtualServer) throws JsonProcessingException {
+    public void setVirtualServer(VirtualServer virtualServer) throws IOException {
         this.virtualServer = virtualServer;
 
         this.virtualServer.setUpdateUICallBack(new UpdateUICallBack() {
             @Override
-            public void process(String answer) throws JsonProcessingException {
-
-                System.out.println("Callback received: " + answer);
-                safeUpdateView(answer);
+            public void process(String cmd) {
+                safeUpdateView(cmd);
             }
 
             @Override
@@ -337,7 +334,4 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
     //              + choose map
     //              + start game on players Ready
     //
-
-
-
 }

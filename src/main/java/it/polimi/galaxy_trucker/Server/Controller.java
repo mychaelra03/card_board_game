@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Common.ChatMessage;
+import it.polimi.galaxy_trucker.Common.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
 import it.polimi.galaxy_trucker.GameModel;
@@ -64,13 +65,13 @@ public class Controller {
             viewToKick.sendPlayerKicked(playerInfo);
             viewToKick.close();
         } else {
-            System.out.println("No VirtualView found for: " + playerInfo.getUsername());
+            System.err.println("No VirtualView found for: " + playerInfo.getUsername());
         }
     }
 
     public void handlePlayersUpdate(PlayersUpdateEvent event) throws JsonProcessingException {
-        for( VirtualView vw : playerMap.keySet() ) {
-            PlayersInfoMessage playersInfoMessage =new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername());
+        for(VirtualView vw : playerMap.keySet()) {
+            PlayersInfoMessage playersInfoMessage = new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername());
 
             vw.sendPlayerAdded(playersInfoMessage);
         }
@@ -88,19 +89,21 @@ public class Controller {
                 PlayerInfo playerInfo = mapper.convertValue(cmd, PlayerInfo.class);
                 Player player = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
 
+//                System.out.println("Putting player: " + player.getName() + " with VirtualView: " + virtualView);
+//                playerMap.forEach((vw, p) -> {
+//                    System.out.println("Current map -> VirtualView: " + vw + " | Player: " + p.getName());
+//                });
+                LobbyJoinResponse.JoinStatus result = gameModel.canAddPlayer(player);
 
-                System.out.println("Putting player: " + player.getName() + " with VirtualView: " + virtualView);
-                System.out.println("VirtualView hash: " + virtualView.hashCode());
-                playerMap.forEach((vw, p) -> {
-                    System.out.println("Current map -> VirtualView: " + vw + " | Player: " + p.getName());
-                });
+                LobbyJoinResponse joinResponse = new LobbyJoinResponse(result);
+                String responseJson = mapper.writeValueAsString(joinResponse);
+                virtualView.out.println(responseJson);
 
-                playerMap.put(virtualView, player);
-                gameModel.addPlayer(player);
-
-                System.out.println(playerMap.size());
-
-
+                if(result == LobbyJoinResponse.JoinStatus.SUCCESS) {
+                    playerMap.put(virtualView, player);
+                    gameModel.addPlayer(player);
+                }
+                else virtualView.close();
                 break;
 
             case "chatMessage":
@@ -121,7 +124,7 @@ public class Controller {
 
                 VirtualView viewToKick = getVirtualViewByPlayer(kickedPlayer);
                 viewToKick.close();
-           //     clientDisconnect(viewToKick);
+                // clientDisconnect(viewToKick);
 
                 playerMap.entrySet().removeIf(entry -> entry.getValue().getName().equals(kickedPlayer.getName()));
                 this.gameModel.removePlayer(kickedPlayer);

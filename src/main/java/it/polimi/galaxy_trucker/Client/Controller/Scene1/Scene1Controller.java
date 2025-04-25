@@ -1,17 +1,21 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene1;
-import it.polimi.galaxy_trucker.Client.ClientSession;
-import it.polimi.galaxy_trucker.Client.LanguageManager;
-import it.polimi.galaxy_trucker.Client.VirtualServer;
-import it.polimi.galaxy_trucker.Client.VirtualServerAware;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.Client.*;
+import it.polimi.galaxy_trucker.Common.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -53,8 +57,6 @@ public class Scene1Controller implements VirtualServerAware {
     @FXML
     public void initialize() {
 
-        System.out.println(getClass().getResource("/textures/background.png"));
-
         randomizeSkin();
 
         leftBodyBtn.setOnAction(e -> updateBody(-1));
@@ -63,16 +65,53 @@ public class Scene1Controller implements VirtualServerAware {
         rightAccessoryBtn.setOnAction(e -> updateAccessory(1));
         randomizeButton.setOnAction(e -> randomizeSkin());
         playButton.setOnAction(e -> validateAndJoin());
-        scene1AnchorPane.setOnKeyPressed(e -> validateAndJoin());
+        scene1AnchorPane.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                playButton.fire();
+            }
+        });
     }
 
 
     private Stage stage;
     private VirtualServer virtualServer;
 
+    private void safeUpdateView(String cmd) {
+        Platform.runLater(() -> {
+            try {
+                updateView(cmd);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     @Override
-    public void setVirtualServer(VirtualServer virtualServer) {
+    public void setVirtualServer(VirtualServer virtualServer) throws IOException {
         this.virtualServer = virtualServer;
+
+        this.virtualServer.setUpdateUICallBack(new UpdateUICallBack() {
+            @Override
+            public void process(String cmd) throws JsonProcessingException {
+
+                ObjectMapper mapper = new ObjectMapper();
+                String type = mapper.readTree(cmd).get("type").asText();
+                switch (type) {
+                    case "lobbyJoinResponse":
+                        LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
+
+                        if(joinResponse.getJoinStatus() == LobbyJoinResponse.JoinStatus.SUCCESS) {
+                            VirtualServer.getInstance().setUpdateUICallBack(null);
+                            Platform.runLater(() -> SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml"));
+                            return;
+                        }
+                }
+                safeUpdateView(cmd);
+            }
+
+            @Override
+            public void disconnect() { }
+        });
     }
 
     private Image loadImage(String path) {
@@ -110,6 +149,13 @@ public class Scene1Controller implements VirtualServerAware {
         label.setVisible(true);
     }
 
+    private void cooldownPlayButton() {
+        playButton.setDisable(true);
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(event -> playButton.setDisable(false));
+        pause.play();
+    }
+
     private void validateAndJoin() {
         errorUsername.setVisible(false);
         errorServerIp.setVisible(false);
@@ -117,12 +163,6 @@ public class Scene1Controller implements VirtualServerAware {
         String username = usernameTextField.getText().trim();
         if(username.isEmpty() || username.length() > 12) {
             showError(errorUsername, LanguageManager.get("error.username_length"));
-            errorUsername.setVisible(true);
-            return;
-        }
-        if(false) { // TODO: check for duplicate names.
-            String errorMsg = MessageFormat.format(LanguageManager.get("error.username_used"), username);
-            showError(errorUsername, errorMsg);
             return;
         }
 
@@ -139,33 +179,41 @@ public class Scene1Controller implements VirtualServerAware {
             return;
         }
 
-        //System.out.println(bodyIndex + " " + accessoryIndex + " " + username);
-
         int[] profilePicIds = new int[]{bodyIndex, accessoryIndex};
-
         PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null,false);
 
+        cooldownPlayButton();
         try {
-            virtualServer.start(hostName, portNumber);
+            virtualServer.attemptConnection(hostName, portNumber);
         } catch (IOException e) {
-            errorServerPort.setText(LanguageManager.get("error.invalid_connection"));
-            errorServerPort.setVisible(true);
+            showError(errorServerPort, LanguageManager.get("error.invalid_connection"));
             return;
         }
         this.virtualServer.sendCmd(playerInfo);
 
         ClientSession.setUsername(username);
         ClientSession.setProfilePicIds(profilePicIds);
-        SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
     }
 
-//
-//    @FXML
-//    private void onEnterKeyPressed(KeyEvent event) throws IOException {
-//        if(event.getCode() == KeyCode.ENTER) {
-//            validateName();
-//        }
-//    }
+    private void updateView(String cmd) throws JsonProcessingException {
 
+        ObjectMapper mapper = new ObjectMapper();
+
+        String type = mapper.readTree(cmd).get("type").asText();
+
+        switch (type) {
+            case "lobbyJoinResponse":
+                LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
+                switch (joinResponse.getJoinStatus()) {
+                    case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
+                    case LOBBY_FULL -> showError(errorUsername, LanguageManager.get("error.full_lobby"));
+                    case NAME_TAKEN -> {
+                        String errorMsg = MessageFormat.format(LanguageManager.get("error.username_used"), ClientSession.getUsername().toLowerCase());
+                        showError(errorUsername, errorMsg);
+                    }
+                }
+                break;
+        }
+    }
 }
 
