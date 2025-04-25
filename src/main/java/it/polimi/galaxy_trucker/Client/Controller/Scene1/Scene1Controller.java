@@ -1,8 +1,8 @@
 package it.polimi.galaxy_trucker.Client.Controller.Scene1;
 import it.polimi.galaxy_trucker.Client.ClientSession;
+import it.polimi.galaxy_trucker.Client.LanguageManager;
 import it.polimi.galaxy_trucker.Client.VirtualServer;
 import it.polimi.galaxy_trucker.Client.VirtualServerAware;
-import it.polimi.galaxy_trucker.Common.ChatMessage;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Server.Model.SceneSwitch;
 import javafx.fxml.FXML;
@@ -10,13 +10,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Locale;
+import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Random;
 
@@ -33,18 +31,20 @@ public class Scene1Controller implements VirtualServerAware {
 
     @FXML private ImageView bodyView;
     @FXML private ImageView accessoryView;
-    @FXML private ImageView backgroundImage;
+
+    @FXML private TextField serverIpTextField;
+    @FXML private TextField serverPortTextField;
+    @FXML private Label errorUsername;
+    @FXML private Label errorServerIp;
+    @FXML private Label errorServerPort;
 
     @FXML private Button leftBodyBtn, rightBodyBtn;
     @FXML private Button leftAccessoryBtn, rightAccessoryBtn;
     @FXML private Button randomizeButton, options;
     @FXML private Button playButton;
 
-    @FXML private TextField nameField;
-    @FXML private Label errorLabel;
-
     private static final int MAX_BODIES = 9;
-    private static final int MAX_ACCESSORIES = 8;
+    private static final int MAX_ACCESSORIES = 10;
 
     private static int bodyIndex = 0;
     private static int accessoryIndex = 0;
@@ -62,23 +62,8 @@ public class Scene1Controller implements VirtualServerAware {
         leftAccessoryBtn.setOnAction(e -> updateAccessory(-1));
         rightAccessoryBtn.setOnAction(e -> updateAccessory(1));
         randomizeButton.setOnAction(e -> randomizeSkin());
-        playButton.setOnAction(e -> {
-            try {
-                validateName();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        scene1AnchorPane.setOnKeyPressed(event -> {
-            if(event.getCode() == KeyCode.ENTER) {
-                try {
-                    validateName();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
+        playButton.setOnAction(e -> validateAndJoin());
+        scene1AnchorPane.setOnKeyPressed(e -> validateAndJoin());
     }
 
 
@@ -120,31 +105,58 @@ public class Scene1Controller implements VirtualServerAware {
         accessoryView.setImage(loadAccessoryImage(accessoryIndex));
     }
 
-    private void validateName() throws IOException {
-        String name = usernameTextField.getText().trim();
-        if (name.isEmpty() || name.length() > 12) {
-            errorLabel.setText("Name must be between 1 and 12 characters.");
-            errorLabel.setVisible(true);
-        } else if(false) { // TODO: check for duplicate names.
-            errorLabel.setText("There is already a player named \""+ name +"\" in the lobby.");
-            errorLabel.setVisible(true);
-        } else {
-            errorLabel.setVisible(false);
-            String username = usernameTextField.getText();
+    private void showError(Label label, String message) {
+        label.setText(message);
+        label.setVisible(true);
+    }
 
-            System.out.println(bodyIndex + " " + accessoryIndex + " " + username);
-
-            int[] profilePicIds = new int[]{bodyIndex, accessoryIndex};
-
-            PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null,false);
-
-            virtualServer.start();
-            this.virtualServer.sendCmd(playerInfo);
-
-            ClientSession.setUsername(username);
-            ClientSession.setProfilePicIds(profilePicIds);
-            SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
+    private void validateAndJoin() {
+        errorUsername.setVisible(false);
+        errorServerIp.setVisible(false);
+        errorServerPort.setVisible(false);
+        String username = usernameTextField.getText().trim();
+        if(username.isEmpty() || username.length() > 12) {
+            showError(errorUsername, LanguageManager.get("error.username_length"));
+            errorUsername.setVisible(true);
+            return;
         }
+        if(false) { // TODO: check for duplicate names.
+            String errorMsg = MessageFormat.format(LanguageManager.get("error.username_used"), username);
+            showError(errorUsername, errorMsg);
+            return;
+        }
+
+        String hostName = serverIpTextField.getText().trim();
+        int portNumber;
+        try {
+            portNumber = Integer.parseInt(serverPortTextField.getText());
+        } catch (NumberFormatException e) {
+            showError(errorServerPort, LanguageManager.get("error.port_type"));
+            return;
+        }
+        if(portNumber < 0 || portNumber > 65535) {
+            showError(errorServerPort, LanguageManager.get("error.port_range"));
+            return;
+        }
+
+        //System.out.println(bodyIndex + " " + accessoryIndex + " " + username);
+
+        int[] profilePicIds = new int[]{bodyIndex, accessoryIndex};
+
+        PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null,false);
+
+        try {
+            virtualServer.start(hostName, portNumber);
+        } catch (IOException e) {
+            errorServerPort.setText(LanguageManager.get("error.invalid_connection"));
+            errorServerPort.setVisible(true);
+            return;
+        }
+        this.virtualServer.sendCmd(playerInfo);
+
+        ClientSession.setUsername(username);
+        ClientSession.setProfilePicIds(profilePicIds);
+        SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml");
     }
 
 //

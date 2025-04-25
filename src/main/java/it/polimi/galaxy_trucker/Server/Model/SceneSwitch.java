@@ -27,18 +27,25 @@ public class SceneSwitch {
         primaryStage = stage;
     }
 
-    public static void switchScene(String fxmlFile) throws IOException {
+    public static void switchScene(String fxmlFile) {
         URL resource = SceneSwitch.class.getResource(fxmlFile);
-        if (resource == null) throw new IOException("FXML file not found: " + fxmlFile);
 
-        ResourceBundle bundle = LanguageManager.getBundle();
+        Parent root;
+        try {
+            if (resource == null) throw new IOException("FXML file not found: " + fxmlFile);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(resource, bundle);
-        Parent root = fxmlLoader.load();
+            ResourceBundle bundle = LanguageManager.getBundle();
 
-        Object controller = fxmlLoader.getController();
-        if (controller instanceof VirtualServerAware aware) {
-            aware.setVirtualServer(VirtualServer.getInstance());
+            FXMLLoader fxmlLoader = new FXMLLoader(resource, bundle);
+            root = fxmlLoader.load();
+
+            Object controller = fxmlLoader.getController();
+            if (controller instanceof VirtualServerAware aware) {
+                aware.setVirtualServer(VirtualServer.getInstance());
+            }
+        } catch (IOException e) {
+            System.out.println("Error while switching scenes: " + e.getMessage());
+            return;
         }
 
         Scene newScene = new Scene(root);

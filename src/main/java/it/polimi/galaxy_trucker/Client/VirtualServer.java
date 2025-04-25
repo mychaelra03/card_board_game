@@ -30,34 +30,23 @@ public class VirtualServer {
         return instance;
     }
 
-    public void start() {
-        String hostName = "localhost";
-        int portNumber = 8080;
+    public void start(String hostName, int portNumber) throws IOException {
 
-        Socket socket = null;
-        try{
-            socket = new Socket(hostName,portNumber);
-
-        } catch (IOException e) {
-           System.err.println(e.toString() + " " + hostName);
-           System.exit(1);
-        }
-
+        Socket socket = new Socket(hostName, portNumber);
 
         BufferedReader stdIn = null;
         try{
             out = new PrintWriter(socket.getOutputStream(),true);
             in = new DataInputStream(socket.getInputStream());
             stdIn = new BufferedReader(new InputStreamReader(System.in));
-        }catch (IOException e) {
-            System.err.println(e.toString() + " " + hostName);
+        } catch (IOException e) {
+            System.err.println(e + " " + hostName);
             System.exit(1);
         }
 
         this.clientThread = new ClientThread(in,this);
         clientThread.setUpdateUICallBack(this.updateUICallBack);
         clientThread.start();
-
     }
 
     public void sendCmd(Object obj){

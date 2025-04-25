@@ -101,14 +101,14 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
 
                 boolean isCurrentUserAdmin = false;
 
-                for (PlayerInfo p : playersInfo) {
+                for(PlayerInfo p : playersInfo) {
                     if (p.getUsername().equals(ClientSession.getUsername())) {
                         isCurrentUserAdmin = p.isAdmin();
                         break;
                     }
                 }
 
-                if (playersInfo.size() > Integer.parseInt(playerCounterLabel.getText())) {
+                if(playersInfo.size() > Integer.parseInt(playerCounterLabel.getText())) {
 
                     String joinMsg = MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername());
                     Label playerEnteredLabel = new Label(joinMsg);
@@ -117,7 +117,8 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
                     playerEnteredLabel.setAlignment(Pos.CENTER);
 
                     chatVbox.getChildren().add(playerEnteredLabel);
-                } else {
+                }
+                else if(playersInfo.size() != Integer.parseInt(playerCounterLabel.getText())) {
 
                     String leftMsg = MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername());
                     Label playerLeftLabel = new Label(leftMsg);
@@ -311,18 +312,9 @@ public class PlayerCounterSceneControllerTest implements VirtualServerAware {
             public void disconnect() {
 
                 Platform.runLater(() -> {
-                    SceneSwitch sceneSwitch = new SceneSwitch();
-                    //SceneSwitch.closeScene(playerList);
-                    try {
-                        sceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/hello-view.fxml");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/hello-view.fxml");
                 });
-
             }
-
-
         });
     }
 

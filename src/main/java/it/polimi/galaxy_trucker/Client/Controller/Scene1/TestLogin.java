@@ -32,7 +32,6 @@ public class TestLogin {
     @FXML
     public void initialize() {
         gameTitle.setImage(loadImage("/textures/title.png"));
-        //backgroundView.setImage(loadImage("/textures/characters/bg_blue.png"));
         bodyView.setImage(loadBodyImage(bodyIndex));
         accessoryView.setImage(loadAccessoryImage(accessoryIndex));
 
