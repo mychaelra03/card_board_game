@@ -201,15 +201,12 @@ public class Scene2Controller {
                                     placedImageView.setEffect(null);
                                     placedImageView.setMouseTransparent(false);
                                     placedImageView = null;
-
                                 }
                             }
                         } catch (Exception e) {
-                            System.out.println(e.getMessage());
+                            System.err.println(e.getMessage());
                         }
-
                     });
-
                 }
             }
 
@@ -221,7 +218,6 @@ public class Scene2Controller {
                     throw new RuntimeException(e);
                 }
             });
-
 
             leftButton.setOnAction(event -> {
                 try {

@@ -36,9 +36,4 @@ public abstract class Tile {
     }
 
     public abstract String getTileType();
-
-    // For debugging
-    public void printConnectors() {
-        System.out.println("Top: "+getConnector(0)+", Right: "+getConnector(1)+", Bottom: "+getConnector(2)+", Left: "+getConnector(3));
-    }
 }

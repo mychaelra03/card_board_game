@@ -43,12 +43,11 @@ public class Controller {
 
     public VirtualView getVirtualViewByPlayer(Player targetPlayer) {
         for (Map.Entry<VirtualView, Player> entry : playerMap.entrySet()) {
-            System.out.println("Comparing: " + entry.getValue().getName() + " with " + targetPlayer.getName());
             if (entry.getValue().getName().equals(targetPlayer.getName())) {
                 return entry.getKey();
             }
         }
-        System.out.println("No VirtualView found for player: " + targetPlayer.getName());
+        System.err.println("No VirtualView found for player: " + targetPlayer.getName());
         return null;
     }
 
@@ -89,10 +88,6 @@ public class Controller {
                 PlayerInfo playerInfo = mapper.convertValue(cmd, PlayerInfo.class);
                 Player player = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
 
-//                System.out.println("Putting player: " + player.getName() + " with VirtualView: " + virtualView);
-//                playerMap.forEach((vw, p) -> {
-//                    System.out.println("Current map -> VirtualView: " + vw + " | Player: " + p.getName());
-//                });
                 LobbyJoinResponse.JoinStatus result = gameModel.canAddPlayer(player);
 
                 LobbyJoinResponse joinResponse = new LobbyJoinResponse(result);
@@ -110,21 +105,20 @@ public class Controller {
 
                 ChatMessage chatMessage = mapper.convertValue(cmd, ChatMessage.class);
                 ChatMessage chatMessageUsername = new ChatMessage(this.playerMap.get(virtualView).getName(), this.playerMap.get(virtualView).getColor().toString(), chatMessage.getMessage());
-                System.out.println(this.playerMap.get(virtualView).getColor());
+
                 String messageInfo = mapper.writeValueAsString(chatMessageUsername);
 
                 virtualView.broadcastMessage(messageInfo);
                 break;
 
             case "kickPlayer":
-                System.out.println("KICKING PLAYER");
+
                 PlayerInfo kickedPlayerInfo = mapper.convertValue(cmd, PlayerInfo.class);
                 Player kickedPlayer = new Player(kickedPlayerInfo.getUsername(), kickedPlayerInfo.getProfilePicIds());
 
 
                 VirtualView viewToKick = getVirtualViewByPlayer(kickedPlayer);
                 viewToKick.close();
-                // clientDisconnect(viewToKick);
 
                 playerMap.entrySet().removeIf(entry -> entry.getValue().getName().equals(kickedPlayer.getName()));
                 this.gameModel.removePlayer(kickedPlayer);

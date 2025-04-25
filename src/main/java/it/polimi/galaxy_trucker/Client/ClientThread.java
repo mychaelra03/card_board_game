@@ -26,12 +26,11 @@ public class ClientThread extends Thread {
                     break;
                 }
                 virtualServer.handleMessageFromServer(msg);
-                //virtualServer.handleMessageFromServer(msg);
             }
         } catch (SocketException e) {
-            System.out.println("Client forcibly disconnected.");
+            System.err.println("Client forcibly disconnected.");
         } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
+            System.err.println("IOException: " + e.getMessage());
         } finally {
             close();
         }

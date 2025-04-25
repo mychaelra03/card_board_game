@@ -22,13 +22,6 @@ public class VirtualView implements Runnable {
         this.controller = controller;
         this.clients = clients;
 
-//        CallBack callBack = ( evt) -> {
-//            for(VirtualView client : clients) {
-//                client.out.println(evt.getNewValue());
-//
-//            }
-//        };
-
         try{
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -50,7 +43,6 @@ public class VirtualView implements Runnable {
         String json = mapper.writeValueAsString(playerInfo);
 
         this.out.println(json);
-        System.out.println(json);
     }
 
 
@@ -68,7 +60,7 @@ public class VirtualView implements Runnable {
             System.out.println("done");
             this.controller.clientDisconnect(this);
         } catch (SocketException e) {
-            System.out.println("Client disconnected: " + e.getMessage());
+            System.err.println("Client disconnected: " + e.getMessage());
         } catch (IOException e) {
             System.err.println("Error reading from client: " + e.getMessage());
         } finally {

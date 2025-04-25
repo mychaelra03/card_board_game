@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.net.InetAddress;
 
 public class VirtualServer {
     DataInputStream in = null;
@@ -30,13 +31,14 @@ public class VirtualServer {
 
     public void attemptConnection(String hostName, int portNumber) throws IOException {
 
+        InetAddress address = InetAddress.getByName(hostName);
+        if(!address.isReachable(500)) throw new IOException("Host is not reachable: " + hostName);
+
         Socket socket = new Socket(hostName, portNumber);
 
-        BufferedReader stdIn = null;
         try{
             out = new PrintWriter(socket.getOutputStream(),true);
             in = new DataInputStream(socket.getInputStream());
-            stdIn = new BufferedReader(new InputStreamReader(System.in));
         } catch (IOException e) {
             System.err.println(e + " " + hostName);
             System.exit(1);
