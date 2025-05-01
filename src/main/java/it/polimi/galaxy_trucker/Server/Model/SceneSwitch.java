@@ -18,18 +18,13 @@ import java.util.ResourceBundle;
 
 public class SceneSwitch {
     private static Stage primaryStage;
-    private static VirtualServer virtualServer;
-
-    public static void setVirtualServer(VirtualServer vs) {
-        virtualServer = vs;
-    }
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
     }
 
     public static void switchScene(String fxmlFile) {
-        URL resource = SceneSwitch.class.getResource(fxmlFile);
+        URL resource = SceneSwitch.class.getResource("/it/polimi/galaxy_trucker/scenes/" + fxmlFile);
 
         Parent root;
         try {
@@ -42,7 +37,9 @@ public class SceneSwitch {
 
             Object controller = fxmlLoader.getController();
             if (controller instanceof VirtualServerAware aware) {
-                aware.setVirtualServer(VirtualServer.getInstance());
+                VirtualServer virtualServer = VirtualServer.getInstance();
+                virtualServer.setUpdateUICallBack(null);
+                aware.setVirtualServer(virtualServer);
             }
         } catch (IOException e) {
             System.err.println("Error while switching scenes: " + e.getMessage());

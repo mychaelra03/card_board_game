@@ -3,15 +3,17 @@ package it.polimi.galaxy_trucker;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Server.Model.cards.*;
+import it.polimi.galaxy_trucker.Server.ServerMain;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 
 public class CardFactory {
 
-    private static final String PATH = "src/main/resources/it/polimi/galaxy_trucker/";
+    private static final String PATH = "it/polimi/galaxy_trucker/";
     private static CardFactory instance;
     private final Map<String, List<JsonNode>> cardsByGroup;
     private final ObjectMapper mapper;
@@ -38,8 +40,12 @@ public class CardFactory {
         // Loads the JSON file and builds a map of group names to a list of card jsons.
         Map<String, List<JsonNode>> groupMap = new HashMap<>();
         try {
-            JsonNode root = mapper.readTree(new File(path));
-            for (Iterator<String> iterator = root.fieldNames(); iterator.hasNext(); ) {
+            InputStream is = CardFactory.class.getClassLoader().getResourceAsStream(path);
+            if(is == null) {
+                throw new IOException("Could not find " + path);
+            }
+            JsonNode root = mapper.readTree(is);
+            for(Iterator<String> iterator = root.fieldNames(); iterator.hasNext(); ) {
                 String groupName = iterator.next();
                 JsonNode cardsArray = root.get(groupName);
                 if(!cardsArray.isArray()) {
@@ -103,17 +109,17 @@ public class CardFactory {
     }
 
     private static final Map<String, Class<? extends Card>> CARD_MAP = Map.ofEntries(
-        Map.entry("abandonedShip", AbandonedShipCard.class),
-        Map.entry("abandonedStation", AbandonedStationCard.class),
-        Map.entry("combatZone", CombatZoneCard.class),
-        Map.entry("epidemic", EpidemicCard.class),
-        Map.entry("meteorSwarm", MeteorSwarmCard.class),
-        Map.entry("openSpace", OpenSpaceCard.class),
-        Map.entry("pirates", PiratesCard.class),
-        Map.entry("planets", PlanetsCard.class),
-        Map.entry("slavers", SlaversCard.class),
-        Map.entry("smugglers", SmugglersCard.class),
-        Map.entry("starDust", StarDustCard.class)
+            Map.entry("abandonedShip", AbandonedShipCard.class),
+            Map.entry("abandonedStation", AbandonedStationCard.class),
+            Map.entry("combatZone", CombatZoneCard.class),
+            Map.entry("epidemic", EpidemicCard.class),
+            Map.entry("meteorSwarm", MeteorSwarmCard.class),
+            Map.entry("openSpace", OpenSpaceCard.class),
+            Map.entry("pirates", PiratesCard.class),
+            Map.entry("planets", PlanetsCard.class),
+            Map.entry("slavers", SlaversCard.class),
+            Map.entry("smugglers", SmugglersCard.class),
+            Map.entry("starDust", StarDustCard.class)
     );
 
     private Card createCard(JsonNode cardNode) {

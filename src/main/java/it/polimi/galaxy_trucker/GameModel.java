@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker;
 
+import it.polimi.galaxy_trucker.Common.BoardSelectMessage;
 import it.polimi.galaxy_trucker.Common.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.Common.PlayerInfo;
 import it.polimi.galaxy_trucker.Server.Event.*;
@@ -12,9 +13,9 @@ import static it.polimi.galaxy_trucker.GameModel.GameState.*;
 import static it.polimi.galaxy_trucker.Player.PlayerState.*;
 
 public class GameModel {
-    private final BoardType boardType;
+    private BoardType boardType;
     private final List<Player> players;
-    private final List<Card> deck;
+    private List<Card> deck;
 
     public enum GameState {
         WAITING_FOR_PLAYERS,
@@ -24,21 +25,39 @@ public class GameModel {
     }
     private GameState gameState = WAITING_FOR_PLAYERS;
 
-    public GameModel(BoardType boardType) {
-        this.boardType = boardType;
+    public GameModel() {
+        this.boardType = BoardType.LEVEL_TWO;
         this.players = new ArrayList<>();
-        this.deck = CardFactory.getInstance().generateDeck(boardType);
+        this.deck = new ArrayList<>();
     }
 
     public BoardType getBoardType() {
         return boardType;
+    }
+    public void cycleBoard(BoardSelectMessage.Action action) {
+        BoardType[] cycleTypes = {BoardType.LEARNING, BoardType.LEVEL_TWO};
+
+        int currentIndex = Arrays.asList(cycleTypes).indexOf(boardType);
+
+        int newIndex = switch (action) {
+            case NEXT -> (currentIndex + 1) % cycleTypes.length;
+            case PREVIOUS -> (currentIndex - 1 + cycleTypes.length) % cycleTypes.length;
+        };
+
+        this.boardType = cycleTypes[newIndex];
+
+        eventDispatcher.fireEvent(new BoardTypeUpdateEvent(boardType));
+    }
+
+    public void generateDeck() {
+        this.deck = CardFactory.getInstance().generateDeck(boardType);
     }
     public List<Card> getDeck() {
         return deck;
     }
 
     public LobbyJoinResponse.JoinStatus canAddPlayer(Player player) {
-        verifyGameState(WAITING_FOR_PLAYERS);
+        if(gameState != WAITING_FOR_PLAYERS) return LobbyJoinResponse.JoinStatus.GAME_STARTED;
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
         if(players.size() >= 4) return LobbyJoinResponse.JoinStatus.LOBBY_FULL;
 
@@ -62,20 +81,23 @@ public class GameModel {
         eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
     }
 
-    public void removePlayer(Player player) {
+    public void removePlayer(String username) {
 
-        Iterator<Player> iterator = players.iterator();
-        while (iterator.hasNext()) {
-            Player p = iterator.next();
-            if(p.getName().equals(player.getName())) {
-                iterator.remove();
-
-                eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(),p.getName()));
-                eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(p)));
+        for (Player p : players) {
+            if (p.getName().equals(username)) {
+                removePlayer(p);
                 return;
             }
         }
-        throw new IllegalArgumentException("Player " + player.getName() + "not found.");
+        throw new IllegalArgumentException("Player " + username + " not found.");
+    }
+
+    public void removePlayer(Player player) {
+        if(!players.contains(player)) throw new IllegalArgumentException("Player " + player.getName() + " not found.");
+        players.remove(player);
+
+        eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(player)));
+        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
     }
 
     private void assignFirstAvailableColor(Player player) {
@@ -97,8 +119,19 @@ public class GameModel {
         for (Player p : players) {
             p.setAdmin(username.equals(p.getName()));
         }
-
         eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), username));
+    }
+
+    public void updatePlayersReady() {
+        int playersReady = 0;
+        for(Player p : players) {
+            if(p.isReady()) playersReady++;
+        }
+        if(players.size() > 1 && playersReady == players.size()) {
+            setGameState(BUILDING_SHIPS);
+        } else {
+            eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), ""));
+        }
     }
 
 
@@ -169,6 +202,11 @@ public class GameModel {
 
     protected final void setGameState(GameState state) {
         this.gameState = state;
+        switch(state) {
+            case BUILDING_SHIPS -> players.forEach(player -> player.setState(BUILDING_SHIP));
+        }
+
+        eventDispatcher.fireEvent(new GameStateUpdateEvent(state));
     }
     protected final void verifyGameState(GameState expectedState) {
         if(gameState != expectedState) {
@@ -177,11 +215,11 @@ public class GameModel {
     }
     private List<PlayerInfo> getPlayersInfo(){
         return players.stream()
-                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor().toString(),p.isAdmin()))
+                .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor().toString(),p.isAdmin(),p.isReady()))
                 .collect(Collectors.toList());
     }
     private PlayerInfo getPlayerInfo(Player player) {
-        return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor().toString(),player.isAdmin());
+        return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor().toString(),player.isAdmin(),player.isReady());
     }
 
     private final EventDispatcher eventDispatcher = new EventDispatcher();

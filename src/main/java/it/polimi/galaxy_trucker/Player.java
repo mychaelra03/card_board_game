@@ -6,6 +6,8 @@ import it.polimi.galaxy_trucker.Server.Model.tiles.*;
 import java.awt.*;
 import java.util.List;
 
+import static it.polimi.galaxy_trucker.Player.PlayerState.*;
+
 public class Player {
 
     public enum Color {
@@ -13,26 +15,28 @@ public class Player {
     }
     public enum PlayerState {
         IDLE,
+        READY_TO_PLAY,
         BUILDING_SHIP,
         RESOLVING_CARD,
         ELIMINATED
     }
 
-    private final String name;
+    private final String username;
     private final int[] profilePictureIds;
     private Color color;
     private ShipBoard shipBoard;
     private int credits;
     private int position;
-    private PlayerState playerState;
+
+    private PlayerState playerState = IDLE;
     private boolean admin;
 
     private List<BlockType> cargoPool;
 
     private int chosenPlanet;
 
-    public Player(String name, int[] profilePictureIds) {
-        this.name = name;
+    public Player(String username, int[] profilePictureIds) {
+        this.username = username;
         this.profilePictureIds = profilePictureIds;
         this.color = null;
         this.shipBoard = null;
@@ -40,14 +44,14 @@ public class Player {
         this.position = 0;
         this.admin = false;
     }
-    public Player(String name, int[] profilePictureIds, ShipBoard shipBoard) {
-        this(name, profilePictureIds);
+    public Player(String username, int[] profilePictureIds, ShipBoard shipBoard) {
+        this(username, profilePictureIds);
         this.shipBoard = shipBoard;
     }
 
     // GETTERS AND SETTERS
     public String getName() {
-        return name;
+        return username;
     }
     public void setColor(Color color) {
         this.color = color;
@@ -145,6 +149,16 @@ public class Player {
 
     public boolean isAdmin() {
         return admin;
+    }
+    public boolean isReady() {
+        return playerState == READY_TO_PLAY;
+    }
+    public void toggleReady() {
+        switch (playerState) {
+            case IDLE -> setState(READY_TO_PLAY);
+            case READY_TO_PLAY -> setState(IDLE);
+            default -> throw new IllegalStateException("Cannot toggle ready state from " + playerState);
+        }
     }
 
     public void setAdmin(boolean admin) {

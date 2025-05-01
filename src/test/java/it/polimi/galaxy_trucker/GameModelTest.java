@@ -15,7 +15,7 @@ class GameModelTest {
 
     @Test
     void addPlayer() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player1b = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
@@ -35,7 +35,7 @@ class GameModelTest {
 
     @Test
     void removePlayer() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
@@ -53,7 +53,7 @@ class GameModelTest {
 
     @Test
     void updatePlayersColor() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
@@ -74,7 +74,7 @@ class GameModelTest {
 
     @Test
     void getSortedPlayers() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
@@ -97,7 +97,7 @@ class GameModelTest {
 
     @Test
     void setPlayerPosition() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
@@ -127,7 +127,7 @@ class GameModelTest {
 
     @Test
     void movePlayerForward() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
@@ -154,7 +154,7 @@ class GameModelTest {
 
     @Test
     void movePlayerBackward() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0});
         Player player2 = new Player("Test Player 2", new int[]{0, 0});
         Player player3 = new Player("Test Player 3", new int[]{0, 0});
@@ -181,7 +181,7 @@ class GameModelTest {
 
     @Test
     void updatePlayersStatus() {
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0}, defaultShipBoard(1));
         Player player2 = new Player("Test Player 2", new int[]{0, 0}, defaultShipBoard(2));
         Player player3 = new Player("Test Player 3", new int[]{0, 0}, defaultShipBoard(3));

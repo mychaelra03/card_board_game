@@ -1,0 +1,35 @@
+.scroll-pane .viewport {
+    -fx-padding: 0;
+}
+
+.scroll-pane .scroll-bar:vertical {
+    -fx-side: left;
+    -fx-background-color: purple;
+}
+
+#readyButton {
+    -fx-background-color: #FFD700;
+    -fx-background-radius: 20px;
+    -fx-border-color: #ffae00;
+    -fx-border-radius: 20px;
+    -fx-text-fill: black;
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+}
+#readyCounter {
+    -fx-background-color: #FFD700;
+    -fx-text-fill: black;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15;
+}
+
+.board-buttons {
+    -fx-background-color: #FFD700;
+    -fx-background-radius: 10px;
+    -fx-border-color: #ffae00;
+    -fx-border-radius: 10px;
+    -fx-text-fill: black;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}

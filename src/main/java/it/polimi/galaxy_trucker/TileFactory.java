@@ -5,15 +5,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.Server.Model.cards.Card;
 import it.polimi.galaxy_trucker.Server.Model.tiles.*;
+import it.polimi.galaxy_trucker.Server.ServerMain;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 
 public class TileFactory {
 
-    private static final String PATH = "src/main/resources/it/polimi/galaxy_trucker/";
+    private static final String PATH = "it/polimi/galaxy_trucker/";
     private static TileFactory instance;
     private final List<JsonNode> tilesJson;
     private final ObjectMapper mapper;
@@ -26,7 +28,7 @@ public class TileFactory {
 
     public static TileFactory getInstance() {
         // Retrieves the singleton instance of TileFactory.
-        if (instance == null) {
+        if(instance == null) {
             instance = new TileFactory(PATH + "public/tiles.json");
         }
         return instance;
@@ -35,9 +37,13 @@ public class TileFactory {
     private List<JsonNode> loadJson(String path) {
         // Loads the JSON file and returns a list of tile definitions.
         List<JsonNode> tileList = new ArrayList<>();
-        try {
-            JsonNode root = mapper.readTree(new File(path));
-            if (!root.isArray()) {
+        try{
+            InputStream is = TileFactory.class.getClassLoader().getResourceAsStream(path);
+            if(is == null) {
+                throw new IOException("Could not find " + path);
+            }
+            JsonNode root = mapper.readTree(is);
+            if(!root.isArray()) {
                 throw new IllegalArgumentException("Root element must be a JSON array.");
             }
             for (JsonNode tileNode : root) {

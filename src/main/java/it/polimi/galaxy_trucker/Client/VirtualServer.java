@@ -4,10 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import it.polimi.galaxy_trucker.Client.Network.MessageSender;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.net.InetAddress;
 
 public class VirtualServer {
     DataInputStream in = null;
@@ -30,21 +29,18 @@ public class VirtualServer {
     }
 
     public void attemptConnection(String hostName, int portNumber) throws IOException {
+        Socket socket = new Socket();
+        socket.connect(new InetSocketAddress(hostName, portNumber), 500);
 
-        InetAddress address = InetAddress.getByName(hostName);
-        if(!address.isReachable(500)) throw new IOException("Host is not reachable: " + hostName);
-
-        Socket socket = new Socket(hostName, portNumber);
-
-        try{
-            out = new PrintWriter(socket.getOutputStream(),true);
+        try {
+            out = new PrintWriter(socket.getOutputStream(), true);
             in = new DataInputStream(socket.getInputStream());
         } catch (IOException e) {
-            System.err.println(e + " " + hostName);
+            System.err.println("Error setting up streams: " + e.getMessage());
             System.exit(1);
         }
 
-        this.clientThread = new ClientThread(in,this);
+        this.clientThread = new ClientThread(in, this);
         clientThread.setUpdateUICallBack(this.updateUICallBack);
         clientThread.start();
     }

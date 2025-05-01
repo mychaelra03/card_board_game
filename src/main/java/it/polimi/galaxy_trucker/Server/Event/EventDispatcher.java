@@ -9,7 +9,7 @@ public class EventDispatcher {
     private final Map<Class<? extends EventModel>, List<ModelEventListener<? extends EventModel>>> listeners = new HashMap<>();
 
     public <T extends EventModel> void  addListener(Class<T> eventType, ModelEventListener<T> listener) {
-        listeners.computeIfAbsent(eventType, k -> new ArrayList<>()).add(listener);
+        listeners.computeIfAbsent(eventType, _ -> new ArrayList<>()).add(listener);
     }
 
     @SuppressWarnings("unchecked")

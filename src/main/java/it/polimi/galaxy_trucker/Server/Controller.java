@@ -3,12 +3,11 @@ package it.polimi.galaxy_trucker.Server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.Common.ChatMessage;
-import it.polimi.galaxy_trucker.Common.LobbyJoinResponse;
-import it.polimi.galaxy_trucker.Common.PlayerInfo;
-import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
+import it.polimi.galaxy_trucker.Common.*;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.Server.Event.BoardTypeUpdateEvent;
+import it.polimi.galaxy_trucker.Server.Event.GameStateUpdateEvent;
 import it.polimi.galaxy_trucker.Server.Event.PlayersUpdateEvent;
 import it.polimi.galaxy_trucker.Server.Event.PlayerKickedEvent;
 
@@ -22,121 +21,125 @@ public class Controller {
     public Controller(GameModel gameModel) {
         this.gameModel = gameModel;
 
-        gameModel.addEventListener(PlayersUpdateEvent.class, (event) -> {
-            try {
-                this.handlePlayersUpdate(event);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        gameModel.addEventListener(PlayerKickedEvent.class, (event) -> {
-            try{
-                this.handlePlayerKicked(event);
-            } catch (JsonProcessingException e){
-                throw new RuntimeException(e);
-            }
-        });
-
-
+        gameModel.addEventListener(PlayersUpdateEvent.class, this::handlePlayersUpdate);
+        gameModel.addEventListener(BoardTypeUpdateEvent.class, this::handleBoardTypeUpdate);
+        gameModel.addEventListener(PlayerKickedEvent.class, this::handlePlayerKicked);
+        gameModel.addEventListener(GameStateUpdateEvent.class, this::handleGameStateUpdate);
     }
 
-    public VirtualView getVirtualViewByPlayer(Player targetPlayer) {
+    public VirtualView getVirtualViewByPlayerName(String username) {
         for (Map.Entry<VirtualView, Player> entry : playerMap.entrySet()) {
-            if (entry.getValue().getName().equals(targetPlayer.getName())) {
+            if (entry.getValue().getName().equals(username)) {
                 return entry.getKey();
             }
         }
-        System.err.println("No VirtualView found for player: " + targetPlayer.getName());
+        System.err.println("No VirtualView found for player: " + username);
         return null;
     }
 
 
-    private void handlePlayerKicked(PlayerKickedEvent event) throws JsonProcessingException {
+    private void handlePlayerKicked(PlayerKickedEvent event) {
             PlayerInfo playerInfo = event.getPlayerInfo();
             playerInfo.setType("playerKicked");
 
-        Player kickedPlayer = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
-
-        VirtualView viewToKick = getVirtualViewByPlayer(kickedPlayer);
+        VirtualView viewToKick = getVirtualViewByPlayerName(playerInfo.getUsername());
 
         if (viewToKick != null) {
-            viewToKick.sendPlayerKicked(playerInfo);
+            viewToKick.sendMessage(playerInfo);
+            playerMap.remove(viewToKick);
             viewToKick.close();
-        } else {
-            System.err.println("No VirtualView found for: " + playerInfo.getUsername());
         }
     }
 
-    public void handlePlayersUpdate(PlayersUpdateEvent event) throws JsonProcessingException {
+    public void handlePlayersUpdate(PlayersUpdateEvent event) {
         for(VirtualView vw : playerMap.keySet()) {
-            PlayersInfoMessage playersInfoMessage = new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername());
-
-            vw.sendPlayerAdded(playersInfoMessage);
+            vw.sendMessage(new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername()));
+        }
+    }
+    public void handleBoardTypeUpdate(BoardTypeUpdateEvent event) {
+        for(VirtualView vw : playerMap.keySet()) {
+            vw.sendMessage(new BoardTypeMessage(event.getBoardType()));
+        }
+    }
+    public void handleGameStateUpdate(GameStateUpdateEvent event) {
+        for(VirtualView vw : playerMap.keySet()) {
+            vw.sendMessage(new GameStateMessage(event.getGameState()));
         }
     }
 
-    public void processCmd(VirtualView virtualView, String json) throws JsonProcessingException {
+    public void processCmd(VirtualView senderVirtualView, String json) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode cmd = mapper.readTree(json);
         String type = cmd.get("type").asText();
 
         switch (type) {
-            case "playerInfo":
+            case "playerInfo" -> {
 
                 PlayerInfo playerInfo = mapper.convertValue(cmd, PlayerInfo.class);
+
                 Player player = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
 
                 LobbyJoinResponse.JoinStatus result = gameModel.canAddPlayer(player);
 
                 LobbyJoinResponse joinResponse = new LobbyJoinResponse(result);
-                String responseJson = mapper.writeValueAsString(joinResponse);
-                virtualView.out.println(responseJson);
+                senderVirtualView.sendMessage(joinResponse);
 
-                if(result == LobbyJoinResponse.JoinStatus.SUCCESS) {
-                    playerMap.put(virtualView, player);
+                if (result == LobbyJoinResponse.JoinStatus.SUCCESS) {
+                    playerMap.put(senderVirtualView, player);
                     gameModel.addPlayer(player);
-                }
-                else virtualView.close();
-                break;
+                    senderVirtualView.sendMessage(new BoardTypeMessage(gameModel.getBoardType()));
+                } else senderVirtualView.close();
+            }
 
-            case "chatMessage":
+            case "boardSelect" -> {
+                if(!playerMap.get(senderVirtualView).isAdmin()) {
+                    System.err.println("You do not have the permission to change board type.");
+                    return;
+                }
+                BoardSelectMessage boardSelectMessage = mapper.convertValue(cmd, BoardSelectMessage.class);
+                gameModel.cycleBoard(boardSelectMessage.getAction());
+            }
+
+            case "readyToggle" -> {
+                Player player = playerMap.get(senderVirtualView);
+                if (player == null) throw new RuntimeException("Player not found");
+                player.toggleReady();
+                gameModel.updatePlayersReady();
+            }
+
+            case "chatMessage" -> {
 
                 ChatMessage chatMessage = mapper.convertValue(cmd, ChatMessage.class);
-                ChatMessage chatMessageUsername = new ChatMessage(this.playerMap.get(virtualView).getName(), this.playerMap.get(virtualView).getColor().toString(), chatMessage.getMessage());
 
-                String messageInfo = mapper.writeValueAsString(chatMessageUsername);
+                ChatMessage chatMessageUsername = new ChatMessage(playerMap.get(senderVirtualView).getName(), playerMap.get(senderVirtualView).getColor().toString(), chatMessage.getMessage());
 
-                virtualView.broadcastMessage(messageInfo);
-                break;
+                playerMap.forEach((v, _) -> v.sendMessage(chatMessageUsername));
+            }
 
-            case "kickPlayer":
+            case "kickPlayer" -> {
 
                 PlayerInfo kickedPlayerInfo = mapper.convertValue(cmd, PlayerInfo.class);
-                Player kickedPlayer = new Player(kickedPlayerInfo.getUsername(), kickedPlayerInfo.getProfilePicIds());
 
+                this.gameModel.removePlayer(kickedPlayerInfo.getUsername());
+            }
 
-                VirtualView viewToKick = getVirtualViewByPlayer(kickedPlayer);
-                viewToKick.close();
+            case "promotePlayer" -> {
 
-                playerMap.entrySet().removeIf(entry -> entry.getValue().getName().equals(kickedPlayer.getName()));
-                this.gameModel.removePlayer(kickedPlayer);
-                break;
+                PlayerInfo promotedPlayerInfo = mapper.convertValue(cmd, PlayerInfo.class);
 
-                case "promotePlayer":
+                Player promotedPlayer = new Player(promotedPlayerInfo.getUsername(), promotedPlayerInfo.getProfilePicIds());
 
-                    PlayerInfo promotedPlayerInfo = mapper.convertValue(cmd, PlayerInfo.class);
-                    Player promotedPlayer = new Player(promotedPlayerInfo.getUsername(), promotedPlayerInfo.getProfilePicIds());
-
-                    gameModel.setNewAdmin(promotedPlayer.getName());
-
+                gameModel.setNewAdmin(promotedPlayer.getName());
+            }
         }
 
     }
 
-    public void clientDisconnect(VirtualView virtualView){
-        this.gameModel.removePlayer(playerMap.get(virtualView));
+    public void clientDisconnect(VirtualView virtualView) {
+        if(playerMap.containsKey(virtualView)) {
+            this.gameModel.removePlayer(playerMap.get(virtualView).getName());
+        }
     }
 
 }

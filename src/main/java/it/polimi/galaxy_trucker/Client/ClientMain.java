@@ -14,7 +14,7 @@ public class ClientMain extends Application {
 
         SceneSwitch.setStage(stage);
 
-        SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/hello-view.fxml");
+        SceneSwitch.switchScene("login_scene.fxml");
 
         stage.setTitle("Galaxy Trucker");
         stage.setResizable(false);

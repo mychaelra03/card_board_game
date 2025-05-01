@@ -30,9 +30,6 @@ public class Scene1Controller implements VirtualServerAware {
     @FXML
     private TextField usernameTextField;
 
-    @FXML
-    private ImageView myImageView;
-
     @FXML private ImageView bodyView;
     @FXML private ImageView accessoryView;
 
@@ -48,7 +45,7 @@ public class Scene1Controller implements VirtualServerAware {
     @FXML private Button playButton;
 
     private static final int MAX_BODIES = 9;
-    private static final int MAX_ACCESSORIES = 10;
+    private static final int MAX_ACCESSORIES = 9;
 
     private static int bodyIndex = 0;
     private static int accessoryIndex = 0;
@@ -59,12 +56,12 @@ public class Scene1Controller implements VirtualServerAware {
 
         randomizeSkin();
 
-        leftBodyBtn.setOnAction(e -> updateBody(-1));
-        rightBodyBtn.setOnAction(e -> updateBody(1));
-        leftAccessoryBtn.setOnAction(e -> updateAccessory(-1));
-        rightAccessoryBtn.setOnAction(e -> updateAccessory(1));
-        randomizeButton.setOnAction(e -> randomizeSkin());
-        playButton.setOnAction(e -> validateAndJoin());
+        leftBodyBtn.setOnAction(_ -> updateBody(-1));
+        rightBodyBtn.setOnAction(_ -> updateBody(1));
+        leftAccessoryBtn.setOnAction(_ -> updateAccessory(-1));
+        rightAccessoryBtn.setOnAction(_ -> updateAccessory(1));
+        randomizeButton.setOnAction(_ -> randomizeSkin());
+        playButton.setOnAction(_ -> validateAndJoin());
         scene1AnchorPane.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 playButton.fire();
@@ -96,15 +93,14 @@ public class Scene1Controller implements VirtualServerAware {
 
                 ObjectMapper mapper = new ObjectMapper();
                 String type = mapper.readTree(cmd).get("type").asText();
-                switch (type) {
-                    case "lobbyJoinResponse":
-                        LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
+                if (type.equals("lobbyJoinResponse")) {
+                    LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
 
-                        if(joinResponse.getJoinStatus() == LobbyJoinResponse.JoinStatus.SUCCESS) {
-                            VirtualServer.getInstance().setUpdateUICallBack(null);
-                            Platform.runLater(() -> SceneSwitch.switchScene("/it/polimi/galaxy_trucker/View/Untitled.fxml"));
-                            return;
-                        }
+                    if (joinResponse.getJoinStatus() == LobbyJoinResponse.JoinStatus.SUCCESS) {
+                        VirtualServer.getInstance().setUpdateUICallBack(null);
+                        Platform.runLater(() -> SceneSwitch.switchScene("lobby_scene.fxml"));
+                        return;
+                    }
                 }
                 safeUpdateView(cmd);
             }
@@ -180,7 +176,7 @@ public class Scene1Controller implements VirtualServerAware {
         }
 
         int[] profilePicIds = new int[]{bodyIndex, accessoryIndex};
-        PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null,false);
+        PlayerInfo playerInfo = new PlayerInfo(username,profilePicIds,null,false,false);
 
         cooldownPlayButton();
         try {
@@ -211,6 +207,7 @@ public class Scene1Controller implements VirtualServerAware {
                         String errorMsg = MessageFormat.format(LanguageManager.get("error.username_used"), ClientSession.getUsername().toLowerCase());
                         showError(errorUsername, errorMsg);
                     }
+                    case GAME_STARTED -> showError(errorUsername, LanguageManager.get("error.game_started"));
                 }
                 break;
         }

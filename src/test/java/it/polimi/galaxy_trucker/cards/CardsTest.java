@@ -28,7 +28,7 @@ class CardsTest {
     void abandonedShip() {
         AbandonedShipCard abShipCard = new AbandonedShipCard(0,2, 6,3, 3);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0}, defaultShipBoard(1));
         Player player2 = new Player("Test Player 2", new int[]{0, 0}, defaultShipBoard(2));
         Player player3 = new Player("Test Player 3", new int[]{0, 0}, defaultShipBoard(3));
@@ -82,7 +82,7 @@ class CardsTest {
         BlockType[] reward = {RED, GREEN, YELLOW, YELLOW};
         AbandonedStationCard abStationCard = new AbandonedStationCard(0,2, 8, reward, 3);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0}, defaultShipBoard(1));
         Player player2 = new Player("Test Player 2", new int[]{0, 0}, defaultShipBoard(2));
         Player player3 = new Player("Test Player 3", new int[]{0, 0}, defaultShipBoard(3));
@@ -156,7 +156,7 @@ class CardsTest {
 
         CombatZoneCard combatZoneCard = new CombatZoneCard(0,2,combatRules);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("Test Player 1", new int[]{0, 0}, defaultShipBoard(1));
         Player player2 = new Player("Test Player 2", new int[]{0, 0}, defaultShipBoard(2));
         Player player3 = new Player("Test Player 3", new int[]{0, 0}, defaultShipBoard(3));
@@ -265,7 +265,7 @@ class CardsTest {
     void epidemicCard() {
         EpidemicCard epidemicCard = new EpidemicCard(0, 1);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("TestPlayer1", new int[]{0, 0});
         Player player2 = new Player("TestPlayer2", new int[]{0, 0});
         Player player3 = new Player("TestPlayer3", new int[]{0, 0});
@@ -324,7 +324,7 @@ class CardsTest {
         };
         MeteorSwarmCard meteorsCard = new MeteorSwarmCard(0, 2, meteors);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("player1", new int[]{0,0}, defaultShipBoard(1));
         Player player2 = new Player("player2", new int[]{0,0}, defaultShipBoard(2));
         Player player3 = new Player("player3", new int[]{0,0}, defaultShipBoard(3));
@@ -380,7 +380,7 @@ class CardsTest {
     void openSpaceCard() {
         OpenSpaceCard openSpaceCard = new OpenSpaceCard(0, 2);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("player1", new int[]{0,0}, defaultShipBoard(1));
         Player player2 = new Player("player2", new int[]{0,0}, defaultShipBoard(2));
         Player player3 = new Player("player3", new int[]{0,0}, defaultShipBoard(3));
@@ -430,7 +430,7 @@ class CardsTest {
         };
         PiratesCard piratesCard = new PiratesCard(0,2,6,3,3, cannonShots);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("player1", new int[]{0,0}, defaultShipBoard(1));
         Player player2 = new Player("player2", new int[]{0,0}, defaultShipBoard(2));
         Player player3 = new Player("player3", new int[]{0,0}, defaultShipBoard(3));
@@ -487,7 +487,7 @@ class CardsTest {
         };
         PlanetsCard planetsCard = new PlanetsCard(0,2,blockTypes,3);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("player1", new int[]{0,0}, defaultShipBoard(1));
         Player player2 = new Player("player2", new int[]{0,0}, defaultShipBoard(2));
         Player player3 = new Player("player3", new int[]{0,0}, defaultShipBoard(3));
@@ -561,7 +561,7 @@ class CardsTest {
     void slaversCard() {
         SlaversCard slaversCard = new SlaversCard(0,2,5,3,3,4);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("player1", new int[]{0,0}, defaultShipBoard(1));
         Player player2 = new Player("player2", new int[]{0,0}, defaultShipBoard(2));
         Player player3 = new Player("player3", new int[]{0,0}, defaultShipBoard(3));
@@ -616,7 +616,7 @@ class CardsTest {
         BlockType[] rewardCargo = new BlockType[]{GREEN, BLUE, YELLOW};
         SmugglersCard smugglersCard = new SmugglersCard(0,2,4,rewardCargo,3,4);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("player1", new int[]{0,0}, defaultShipBoard(1));
         Player player2 = new Player("player2", new int[]{0,0}, defaultShipBoard(2));
         Player player3 = new Player("player3", new int[]{0,0}, defaultShipBoard(3));
@@ -674,7 +674,7 @@ class CardsTest {
     void starDustCard() {
         StarDustCard starDustCard = new StarDustCard(24,1);
 
-        GameModel gameModel = new GameModel(LEVEL_TWO);
+        GameModel gameModel = new GameModel();
         Player player1 = new Player("TestPlayer1", new int[]{0, 0});
         Player player2 = new Player("TestPlayer2", new int[]{0, 0});
         Player player3 = new Player("TestPlayer3", new int[]{0, 0});

@@ -25,6 +25,4 @@ module it.polimi.galaxy_trucker {
     exports it.polimi.galaxy_trucker.Common;
     opens it.polimi.galaxy_trucker.Common to com.fasterxml.jackson.databind;
     opens it.polimi.galaxy_trucker.Client.Controller to javafx.fxml;
-
-
 }

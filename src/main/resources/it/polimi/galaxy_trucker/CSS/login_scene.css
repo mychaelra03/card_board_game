@@ -35,9 +35,10 @@
 
 .button {
     -fx-background-color: #FFD700;
+    -fx-background-radius: 10px;
+    -fx-border-color: #ffae00;
+    -fx-border-radius: 10px;
     -fx-text-fill: black;
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
 }

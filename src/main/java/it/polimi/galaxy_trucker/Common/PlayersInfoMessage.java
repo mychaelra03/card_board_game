@@ -6,12 +6,12 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayersInfoMessage implements GameMessage {
-    private  List<PlayerInfo> players;
+    private List<PlayerInfo> players;
     private String username;
     private String type = "playersInfo";
 
 
-   public PlayersInfoMessage(){}
+   public PlayersInfoMessage() {}
 
     public PlayersInfoMessage(List<PlayerInfo> players, String username) {
         this.players = players;
@@ -34,6 +34,4 @@ public class PlayersInfoMessage implements GameMessage {
     public String getType() {
         return type;
     }
-
-
 }

@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.net.SocketException;
 
 public class ClientThread extends Thread {
-    private DataInputStream reader;
-    private VirtualServer virtualServer;
+    private final DataInputStream reader;
+    private final VirtualServer virtualServer;
 
     public ClientThread(DataInputStream reader, VirtualServer virtualServer) {
         this.reader = reader;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LobbyJoinResponse implements GameMessage {
     public enum JoinStatus {
-        SUCCESS, LOBBY_FULL, NAME_TAKEN
+        SUCCESS, LOBBY_FULL, NAME_TAKEN, GAME_STARTED
     }
     private JoinStatus joinStatus;
 

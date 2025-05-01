@@ -2,8 +2,6 @@ package it.polimi.galaxy_trucker.Server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.Common.PlayerInfo;
-import it.polimi.galaxy_trucker.Common.PlayersInfoMessage;
 
 import java.io.*;
 import java.net.Socket;
@@ -30,41 +28,33 @@ public class VirtualView implements Runnable {
         }
     }
 
-    public void sendPlayerAdded(PlayersInfoMessage players) throws JsonProcessingException {
+    public void sendMessage(Object object) {
 
         ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(players);
-
+        String json;
+        try {
+        json = mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         this.out.println(json);
-    }
-
-    public void sendPlayerKicked(PlayerInfo playerInfo) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(playerInfo);
-
-        this.out.println(json);
-    }
-
-
-    public void broadcastMessage(String message) {
-
-        clients.forEach(client -> {client.out.println(message);});
     }
 
     void networkEventLoop(){
         String line;
-        try{
-            while((line = in.readLine()) != null ){
-                this.controller.processCmd(this,line);
+        try {
+            while((line = in.readLine()) != null ) {
+                System.out.println("RECEIVED MESSAGE: " + line);
+                this.controller.processCmd(this, line);
             }
             System.out.println("done");
-            this.controller.clientDisconnect(this);
         } catch (SocketException e) {
             System.err.println("Client disconnected: " + e.getMessage());
         } catch (IOException e) {
             System.err.println("Error reading from client: " + e.getMessage());
         } finally {
-            close();
+            this.controller.clientDisconnect(this);
+            //close();
         }
     }
 

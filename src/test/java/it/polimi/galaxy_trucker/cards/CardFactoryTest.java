@@ -15,9 +15,15 @@ public class CardFactoryTest {
 
     @Test
     void generateDeck() {
-        GameModel learningBoard = new GameModel(LEARNING);
-        GameModel levelOneBoard = new GameModel(LEVEL_ONE);
-        GameModel levelTwoBoard = new GameModel(LEVEL_TWO);
+        GameModel learningBoard = new GameModel();
+        learningBoard.setBoardType(LEARNING);
+        learningBoard.generateDeck();
+        GameModel levelOneBoard = new GameModel();
+        levelOneBoard.setBoardType(LEVEL_ONE);
+        levelOneBoard.generateDeck();
+        GameModel levelTwoBoard = new GameModel();
+        levelTwoBoard.setBoardType(LEVEL_TWO);
+        levelTwoBoard.generateDeck();
         assertEquals(8, learningBoard.getDeck().size(), "Learning decks should contain 8 cards.");
         assertEquals(8, levelOneBoard.getDeck().size(), "Level 1 decks should contain 8 cards.");
         assertEquals(12, levelTwoBoard.getDeck().size(), "Level 2 decks should contain 12 cards.");

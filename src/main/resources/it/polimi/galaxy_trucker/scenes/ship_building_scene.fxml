@@ -18,7 +18,7 @@
       <Rectangle arcHeight="5.0" fill="#1f93ff00" height="80.0" layoutX="312.0" layoutY="637.0" scaleX="1.7" scaleY="1.7" stroke="BLACK" strokeType="INSIDE" width="80.0" AnchorPane.bottomAnchor="83.0" />
       <ImageView fitHeight="530.0" fitWidth="646.0" layoutX="30.0" layoutY="120.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../textures/cardboards/cardboard_1.png" />
+            <Image url="@../../../../textures/cardboards/shipboard_2.png" />
          </image>
       </ImageView>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#2197ff00" height="85.0" layoutX="578.0" layoutY="135.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="84.0" />
