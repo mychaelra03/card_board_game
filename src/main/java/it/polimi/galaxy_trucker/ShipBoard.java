@@ -1,7 +1,7 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
-import it.polimi.galaxy_trucker.Server.Model.tiles.*;
+import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.server.model.tiles.*;
 
 import java.awt.Point;
 import java.util.*;

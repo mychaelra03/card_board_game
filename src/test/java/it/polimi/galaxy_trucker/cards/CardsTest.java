@@ -1,12 +1,12 @@
 package it.polimi.galaxy_trucker.cards;
 
 import it.polimi.galaxy_trucker.GameModel;
-import it.polimi.galaxy_trucker.Server.Model.cards.*;
+import it.polimi.galaxy_trucker.server.model.cards.*;
 import it.polimi.galaxy_trucker.Player;
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.CannonShot;
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Meteor;
-import it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile;
-import it.polimi.galaxy_trucker.Server.Model.tiles.*;
+import it.polimi.galaxy_trucker.server.model.cards.projectile.CannonShot;
+import it.polimi.galaxy_trucker.server.model.cards.projectile.Meteor;
+import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
+import it.polimi.galaxy_trucker.server.model.tiles.*;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
@@ -14,9 +14,9 @@ import java.util.*;
 import java.util.List;
 
 import static it.polimi.galaxy_trucker.BoardType.*;
-import static it.polimi.galaxy_trucker.Server.Model.cards.CombatZoneCard.CombatRule.*;
-import static it.polimi.galaxy_trucker.Server.Model.tiles.BlockType.*;
-import static it.polimi.galaxy_trucker.Server.Model.tiles.Connector.*;
+import static it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule.*;
+import static it.polimi.galaxy_trucker.server.model.tiles.BlockType.*;
+import static it.polimi.galaxy_trucker.server.model.tiles.Connector.*;
 import static it.polimi.galaxy_trucker.DefaultShipBoards.defaultShipBoard;
 import static org.junit.jupiter.api.Assertions.*;
 

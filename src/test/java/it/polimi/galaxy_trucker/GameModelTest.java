@@ -1,12 +1,11 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Server.Model.tiles.CrewType;
+import it.polimi.galaxy_trucker.server.model.tiles.CrewType;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.util.Arrays;
 
-import static it.polimi.galaxy_trucker.BoardType.*;
 import static it.polimi.galaxy_trucker.DefaultShipBoards.defaultShipBoard;
 import static it.polimi.galaxy_trucker.Player.PlayerState.*;
 import static org.junit.jupiter.api.Assertions.*;

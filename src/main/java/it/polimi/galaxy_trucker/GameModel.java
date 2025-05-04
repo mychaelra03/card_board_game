@@ -1,10 +1,10 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Common.BoardSelectMessage;
-import it.polimi.galaxy_trucker.Common.LobbyJoinResponse;
-import it.polimi.galaxy_trucker.Common.PlayerInfo;
-import it.polimi.galaxy_trucker.Server.Event.*;
-import it.polimi.galaxy_trucker.Server.Model.cards.Card;
+import it.polimi.galaxy_trucker.common.messages.BoardSelectMessage;
+import it.polimi.galaxy_trucker.common.messages.LobbyJoinResponse;
+import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
+import it.polimi.galaxy_trucker.server.events.*;
+import it.polimi.galaxy_trucker.server.model.cards.Card;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +33,9 @@ public class GameModel {
 
     public BoardType getBoardType() {
         return boardType;
+    }
+    public void setBoardType(BoardType boardType) {
+        this.boardType = boardType;
     }
     public void cycleBoard(BoardSelectMessage.Action action) {
         BoardType[] cycleTypes = {BoardType.LEARNING, BoardType.LEVEL_TWO};
@@ -95,6 +98,7 @@ public class GameModel {
     public void removePlayer(Player player) {
         if(!players.contains(player)) throw new IllegalArgumentException("Player " + player.getName() + " not found.");
         players.remove(player);
+        if(player.isAdmin() && !players.isEmpty()) players.getFirst().setAdmin(true);
 
         eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(player)));
         eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));

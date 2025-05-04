@@ -1,15 +1,15 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.Server.Model.tiles.*;
+import it.polimi.galaxy_trucker.server.model.tiles.*;
 import org.junit.jupiter.api.Test;
 
 import java.awt.Point;
 import java.util.Set;
 
 import static it.polimi.galaxy_trucker.BoardType.*;
-import static it.polimi.galaxy_trucker.Server.Model.cards.projectile.Projectile.*;
-import static it.polimi.galaxy_trucker.Server.Model.tiles.CargoTile.CargoType.*;
-import static it.polimi.galaxy_trucker.Server.Model.tiles.Connector.*;
+import static it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.*;
+import static it.polimi.galaxy_trucker.server.model.tiles.CargoTile.CargoType.*;
+import static it.polimi.galaxy_trucker.server.model.tiles.Connector.*;
 import static it.polimi.galaxy_trucker.ShipBoard.*;
 import static org.junit.jupiter.api.Assertions.*;
 

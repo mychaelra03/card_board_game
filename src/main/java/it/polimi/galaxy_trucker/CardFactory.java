@@ -2,10 +2,8 @@ package it.polimi.galaxy_trucker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.Server.Model.cards.*;
-import it.polimi.galaxy_trucker.Server.ServerMain;
+import it.polimi.galaxy_trucker.server.model.cards.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
