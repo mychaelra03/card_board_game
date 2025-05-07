@@ -451,10 +451,10 @@ public class ShipBoard {
         return isConnected;
     }
 
-    public boolean isInsideShip(int x, int y) {
+    protected boolean isInsideShip(int x, int y) {
         // Returns true if(x,y) is inside the usable space of the spaceship.
         if(y < 0 || x < 0 || y >= tiles.length || x >= tiles[0].length) return false;
-        if(shipType == BoardType.LEARNING) {
+        if(shipType == BoardType.LEARNING || shipType == BoardType.LEVEL_ONE) {
             int[][] type1 = {
                     {0, 0, 0, 1, 0, 0, 0},
                     {0, 0, 1, 1, 1, 0, 0},

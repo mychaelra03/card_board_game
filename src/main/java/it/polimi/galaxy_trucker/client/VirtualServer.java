@@ -61,7 +61,6 @@ public class VirtualServer {
                 Logger.logDebug("RECEIVED MESSAGE: " + msg);
                 if (msg == null) {
                     Logger.logInfo("Client disconnected normally.");
-                    //virtualServer.handleServerDisconnect();
                     break;
                 }
                 virtualServer.handleMessageFromServer(msg);
@@ -96,7 +95,7 @@ public class VirtualServer {
         }
     }
 
-    public void sendMessage(Object object){
+    public void sendMessage(Object object) {
 
         ObjectMapper mapper = new ObjectMapper();
         String json;

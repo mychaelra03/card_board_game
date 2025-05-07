@@ -1,0 +1,41 @@
+package it.polimi.galaxy_trucker.common.messages.shipBuilding;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import it.polimi.galaxy_trucker.common.messages.GameMessage;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TileFixedMessage implements GameMessage {
+    int tileId;
+    int x, y;
+    int rotation;
+
+    public TileFixedMessage() {}
+
+    public TileFixedMessage(int tileId, int x, int y, int rotation) {
+        this.tileId = tileId;
+        this.x = x;
+        this.y = y;
+        this.rotation = rotation;
+    }
+
+    public int getTileId() {
+        return tileId;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getRotation() {
+        return rotation;
+    }
+
+    @Override
+    public String getType() {
+        return "tileFixed";
+    }
+}

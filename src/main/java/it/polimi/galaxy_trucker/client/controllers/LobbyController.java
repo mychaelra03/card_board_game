@@ -8,13 +8,18 @@ import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
+import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
+import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
+import it.polimi.galaxy_trucker.common.messages.lobby.ChatMessage;
+import it.polimi.galaxy_trucker.common.messages.lobby.ReadyToggleMessage;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -64,8 +69,6 @@ public class LobbyController implements VirtualServerAware {
 
     @FXML private VBox chatVbox;
 
-    private static final double PROFILE_PIC_SIZE = 50;
-
     private final VirtualServer virtualServer = VirtualServer.getInstance();
 
     @FXML
@@ -109,8 +112,8 @@ public class LobbyController implements VirtualServerAware {
                 case "gameState" -> {
                     GameStateMessage gameStateMessage = mapper.readValue(cmd, GameStateMessage.class);
 
-                    if (gameStateMessage.getGameState() != GameModel.GameState.BUILDING_SHIPS)
-                        throw new IllegalStateException("Invalid game state");
+                    if (gameStateMessage.getGameState() != GameModel.GameState.BUILDING_SHIPS) throw new IllegalStateException("Invalid game state");
+                    virtualServer.setCallBack(null);
                     Platform.runLater(() -> SceneSwitch.switchScene("ShipBuildingScene"));
                     return;
                 }
@@ -149,6 +152,8 @@ public class LobbyController implements VirtualServerAware {
                 PlayersInfoMessage playersInfoMessage = mapper.readValue(cmd, PlayersInfoMessage.class);
                 List<PlayerInfo> playersInfo = playersInfoMessage.getPlayers();
 
+                ClientSession.updatePlayers(playersInfo);
+
                 playerList.getChildren().clear();
 
                 PlayerInfo thisPlayer = null;
@@ -166,9 +171,12 @@ public class LobbyController implements VirtualServerAware {
                     if (playersInfo.size() > currentCount) {
                         msg.setText(MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername()));
                         msg.setTextFill(Color.GREEN);
+                        msg.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
+                        msg.setStyle("-fx-font-weight: bold; -fx-background-color: rgba(0,128,0,0.1); -fx-background-radius: 5");
                     } else {
                         msg.setText(MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername()));
                         msg.setTextFill(Color.RED);
+                        msg.setStyle("-fx-font-weight: bold; -fx-background-color: rgba(255,0,0,0.1); -fx-background-radius: 5");
                     }
                     msg.setPrefWidth(chatScrollPane.getWidth());
                     msg.setAlignment(Pos.CENTER);
@@ -206,69 +214,43 @@ public class LobbyController implements VirtualServerAware {
 
                 ChatMessage chatMessage = mapper.readValue(cmd, ChatMessage.class);
 
-                Label sender = new Label(chatMessage.getSender() + ": ");
-                sender.setStyle("-fx-font-weight: bold");
+                Label sender = new Label(chatMessage.getSender() + ":");
+                sender.setStyle("-fx-font-size: 14; -fx-font-weight: bold");
                 sender.setMinWidth(Region.USE_PREF_SIZE);
                 sender.setTextFill(Paint.valueOf(chatMessage.getColor()));
                 Label message = new Label(chatMessage.getMessage());
                 message.setWrapText(true);
                 message.setMinHeight(Region.USE_PREF_SIZE);
                 message.setTextFill(Color.BLACK);
-                HBox messageBox = new HBox(sender, message);
+                message.setStyle("-fx-font-size: 14;");
+
+                StackPane profilePic = ClientSession.getPlayerProfilePicture(chatMessage.getSender(), 20);
+
+                HBox messageBox = new HBox(profilePic, sender, message);
                 messageBox.setFillHeight(true);
                 messageBox.setAlignment(Pos.TOP_LEFT);
+                messageBox.setSpacing(4);
                 if (chatMessage.getSender().equals(ClientSession.getUsername())) {
-                    sender.setText(LanguageManager.get("text.you") + ": ");
+                    sender.setText(LanguageManager.get("text.you") + ":");
                 }
                 chatVbox.getChildren().add(messageBox);
 
                 Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
             }
 
-            default -> throw new IllegalArgumentException("Unknown command type: " + type);
+            default -> Logger.logError("Unrecognized command: " + type);
         }
     }
 
     private void updatePlayerList(List<PlayerInfo> playersInfo, PlayerInfo thisPlayer) {
+
         for (PlayerInfo playerInfo : playersInfo) {
             boolean isCurrentUser = playerInfo.getUsername().equals(thisPlayer.getUsername());
 
-            ImageView profilePicBody = new ImageView();
-            ImageView profilePicAcc = new ImageView();
-            Image bodyImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/characters/character_" + playerInfo.getProfilePicIds()[0] + ".png")));
-            Image accessoryImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/characters/hand_" + playerInfo.getProfilePicIds()[1] + ".png")));
-
-            profilePicBody.setImage(bodyImage);
-            profilePicBody.setFitHeight(PROFILE_PIC_SIZE);
-            profilePicBody.setFitWidth(PROFILE_PIC_SIZE);
-
-            profilePicAcc.setImage(accessoryImage);
-            profilePicAcc.setFitHeight(PROFILE_PIC_SIZE);
-            profilePicAcc.setFitWidth(PROFILE_PIC_SIZE);
-
-            double radius = PROFILE_PIC_SIZE / 2;
-            Circle profilePicBackground = new Circle(radius);
-
-            profilePicBackground.setFill(Paint.valueOf(playerInfo.getColor()));
-            profilePicBackground.setStroke(Color.BLACK);
-            profilePicBackground.setStrokeWidth(1);
-
-            // Add a circle clip to the first avatar image to make it circular
-            Circle bodyClip = new Circle(radius);
-            bodyClip.setCenterX(profilePicBody.getFitWidth() / 2); // Center the clip within the ImageView
-            bodyClip.setCenterY(profilePicBody.getFitHeight() / 2);
-            profilePicBody.setClip(bodyClip);
-
-            Circle accClip = new Circle(radius);
-            accClip.setCenterX(profilePicAcc.getFitWidth() / 2); // Center the clip within the ImageView
-            accClip.setCenterY(profilePicAcc.getFitHeight() / 2);
-            profilePicAcc.setClip(accClip);
+            StackPane profilePicture = ClientSession.getPlayerProfilePicture(playerInfo.getUsername(), 50);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-
-            StackPane profilePicture = new StackPane(profilePicBackground, profilePicBody, profilePicAcc);
-
 
             Text username = new Text(playerInfo.getUsername());
             username.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
@@ -303,51 +285,60 @@ public class LobbyController implements VirtualServerAware {
                 ImageView adminCrown = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/crownIcon.png"))));
                 adminCrown.setFitHeight(15);
                 adminCrown.setFitWidth(15);
-                HBox.setMargin(adminCrown, new Insets(0, 20, 0, 0));
+                HBox.setMargin(adminCrown, new Insets(0, 18, 0, 0));
                 playerBox.getChildren().add(adminCrown);
             }
 
             if (thisPlayer.isAdmin()) {
                 if (!playerInfo.isAdmin()) {
-                    ImageView dotsMenu = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/dotsMenuIcon.png"))));
-                    dotsMenu.setFitHeight(15);
-                    dotsMenu.setFitWidth(4);
-                    dotsMenu.setCursor(Cursor.HAND);
 
-                    dotsMenu.setOnMouseClicked(event -> {
+                    Button dotsButton = getDotsButton(playerInfo);
 
-                        ContextMenu contextMenu = new ContextMenu();
-
-                        MenuItem kick = new MenuItem(LanguageManager.get("menu_item.kick"));
-                        MenuItem promote = new MenuItem(LanguageManager.get("menu_item.promote"));
-
-                        kick.setOnAction(e -> {
-                            //TODO
-                            playerInfo.setType("kickPlayer");
-                            this.virtualServer.sendMessage(playerInfo);
-                        });
-
-                        promote.setOnAction(e -> {
-                            //TODO
-                            playerInfo.setType("promotePlayer");
-                            this.virtualServer.sendMessage(playerInfo);
-                        });
-
-                        contextMenu.getItems().addAll(kick, promote);
-
-                        contextMenu.show(dotsMenu, event.getScreenX(), event.getScreenY());
-                    });
-
-                    HBox.setMargin(dotsMenu, new Insets(0, 27, 0, 0));
-                    playerBox.getChildren().add(dotsMenu);
+                    playerBox.getChildren().add(dotsButton);
                 }
             }
 
-            playerList.setSpacing(10);
-            playerList.setPadding(new Insets(10, 5, 10, 5));
-
             playerList.getChildren().add(playerBox);
         }
+    }
+
+    private Button getDotsButton(PlayerInfo playerInfo) {
+
+        ImageView dotsImage = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/dotsMenuIcon.png"))));
+        dotsImage.setFitHeight(15);
+        dotsImage.setFitWidth(15);
+        dotsImage.setPreserveRatio(true);
+
+        Button dotsButton = new Button("", dotsImage);
+        dotsButton.setPrefSize(18, 18);
+        dotsButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        dotsButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        dotsButton.setFocusTraversable(false);
+        dotsButton.setCursor(Cursor.HAND);
+        dotsButton.setStyle("-fx-background-color: transparent");
+
+        dotsButton.setOnAction(_ -> {
+
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem promote = new MenuItem(LanguageManager.get("menu_item.promote"));
+            MenuItem kick = new MenuItem(LanguageManager.get("menu_item.kick"));
+
+            promote.setOnAction(_ -> {
+                playerInfo.setType("promotePlayer");
+                this.virtualServer.sendMessage(playerInfo);
+            });
+            kick.setOnAction(_ -> {
+                playerInfo.setType("kickPlayer");
+                this.virtualServer.sendMessage(playerInfo);
+            });
+
+            contextMenu.getItems().addAll(promote, kick);
+
+            contextMenu.show(dotsButton, Side.BOTTOM, 0, 0);
+        });
+        HBox.setMargin(dotsButton, new Insets(0, 16, 0, 0));
+        return dotsButton;
     }
 
     @FXML

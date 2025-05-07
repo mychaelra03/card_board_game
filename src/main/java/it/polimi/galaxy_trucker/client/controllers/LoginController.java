@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
-import it.polimi.galaxy_trucker.common.messages.LobbyJoinResponse;
+import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import javafx.animation.PauseTransition;
@@ -18,7 +19,6 @@ import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Random;
 
@@ -177,7 +177,7 @@ public class LoginController implements VirtualServerAware {
             virtualServer.attemptConnection(hostName, portNumber);
         } catch (IOException e) {
             //showError(errorServerPort, LanguageManager.get("error.invalid_connection"));
-            Popup.newAlertPopup("title.invalid_connection", "description.invalid_connection").show(rootPane, mainContentPane);
+            Popup.newAlertPopup("title.no_server_found", "description.no_server_found").show(rootPane, mainContentPane);
             return;
         }
         this.virtualServer.sendMessage(playerInfo);
@@ -193,18 +193,22 @@ public class LoginController implements VirtualServerAware {
         String type = mapper.readTree(cmd).get("type").asText();
 
         switch (type) {
-            case "lobbyJoinResponse":
+            case "lobbyJoinResponse" -> {
                 LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
+
                 switch (joinResponse.getJoinStatus()) {
                     case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
-                    case LOBBY_FULL -> showError(errorUsername, LanguageManager.get("error.full_lobby"));
+                    case LOBBY_FULL ->
+                            Popup.newAlertPopup("title.unable_to_connect", "description.full_lobby").show(rootPane, mainContentPane);
                     case NAME_TAKEN -> {
-                        String errorMsg = MessageFormat.format(LanguageManager.get("error.username_used"), ClientSession.getUsername().toLowerCase());
-                        showError(errorUsername, errorMsg);
+                        String usedName = ClientSession.getUsername().toLowerCase();
+                        Popup.newAlertPopup("title.unable_to_connect", "description.username_used", usedName).show(rootPane, mainContentPane);
                     }
-                    case GAME_STARTED -> showError(errorUsername, LanguageManager.get("error.game_started"));
+                    case GAME_STARTED ->
+                            Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show(rootPane, mainContentPane);
                 }
-                break;
+            }
+            default -> Logger.logError("Unrecognized command: " + type);
         }
     }
 }

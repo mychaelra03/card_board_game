@@ -10,8 +10,6 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.util.Arrays;
-
 public class SettingsController implements PopupAware {
 
     private Popup popup;
@@ -19,13 +17,14 @@ public class SettingsController implements PopupAware {
     @FXML private Label languageLabel;
     @FXML private Button languageButton;
     @FXML private Label languageNoteLabel;
+
     @FXML private Button mainMenuButton;
     @FXML private Button closeGameButton;
 
     private boolean isMainMenu = false;
 
     @Override
-    public void setPopup(Popup popup) {
+    public void bindPopup(Popup popup) {
         this.popup = popup;
     }
 
@@ -56,12 +55,12 @@ public class SettingsController implements PopupAware {
     @FXML
     public void onClose() {
         if (popup != null) {
-            popup.close();
+            popup.playClosingAnimation();
         }
     }
 
     @Override
-    public void initializeWithArguments(Object... args) {
+    public void initialize(Object... args) {
         if(args == null || args.length == 0) return;
 
         if(args[0] instanceof Boolean arg) {

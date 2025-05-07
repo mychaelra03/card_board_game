@@ -1,14 +1,21 @@
 package it.polimi.galaxy_trucker.client.controllers.shipBuilding;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.*;
+import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,128 +25,98 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.*;
 
-
-public class ShipBuildingController {
-
+public class ShipBuildingController implements VirtualServerAware {
 
     public static final String TILE_PATH = "/textures/tiles/";
     public static final double TILE_SIZE = 83.5;
 
-    protected static ImageView selectedImageView = null;
-    protected static ImageView placedImageView = null;
+    protected static ImageView selectedTile = null;
 
-    protected static Set<Rectangle> validSpots = new HashSet<>();
+    protected static Set<StackPane> validCells = new HashSet<>();
 
-    protected static int lastPlacedTileColumn = 3;
-    protected static int lastPlacedTileRow = 2;
+    private final VirtualServer virtualServer = VirtualServer.getInstance();
 
 
     @FXML private StackPane rootPane;
     @FXML private AnchorPane mainContentPane;
 
-    @FXML private Label settingsLabel;
+    @FXML private ImageView shipBoardImage;
+
+    @FXML private ImageView cardPile0;
+    @FXML private ImageView cardPile1;
+    @FXML private ImageView cardPile2;
+
+    @FXML private Rectangle selectedTileSlot;
+
+    @FXML private Button settingsButton;
     @FXML private GridPane gridPane;
     @FXML private Button rightButton,leftButton;
 
     public static AnimationHandler animationHandler;
 
-    List<ImageView> imageViews = new ArrayList<>();
+    private final Map<Integer, ImageView> tileMap = new HashMap<>();
+    private final Map<Integer, ImageView> cardsMap = new HashMap<>();
+
+    private TileManager tileManager;
 
     public void initialize() {
 
         animationHandler = new AnimationHandler(mainContentPane);
-        TileManager tileManager = new TileManager(gridPane);
+        tileManager = new TileManager(mainContentPane, gridPane, selectedTileSlot);
 
-        tileManager.updateAdjacentSockets(lastPlacedTileColumn, lastPlacedTileRow);
+        cardsMap.put(0, cardPile0);
+        cardsMap.put(1, cardPile1);
+        cardsMap.put(2, cardPile2);
+
+        Image backTexture = new Image(Objects.requireNonNull(getClass().getResource(TILE_PATH + "tile_back.png")).toExternalForm());
 
         // initialize covered tiles
+        List<ImageView> tileList = new ArrayList<>();
         for(int i = 1; i<151; i++) {
 
-            Image image = new Image(Objects.requireNonNull(getClass().getResource(TILE_PATH + "tile_back.png")).toExternalForm());
-
-            ImageView imageView = new ImageView();
-            imageView.setId(String.valueOf(i));
-            imageView.setImage(image);
-            imageView.setFitWidth(TILE_SIZE);
-            imageView.setFitHeight(TILE_SIZE);
-            imageView.setLayoutX((Math.random() * 588) + 712);
-            imageView.setLayoutY((Math.random() * 530)+180);
-            imageView.setRotate(Math.random() * 180);
-            imageView.setCursor(Cursor.HAND);
+            ImageView tile = new ImageView();
+            tile.setId(String.valueOf(i));
+            tile.setImage(backTexture);
+            tile.setFitWidth(TILE_SIZE);
+            tile.setFitHeight(TILE_SIZE);
+            tile.setCursor(Cursor.HAND);
+            tile.setLayoutX((Math.random() * 588) + 712);
+            tile.setLayoutY((Math.random() * 530) + 180);
+            tile.setTranslateX(1500 - tile.getLayoutX() * .7);
+            tile.setTranslateY(100 - tile.getLayoutY() * .7);
+            tile.setScaleX(1.5);
+            tile.setScaleY(1.5);
+            tile.setOpacity(0.4);
 
             DropShadow dropShadow = new DropShadow();
             dropShadow.setColor(new Color(.2, .2, .2, .8));
             dropShadow.setWidth(40);
             dropShadow.setHeight(40);
-            dropShadow.setRadius(19.5);
+            dropShadow.setRadius(20);
+            tile.setEffect(dropShadow);
 
-            imageView.setEffect(dropShadow);
+            tileList.add(tile);
+            tileMap.put(i, tile);
 
-
-            imageViews.add(imageView);
-
-            tileManager.enableEvents(imageView);
+            tileManager.enableEvents(tile);
         }
-        Collections.shuffle(imageViews);
-        mainContentPane.getChildren().addAll(imageViews);
+        Collections.shuffle(tileList);
 
+        for(int i = 0; i < tileList.size(); i++) {
+            ImageView tile = tileList.get(i);
+            animationHandler.playTileReturn(tile, i * 20);
+        }
+        mainContentPane.getChildren().addAll(tileList);
 
         // initialize tiles sockets on board
-        for (Node node : gridPane.getChildren()) {
-            if (node instanceof Rectangle rectangle) {
-                node.setOnMouseClicked(_ -> {
-                    try {
-                        if (!validSpots.contains(rectangle)) return;
 
-                        if (selectedImageView != null || !placedImageView.localToScene(placedImageView.getBoundsInLocal()).intersects(rectangle.localToScene(rectangle.getBoundsInLocal()))) {
-                            // "!= null" to avoid animation errors, and avoid interactions when clicking the first time with no tiles in the focus spot
-
-                            lastPlacedTileColumn = GridPane.getColumnIndex(rectangle) != null ? GridPane.getColumnIndex(rectangle) : 0;
-                            lastPlacedTileRow = GridPane.getRowIndex(rectangle) != null ? GridPane.getRowIndex(rectangle) : 0;
-
-                            Bounds boundsInScene = rectangle.localToScene(rectangle.getBoundsInLocal());
-                            double rectangleX = boundsInScene.getMinX() - mainContentPane.getLayoutX();
-                            double rectangleY = boundsInScene.getMinY() - mainContentPane.getLayoutY();
-
-                            // moving tile from Focus spot to the cardboard socket
-                            if (selectedImageView != null) {
-                                animationHandler.animateImageToPosition(selectedImageView, rectangleX, rectangleY, 1, 0, 200);
-                                placedImageView = selectedImageView;
-
-                                animationHandler.animateShadowEffect(placedImageView);
-
-                                placedImageView.setMouseTransparent(true);
-                                selectedImageView = null;
-
-                            } else {
-                                animationHandler.animateImageToPosition(placedImageView, rectangleX, rectangleY, 1, 0, 100);
-                            }
-
-
-                        } else {
-                            // allowing to remove the tile from cardboard socket and positioning it in the Focus spot
-                            animationHandler.animateImageToPosition(placedImageView, 312, 637, 1.7, 0, 500);
-
-                            selectedImageView = placedImageView;
-                            lastPlacedTileColumn = 0;
-                            lastPlacedTileRow = 0;
-                            placedImageView.setEffect(null);
-                            placedImageView.setMouseTransparent(false);
-                            placedImageView = null;
-                        }
-                    } catch (Exception e) {
-                        Logger.logError(e.getMessage());
-                    }
-                });
-            }
-        }
 
         rightButton.setOnAction(this::onClickTurnTileRight);
-
         leftButton.setOnAction(this::onClickTurnTileLeft);
 
-        settingsLabel.setCursor(Cursor.HAND);
-        settingsLabel.setOnMouseClicked(_ -> Popup.newSettingsPopup().show(rootPane, mainContentPane));
+        selectedTileSlot.setOnMouseReleased(_ -> tileManager.moveToSelectedSlot());
+
+        settingsButton.setOnAction(_ -> Popup.newSettingsPopup().show(rootPane, mainContentPane));
 
         Image image = new Image(Objects.requireNonNull(getClass().getResource(TILE_PATH + "tile_starter_cabin_green.png")).toExternalForm());
         ImageView imageView = new ImageView(image);
@@ -148,13 +125,137 @@ public class ShipBuildingController {
         gridPane.add(imageView, 3, 2);
     }
 
+
+    @Override
+    public void updateCallBack() {
+        virtualServer.setCallBack(cmd -> {
+            ObjectMapper mapper = new ObjectMapper();
+            String type = mapper.readTree(cmd).get("type").asText();
+            switch (type) {
+
+                case "gameState" -> {
+                    GameStateMessage gameStateMessage = mapper.readValue(cmd, GameStateMessage.class);
+
+                    if (gameStateMessage.getGameState() != GameModel.GameState.APPLYING_CARDS) throw new IllegalStateException("Invalid game state");
+                    Platform.runLater(() -> SceneSwitch.switchScene("ApplyingCardsScene"));
+                    return;
+                }
+            }
+            safeUpdateView(cmd);
+        });
+    }
+
+    private void safeUpdateView(String cmd) {
+        Platform.runLater(() -> {
+            try {
+                updateView(cmd);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private void updateView(String cmd) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(cmd);
+
+        String type = node.get("type").asText();
+
+        switch (type) {
+
+            case "boardType" -> {
+
+                BoardTypeMessage boardTypeMessage = mapper.readValue(cmd, BoardTypeMessage.class);
+                BoardType shipType = boardTypeMessage.getBoardType();
+
+                String boardPath = switch (shipType) {
+                    case LEARNING, LEVEL_ONE -> "/textures/cardboards/shipboard_1.png";
+                    case LEVEL_TWO -> "/textures/cardboards/shipboard_2.png";
+                };
+                Image board = new Image(Objects.requireNonNull(getClass().getResourceAsStream(boardPath)));
+                shipBoardImage.setImage(board);
+
+                String pilePath = switch (shipType) {
+                    case LEARNING, LEVEL_ONE -> "/textures/cards/card_pile_level_1.png";
+                    case LEVEL_TWO -> "/textures/cards/card_pile_level_2.png";
+                };
+                Image pile = new Image(Objects.requireNonNull(getClass().getResourceAsStream(pilePath)));
+                cardPile0.setImage(pile);
+                cardPile1.setImage(pile);
+                cardPile2.setImage(pile);
+
+                tileManager.initializeGridPane(shipType);
+
+                // initialize with the center cabin tile
+                tileManager.updateAdjacentCells(3, 2);
+            }
+
+            case "tileTaken" -> {
+
+                TileTakenMessage message = mapper.readValue(cmd, TileTakenMessage.class);
+
+                boolean isSelf = message.getPlayerName().equals(ClientSession.getUsername());
+                ImageView tile = tileMap.get(message.getTileId());
+
+                if (isSelf) {
+                    tileManager.takeTile(tile);
+                } else {
+                    animationHandler.playTileTaken(tile);
+                }
+            }
+
+            case "tileReturned" -> {
+
+                TileReturnedMessage message = mapper.readValue(cmd, TileReturnedMessage.class);
+
+                int tileId = message.getTileId();
+                ImageView tile = tileMap.get(tileId);
+
+                tile.setImage(new Image(Objects.requireNonNull(getClass().getResource("/textures/tiles/tile_" + tileId + ".png")).toExternalForm()));
+
+                animationHandler.playTileReturn(tile, 0);
+            }
+
+            case "cardsTaken" -> {
+
+                CardsTakenMessage message = mapper.readValue(cmd, CardsTakenMessage.class);
+
+                animationHandler.playCardsTaken(cardsMap.get(message.getPileId()), message.getPlayerName());
+            }
+
+            case "cardsReturned" -> {
+
+                CardsReturnedMessage message = mapper.readValue(cmd, CardsReturnedMessage.class);
+
+                animationHandler.playCardsReturn(cardsMap.get(message.getPileId()), 200);
+            }
+
+            case "cards" -> {
+
+                CardsMessage message = mapper.readValue(cmd, CardsMessage.class);
+
+                Popup.newCardsPopup(message.getLevelOneCards(), message.getLevelTwoCards()).show(rootPane, mainContentPane);
+            }
+
+            default -> Logger.logError("Unrecognized command: " + type);
+        }
+    }
+
+    @FXML
+    public void onClickCardPile(Event event) {
+        tileManager.finalizeSelectedTile();
+        String pileId = ((Node) event.getSource()).getId();
+        virtualServer.sendMessage(new CardsTakenMessage(null, Integer.parseInt(pileId)));
+    }
+
     @FXML
     public void onClickTurnTileRight(Event event) {
-        animationHandler.rotateTile(selectedImageView,placedImageView, 90);
+        animationHandler.rotateTile(selectedTile, selectedTile, 90);
     }
 
     @FXML
     public void onClickTurnTileLeft(Event event) {
-        animationHandler.rotateTile(selectedImageView,placedImageView, -90);
+        animationHandler.rotateTile(selectedTile, selectedTile, -90);
     }
 }

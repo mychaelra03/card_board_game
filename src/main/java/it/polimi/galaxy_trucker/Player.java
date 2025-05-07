@@ -98,6 +98,15 @@ public class Player {
 
     // DELEGATE METHODS
 
+    public void setTile(int x, int y, int tileId, int rotation) {
+        shipBoard.setTile(x, y, tileId, rotation);
+    }
+    public int popPrivateTile(int index) {
+        return shipBoard.popPrivateTile(index);
+    }
+    public void pushPrivateTile(int index, int tileId) {
+        shipBoard.pushPrivateTile(index, tileId);
+    }
     public int getTotalTileCount() {
         return shipBoard.getTotalTileCount();
     }

@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class SceneSwitch {

@@ -27,4 +27,10 @@ module it.polimi.galaxy_trucker {
     opens it.polimi.galaxy_trucker.client.popups to javafx.fxml;
     exports it.polimi.galaxy_trucker.common.messages;
     opens it.polimi.galaxy_trucker.common.messages to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.common.messages.shipBuilding;
+    opens it.polimi.galaxy_trucker.common.messages.shipBuilding to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.common.messages.lobby;
+    opens it.polimi.galaxy_trucker.common.messages.lobby to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.common.messages.login;
+    opens it.polimi.galaxy_trucker.common.messages.login to com.fasterxml.jackson.databind;
 }

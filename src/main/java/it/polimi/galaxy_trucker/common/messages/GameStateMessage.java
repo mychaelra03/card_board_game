@@ -7,7 +7,7 @@ import it.polimi.galaxy_trucker.GameModel;
 public class GameStateMessage implements GameMessage {
     private GameModel.GameState gameState;
 
-   public GameStateMessage() {}
+    public GameStateMessage() {}
 
     public GameStateMessage(GameModel.GameState gameState) {
        this.gameState = gameState;

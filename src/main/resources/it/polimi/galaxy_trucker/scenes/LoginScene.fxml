@@ -12,8 +12,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane fx:id="rootPane" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.LoginController">
-   <AnchorPane fx:id="mainContentPane" prefHeight="648.0" prefWidth="764.0" stylesheets="@../css/login-scene.css">
+<StackPane fx:id="rootPane" prefHeight="648.0" prefWidth="764.0" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.LoginController">
+   <AnchorPane fx:id="mainContentPane" stylesheets="@../css/login-scene.css">
       <Label layoutX="19.0" layoutY="224.0" text="%label.username" textFill="WHITE" AnchorPane.bottomAnchor="400.0" AnchorPane.leftAnchor="25.0" />
 
       <TextField fx:id="usernameTextField" layoutX="21.0" layoutY="252.0" prefHeight="31.0" prefWidth="726.0" promptText="%text_field.username" styleClass="textField" AnchorPane.bottomAnchor="365.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="22.0" />

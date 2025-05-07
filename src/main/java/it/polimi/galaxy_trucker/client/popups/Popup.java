@@ -26,6 +26,9 @@ public class Popup {
     private StackPane rootPane;
     private AnchorPane mainContentPane;
 
+    private Object controller = null;
+    private boolean isClosing = false;
+
     public Popup(Node content, double width, double height) {
 
         StackPane popup = new StackPane(content);
@@ -44,10 +47,10 @@ public class Popup {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/polimi/galaxy_trucker/popups/" + fxmlFile + ".fxml"), LanguageManager.getBundle());
             Node content = loader.load();
 
-            Object controller = loader.getController();
-            if (controller instanceof PopupAware) {
-                ((PopupAware)controller).setPopup(this);
-                ((PopupAware)controller).initializeWithArguments(args);
+            controller = loader.getController();
+            if (controller instanceof PopupAware controllerAware) {
+                controllerAware.bindPopup(this);
+                controllerAware.initialize(args);
             }
 
             this.content = content;
@@ -84,7 +87,17 @@ public class Popup {
         });
     }
 
-    public void close() {
+    private void close() {
+        if(isClosing) return;
+        isClosing = true;
+
+        if (controller instanceof PopupAware controllerAware) {
+            controllerAware.onClose();
+        }
+        else playClosingAnimation();
+    }
+
+    public void playClosingAnimation() {
         if (rootPane != null && mainContentPane != null) {
             ParallelTransition closingAnimation = getClosingAnimation();
 
@@ -106,12 +119,20 @@ public class Popup {
         return new Popup("SettingsPopup");
     }
 
-    public static Popup newAlertPopup(String title, String description, String buttonText) {
-        return new Popup("AlertPopup", title, description, buttonText);
+    public static Popup newAlertPopup(String title, String description, String descriptionArgs) {
+        return new Popup("AlertPopup", title, description, descriptionArgs);
     }
     public static Popup newAlertPopup(String title, String description) {
         return new Popup("AlertPopup", title, description);
     }
+
+    public static Popup newCardsPopup(int[] levelOneCards, int[] levelTwoCards) {
+        return new Popup("CardsPopup", levelOneCards, levelTwoCards);
+    }
+    public static Popup newCardsPopup(int[] levelOneCards) {
+        return new Popup("CardsPopup", levelOneCards);
+    }
+
 
     private ParallelTransition getOpeningAnimation() {
         FadeTransition fadeContent = new FadeTransition(Duration.millis(200), content);

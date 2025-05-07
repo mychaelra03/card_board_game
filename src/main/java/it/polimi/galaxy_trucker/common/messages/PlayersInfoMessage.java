@@ -11,7 +11,7 @@ public class PlayersInfoMessage implements GameMessage {
     private String type = "playersInfo";
 
 
-   public PlayersInfoMessage() {}
+    public PlayersInfoMessage() {}
 
     public PlayersInfoMessage(List<PlayerInfo> players, String username) {
         this.players = players;

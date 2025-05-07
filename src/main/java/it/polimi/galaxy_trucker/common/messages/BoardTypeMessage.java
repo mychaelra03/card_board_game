@@ -7,7 +7,7 @@ import it.polimi.galaxy_trucker.BoardType;
 public class BoardTypeMessage implements GameMessage {
     private BoardType boardType;
 
-   public BoardTypeMessage() {}
+    public BoardTypeMessage() {}
 
     public BoardTypeMessage(BoardType boardType) {
        this.boardType = boardType;

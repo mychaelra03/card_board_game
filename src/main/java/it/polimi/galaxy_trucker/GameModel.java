@@ -1,9 +1,14 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.common.messages.BoardSelectMessage;
-import it.polimi.galaxy_trucker.common.messages.LobbyJoinResponse;
+import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
+import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
 import it.polimi.galaxy_trucker.server.events.*;
+import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsReturnedEvent;
+import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsTakenEvent;
+import it.polimi.galaxy_trucker.server.events.shipBuilding.TileReturnedEvent;
+import it.polimi.galaxy_trucker.server.events.shipBuilding.TileTakenEvent;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 
 import java.util.*;
@@ -16,6 +21,10 @@ public class GameModel {
     private BoardType boardType;
     private final List<Player> players;
     private List<Card> deck;
+    private List<List<Card>> cardPiles;
+
+    private final Set<Integer> availableTiles;
+    private final Set<Integer> availableCardPiles;
 
     public enum GameState {
         WAITING_FOR_PLAYERS,
@@ -28,6 +37,14 @@ public class GameModel {
     public GameModel() {
         this.boardType = BoardType.LEVEL_TWO;
         this.players = new ArrayList<>();
+        this.availableTiles = new HashSet<>();
+        for (int i = 0; i < 152; i++) {
+            availableTiles.add(i);
+        }
+        this.availableCardPiles = new HashSet<>();
+        for (int i = 0; i < 3; i++) {
+            availableCardPiles.add(i);
+        }
         this.deck = new ArrayList<>();
     }
 
@@ -54,9 +71,14 @@ public class GameModel {
 
     public void generateDeck() {
         this.deck = CardFactory.getInstance().generateDeck(boardType);
+        splitDeckIntoPiles();
     }
     public List<Card> getDeck() {
         return deck;
+    }
+    public List<Card> getPile(int pileId) {
+        if(pileId < 0 || pileId >= cardPiles.size()) throw new IllegalArgumentException("pileId must be between 0 and " + (cardPiles.size() - 1));
+        return cardPiles.get(pileId);
     }
 
     public LobbyJoinResponse.JoinStatus canAddPlayer(Player player) {
@@ -100,7 +122,6 @@ public class GameModel {
         players.remove(player);
         if(player.isAdmin() && !players.isEmpty()) players.getFirst().setAdmin(true);
 
-        eventDispatcher.fireEvent(new PlayerKickedEvent(getPlayerInfo(player)));
         eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
     }
 
@@ -166,6 +187,66 @@ public class GameModel {
     }
 
 
+    public boolean TryTakeTile(String playerName, int id) {
+        synchronized (availableTiles) {
+            if (!availableTiles.contains(id)) return false;
+            availableTiles.remove(id);
+            eventDispatcher.fireEvent(new TileTakenEvent(playerName, id));
+            return true;
+        }
+    }
+    public void returnTile(int id) {
+        if(id < 0 || id >= 152) {
+            Logger.logError("Tile id " + id + " is out of range.");
+            return;
+        }
+        synchronized (availableTiles) {
+            if (availableTiles.contains(id)) throw new IllegalStateException("Tile " + id + " was already on the board.");
+            availableTiles.add(id);
+            eventDispatcher.fireEvent(new TileReturnedEvent(id));
+        }
+    }
+    public boolean tryTakeCardPile(String playerName, int id) {
+        synchronized (availableCardPiles) {
+            if (!availableCardPiles.contains(id)) return false;
+            availableCardPiles.remove(id);
+            eventDispatcher.fireEvent(new CardsTakenEvent(playerName, id));
+            return true;
+        }
+    }
+    public void returnCardPile(int id) {
+        if(id < 0 || id >= 3) {
+            Logger.logError("Card pile id " + id + " is out of range.");
+            return;
+        }
+        synchronized (availableCardPiles) {
+            if (availableCardPiles.contains(id)) throw new IllegalStateException("Tile " + id + " was already on the board.");
+            availableCardPiles.add(id);
+            eventDispatcher.fireEvent(new CardsReturnedEvent(id));
+        }
+    }
+    public void splitDeckIntoPiles() {
+        if (deck.size() % 4 != 0) {
+            throw new IllegalArgumentException("Deck size must be divisible by 4");
+        }
+        this.cardPiles = List.of(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
+
+        int pileSize = deck.size() / 4;
+
+        for (int i = 0; i < pileSize; i++) {
+            for (int pile = 0; pile < 4; pile++) {
+                int index = i * 4 + pile;
+                cardPiles.get(pile).add(deck.get(index));
+            }
+        }
+    }
+
+
     public void setPlayerPosition(Player player, int position) {
         if(player.getState() == ELIMINATED) throw new IllegalStateException("Player " + player.getName() + " is eliminated.");
         if(isPositionOccupied(player, position)) throw new IllegalArgumentException("Position is occupied");
@@ -207,9 +288,14 @@ public class GameModel {
     protected final void setGameState(GameState state) {
         this.gameState = state;
         switch(state) {
-            case BUILDING_SHIPS -> players.forEach(player -> player.setState(BUILDING_SHIP));
+            case BUILDING_SHIPS -> {
+                generateDeck();
+                players.forEach(player -> {
+                    player.setState(BUILDING_SHIP);
+                    player.setNewShipBoard(boardType);
+                });
+            }
         }
-
         eventDispatcher.fireEvent(new GameStateUpdateEvent(state));
     }
     protected final void verifyGameState(GameState expectedState) {
@@ -217,6 +303,7 @@ public class GameModel {
             throw new IllegalStateException("Expected state: " + expectedState + ". Current state: " + gameState + ".");
         }
     }
+
     private List<PlayerInfo> getPlayersInfo(){
         return players.stream()
                 .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor().toString(),p.isAdmin(),p.isReady()))

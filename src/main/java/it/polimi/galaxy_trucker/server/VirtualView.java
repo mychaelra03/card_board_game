@@ -38,25 +38,35 @@ public class VirtualView extends Thread {
         this.out.println(json);
     }
 
-    public void run(){
-        String line;
+    public void run() {
         try {
-            while((line = in.readLine()) != null ) {
-                Logger.logDebug("RECEIVED: " + line);
-                this.controller.processCmd(this, line);
+            while (true) {
+                String msg = in.readLine();
+                Logger.logDebug("RECEIVED: " + msg);
+                if (msg == null) {
+                    Logger.logInfo("Client disconnected.");
+                    break;
+                }
+                this.controller.processCmd(this, msg);
             }
-            Logger.logInfo("Client disconnected");
+
         } catch (SocketException e) {
             Logger.logWarning("Client disconnected: " + e.getMessage());
         } catch (IOException e) {
-            Logger.logError("Error reading from client: " + e.getMessage());
+            if ("Stream closed".equals(e.getMessage())) {
+                Logger.logInfo("Stream closed locally.");
+            } else {
+                Logger.logError("IOException: " + e.getMessage());
+            }
         } finally {
-            this.controller.removeClient(this);
             close();
         }
     }
 
     public void close() {
+
+        this.controller.removeClient(this);
+
         try {
             if (clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();
