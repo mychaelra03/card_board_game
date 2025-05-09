@@ -5,6 +5,24 @@
 #mainContentPane {
     /*-fx-background-color: #424a5e;*/
     -fx-background-color: #c5dced;
+    -fx-background-image: url('../textures/backgrounds/background.png');
+    -fx-background-size: auto;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center bottom;
+}
+
+.label {
+    -fx-text-fill: white;
+}
+
+
+.region {
+    -fx-opacity: 0.5;
+    -fx-border-color: white;
+    -fx-background-color: #560bad;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
 }
 
 .button {
@@ -12,8 +30,21 @@
     -fx-background-color: gold;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
 }
 
 .button:hover {
     -fx-background-color: #ffe691;
+}
+
+.textField {
+    -fx-opacity: 0.5;
+    -fx-background-color: #560bad;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
 }

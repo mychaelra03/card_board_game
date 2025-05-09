@@ -7,89 +7,77 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.LobbyController">
-   <AnchorPane fx:id="mainContentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0">
-      <StackPane layoutX="410.0" layoutY="42.0" prefHeight="471.0" prefWidth="727.0" style="-fx-border-color: black; -fx-border-radius: 10;">
-         <ImageView fx:id="boardImage" fitHeight="400.0" fitWidth="551.0" preserveRatio="true" StackPane.alignment="CENTER">
-            <Image url="@../../textures/cardboards/showcase_2.png" />
-            <StackPane.margin>
-               <Insets top="30.0" />
-            </StackPane.margin>
-         </ImageView>
-         <Label prefHeight="50.0" prefWidth="430.0" style="-fx-font-weight: bold;" text="%label.selected_board" StackPane.alignment="TOP_LEFT">
+   <children>
+      <AnchorPane fx:id="mainContentPane" prefHeight="720.0" prefWidth="911.0" stylesheets="@../../css/lobby-scene.css">
+         <stylesheets>
+            <URL value="@../../css/default.css" />
+            <URL value="@../../css/lobby-scene.css" />
+         </stylesheets>
+         <Region layoutX="264.0" layoutY="28.0" prefHeight="359.0" prefWidth="624.0" styleClass="region" />
+      
+         <!-- Color selection -->
+         <!--<VBox layoutX="620.0" layoutY="469.0" spacing="10" AnchorPane.leftAnchor="620.0" AnchorPane.topAnchor="469.0">
+            <Label text="Color:" />
+            <RadioButton fx:id="redButton" text="Red" />
+            <RadioButton fx:id="blueButton" text="Blue" />
+            <RadioButton fx:id="greenButton" text="Green" />
+            <RadioButton fx:id="yellowButton" text="Yellow" />
+         </VBox>-->
+      
+         <!-- Ready Button -->
+         <Button fx:id="readyButton" layoutX="579.0" layoutY="622.0" prefHeight="79.0" prefWidth="316.0" text="%button.ready" />
+         <Button fx:id="prevMapButton" layoutX="273.0" layoutY="195.0" text="←" />
+         <ImageView fx:id="boardImage" fitHeight="300" fitWidth="500" layoutX="329.0" layoutY="58.0" />
+         <Button fx:id="nextMapButton" layoutX="839.0" layoutY="195.0" text="→" />
+         <Region layoutX="34.0" layoutY="405.0" prefHeight="247.0" prefWidth="518.0" styleClass="region" />
+         <TextField fx:id="chatTextField" layoutX="34.0" layoutY="662.0" onKeyPressed="#onEnterKeyPressed" prefHeight="28.0" prefWidth="469.0" promptText="Type a message..." />
+         <Region layoutX="23.0" layoutY="33.0" prefHeight="352.0" prefWidth="218.0" styleClass="region" />
+         <Label layoutX="38.0" layoutY="50.0" text="Players logged:">
             <font>
-               <Font size="20.0" />
+               <Font size="14.0" />
             </font>
-            <StackPane.margin>
-               <Insets left="70.0" top="10.0" />
-            </StackPane.margin>
          </Label>
-         <Label fx:id="boardName" alignment="CENTER" prefHeight="50.0" prefWidth="430.0" style="-fx-font-weight: bold;" textFill="WHITE" StackPane.alignment="BOTTOM_RIGHT">
-            <font>
-               <Font size="20.0" />
-            </font>
-            <effect>
-               <DropShadow blurType="TWO_PASS_BOX" height="50.0" radius="24.5" spread="0.5" width="50.0" />
-            </effect>
-            <StackPane.margin>
-               <Insets bottom="160.0" right="15.0" />
-            </StackPane.margin>
-         </Label>
-         <Button fx:id="prevMapButton" alignment="CENTER" mnemonicParsing="false" styleClass="board-buttons" text="&lt;" visible="false" StackPane.alignment="CENTER_LEFT">
-            <StackPane.margin>
-               <Insets left="15.0" />
-            </StackPane.margin>
+         <Label fx:id="readyCounter" alignment="CENTER" prefHeight="40.0" prefWidth="100.0" text="0 / 4" textAlignment="CENTER" AnchorPane.bottomAnchor="110.0" AnchorPane.rightAnchor="30.0" />
+         <Button fx:id="leftButton1" layoutX="508.0" layoutY="662.0" prefHeight="26.0" prefWidth="43.0" text="↑" />
+         <Label fx:id="playerCounter" alignment="CENTER_RIGHT" layoutX="176.0" layoutY="349.0" prefHeight="17.0" prefWidth="50.0" text="0 / 4" textFill="WHITE" />
+         <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" layoutX="189.0" layoutY="35.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;">
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+            <graphic>
+               <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@../../textures/icons/settingsIcon2.png" />
+                  </image>
+               </ImageView>
+            </graphic>
          </Button>
-         <Button fx:id="nextMapButton" alignment="CENTER" mnemonicParsing="false" styleClass="board-buttons" text="&gt;" textAlignment="CENTER" visible="false" StackPane.alignment="CENTER_RIGHT">
-            <StackPane.margin>
-               <Insets right="15.0" />
-            </StackPane.margin>
-         </Button>
-      </StackPane>
-      <VBox fx:id="playerList" layoutX="10.0" layoutY="42.0" prefHeight="300.0" prefWidth="214.0" spacing="10.0" style="-fx-border-color: black; -fx-border-radius: 5;" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="42.0">
-         <padding>
-            <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
-         </padding></VBox>
-      <VBox alignment="BOTTOM_LEFT" layoutX="61.0" layoutY="485.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="4.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0">
-         <ScrollPane fx:id="chatScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="220.0" prefWidth="400.0" style="-fx-border-color: gray; -fx-border-radius: 5; -fx-background-color: transparent;">
-            <VBox fx:id="chatVbox" spacing="2">
+         <Label fx:id="boardName" layoutX="720.0" layoutY="282.0" text="Default" />
+         <VBox fx:id="playerList" layoutX="41.0" layoutY="95.0" prefHeight="247.0" prefWidth="183.0">
+            <padding>
+               <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+            </padding>
+         </VBox>
+
+         <ScrollPane fx:id="chatScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" layoutX="48.0" layoutY="419.0" prefHeight="220.0" prefWidth="490.0" style="-fx-border-color: gray; -fx-border-radius: 5; -fx-background-color: transparent;" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="48.0">
+            <VBox fx:id="chatVbox" spacing="2" style="-fx-background-color: transparent;">
                <padding>
                   <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
-               </padding></VBox>
+               </padding>
+            </VBox>
             <VBox.margin>
                <Insets />
             </VBox.margin>
          </ScrollPane>
-         <TextField fx:id="chatTextField" onKeyPressed="#onEnterKeyPressed" prefHeight="28.0" promptText="%text_field.send_message" style="-fx-background-color: lightgrey; -fx-background-radius: 10;">
-            <cursor>
-               <Cursor fx:constant="TEXT" />
-            </cursor>
-         </TextField>
-      </VBox>
-      <Button fx:id="settingsButton" alignment="CENTER" cancelButton="true" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" layoutX="327.0" layoutY="83.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;" AnchorPane.leftAnchor="235.0" AnchorPane.topAnchor="42.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-         <graphic>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../../textures/icons/settingsIcon2.png" />
-            </ImageView>
-         </graphic>
-      </Button>
-      <Label fx:id="readyCounter" alignment="CENTER" prefHeight="40.0" prefWidth="100.0" text="0 / 4" textAlignment="CENTER" AnchorPane.bottomAnchor="110.0" AnchorPane.rightAnchor="30.0" />
-      <Button fx:id="readyButton" layoutX="1036.0" layoutY="734.0" mnemonicParsing="false" prefHeight="107.0" prefWidth="318.0" text="%button.ready" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
-      <Label fx:id="playerCounter" style="-fx-font-weight: bold;" text="0 / 4" AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="315.0" />
-      <stylesheets>
-         <URL value="@../../css/default.css" />
-         <URL value="@../../css/lobby-scene.css" />
-      </stylesheets>
-   </AnchorPane>
+      </AnchorPane>
+   </children>
 </StackPane>

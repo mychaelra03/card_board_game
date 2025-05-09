@@ -15,15 +15,7 @@
     -fx-background-radius: 10px;
 }
 
-.textField {
-    -fx-opacity: 0.5;
-    -fx-background-color: #560bad;
-    -fx-text-fill: white;
-    -fx-border-color: white;
-    -fx-border-width: 1px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-}
+
 
 .button {
     -fx-background-radius: 10px;
