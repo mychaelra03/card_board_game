@@ -10,13 +10,11 @@ import java.util.function.Predicate;
 public class ShipBoard {
 
     private final Tile[][] tiles;
-    private final Integer[] privateTiles;
     private final BoardType shipType;
     private int removedTiles;
 
     public ShipBoard(BoardType shipType) {
         this.tiles = new Tile[5][7];
-        this.privateTiles = new Integer[2];
         this.shipType = shipType;
         initializeShip();
         removedTiles = 0;
@@ -29,7 +27,6 @@ public class ShipBoard {
                 tiles[i][j] = new EmptyTile();
             }
         }
-        Arrays.fill(privateTiles, null);
 
         tiles[2][3] = new StartingCabinTile();
     }
@@ -37,11 +34,11 @@ public class ShipBoard {
     public Tile[][] getTiles() {
         return tiles;
     }
-    public Integer[] getPrivateTiles() {
-        return privateTiles;
-    }
-    public int getRemovedTiles() {
+    public int getRemovedTilesCount() {
         return removedTiles;
+    }
+    public void addToRemovedTiles(int amount) {
+        removedTiles += amount;
     }
 
     public BoardType getShipType() {
@@ -51,10 +48,6 @@ public class ShipBoard {
     public Tile getTile(int x, int y) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+") is outside the ship board.");
         return tiles[y][x];
-    }
-    public Integer getPrivateTile(int index) {
-        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: "+index+".");
-        return privateTiles[index];
     }
 
     public void setTile(int x, int y, int tileId, int rotation) {
@@ -82,17 +75,6 @@ public class ShipBoard {
         // Checks if the removal of this tile left other tiles not connected to the ship.
         removedTiles++;
         checkConnectivity();
-    }
-
-    public void pushPrivateTile(int index, int tileId) {
-        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: "+index+".");
-        if(privateTiles[index] != null) throw new IllegalArgumentException("Slot occupied.");
-        privateTiles[index] = tileId;
-    }
-    public int popPrivateTile(int index) {
-        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: "+index+".");
-        if(privateTiles[index] == null) throw new IllegalArgumentException("Slot is empty.");
-        return privateTiles[index];
     }
 
     // BATTERY TILES

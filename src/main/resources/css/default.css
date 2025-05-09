@@ -1,0 +1,19 @@
+* {
+    -fx-font-family: "DynaPuff", "Sour Gummy", "Rajdhani", "Arial";
+}
+
+#mainContentPane {
+    /*-fx-background-color: #424a5e;*/
+    -fx-background-color: #c5dced;
+}
+
+.button {
+    -fx-text-fill: black;
+    -fx-background-color: gold;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+
+.button:hover {
+    -fx-background-color: #ffe691;
+}

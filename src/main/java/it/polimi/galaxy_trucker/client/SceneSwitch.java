@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.client;
 
 import it.polimi.galaxy_trucker.common.Logger;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -10,7 +9,6 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class SceneSwitch {
@@ -21,7 +19,7 @@ public class SceneSwitch {
     }
 
     public static void switchScene(String fxmlFile) {
-        URL resource = SceneSwitch.class.getResource("/it/polimi/galaxy_trucker/scenes/" + fxmlFile + ".fxml");
+        URL resource = SceneSwitch.class.getResource("/fxml/scenes/" + fxmlFile + ".fxml");
 
         Parent root;
         try {
@@ -47,9 +45,4 @@ public class SceneSwitch {
 
         if (!primaryStage.isShowing()) primaryStage.show();
     }
-
-//    public static void closeScene(Node someNodeInTheScene) {
-//        Stage stage = (Stage) someNodeInTheScene.getScene().getWindow();
-//        stage.close();
-//    }
 }

@@ -161,9 +161,9 @@ public class Controller {
             case "tileTaken" -> {
                 if(isPlayerHoldingItem(senderVirtualView)) return;
 
-                TileTakenMessage tileTakenMessage = mapper.convertValue(cmd, TileTakenMessage.class);
+                TileTakenMessage message = mapper.convertValue(cmd, TileTakenMessage.class);
 
-                int id = tileTakenMessage.getTileId();
+                int id = message.getTileId();
                 String playerName = playerMap.get(senderVirtualView).getName();
 
                 if(gameModel.TryTakeTile(playerName, id)) {
@@ -197,6 +197,32 @@ public class Controller {
 
                 tileMap.remove(senderVirtualView);
                 playerMap.get(senderVirtualView).setTile(x, y, tileId, rotation);
+            }
+
+            case "reserveTile" -> {
+                if(!tileMap.containsKey(senderVirtualView)) {
+                    Logger.logWarning("Player was not holding a tile");
+                    return;
+                }
+
+                ReserveTileMessage message = mapper.convertValue(cmd, ReserveTileMessage.class);
+
+                int tileId = tileMap.get(senderVirtualView);
+                int slotId = message.getSlotId();
+
+                tileMap.remove(senderVirtualView);
+                playerMap.get(senderVirtualView).reserveTile(tileId, slotId);
+            }
+
+            case "useReservedTile" -> {
+                if(isPlayerHoldingItem(senderVirtualView)) return;
+
+                UseReservedTileMessage message = mapper.convertValue(cmd, UseReservedTileMessage.class);
+
+                int slotId = message.getSlotId();
+                int tileId = playerMap.get(senderVirtualView).useReservedTile(slotId);
+
+                tileMap.put(senderVirtualView, tileId);
             }
 
             case "cardsTaken" -> {

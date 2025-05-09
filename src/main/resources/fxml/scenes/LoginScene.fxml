@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
@@ -13,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <StackPane fx:id="rootPane" prefHeight="648.0" prefWidth="764.0" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.LoginController">
-   <AnchorPane fx:id="mainContentPane" stylesheets="@../css/login-scene.css">
+   <AnchorPane fx:id="mainContentPane">
       <Label layoutX="19.0" layoutY="224.0" text="%label.username" textFill="WHITE" AnchorPane.bottomAnchor="400.0" AnchorPane.leftAnchor="25.0" />
 
       <TextField fx:id="usernameTextField" layoutX="21.0" layoutY="252.0" prefHeight="31.0" prefWidth="726.0" promptText="%text_field.username" styleClass="textField" AnchorPane.bottomAnchor="365.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="22.0" />
@@ -80,9 +81,13 @@
             <Cursor fx:constant="HAND" />
          </cursor></Button>
       <ImageView fitHeight="200.0" fitWidth="362.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="201.0" AnchorPane.rightAnchor="201.0" AnchorPane.topAnchor="15.0">
-         <Image url="@../../../../textures/title.png" />
+         <Image url="@../../textures/title.png" />
       </ImageView>
       <ImageView fx:id="bodyView" fitHeight="200" fitWidth="200" layoutX="456.0" layoutY="341.0" AnchorPane.bottomAnchor="105.0" AnchorPane.rightAnchor="125.0" />
       <ImageView fx:id="accessoryView" fitHeight="200" fitWidth="200.0" layoutX="456.0" layoutY="341.0" AnchorPane.bottomAnchor="105.0" AnchorPane.rightAnchor="125.0" />
+      <stylesheets>
+         <URL value="@../../css/default.css" />
+         <URL value="@../../css/login-scene.css" />
+      </stylesheets>
    </AnchorPane>
 </StackPane>

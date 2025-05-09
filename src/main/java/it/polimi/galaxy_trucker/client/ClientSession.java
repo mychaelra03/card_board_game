@@ -34,6 +34,9 @@ public class ClientSession {
     public static PlayerInfo getPlayerInfo(String username) {
         return players.get(username);
     }
+    public static PlayerInfo getPlayerInfo() {
+        return players.get(username);
+    }
     public static void updatePlayers(List<PlayerInfo> playersInfo) {
         players = playersInfo.stream().collect(Collectors.toMap(PlayerInfo::getUsername, p -> p));
     }

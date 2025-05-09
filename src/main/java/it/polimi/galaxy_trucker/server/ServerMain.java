@@ -18,7 +18,7 @@ public class ServerMain {
             portNumber = Integer.parseInt(args[0]);
         } else {
             try {
-                InputStream config = ServerMain.class.getClassLoader().getResourceAsStream("it/polimi/galaxy_trucker/public/config.json");
+                InputStream config = ServerMain.class.getClassLoader().getResourceAsStream("public/config.json");
                 if(config == null) throw new IOException("Could not find config.json");
                 portNumber = new ObjectMapper().readTree(config).get("port").asInt();
             } catch (IOException e) {

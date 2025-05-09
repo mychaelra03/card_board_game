@@ -11,7 +11,6 @@ import java.util.*;
 
 public class TileFactory {
 
-    private static final String PATH = "it/polimi/galaxy_trucker/";
     private static TileFactory instance;
     private final List<JsonNode> tilesJson;
     private final ObjectMapper mapper;
@@ -25,7 +24,7 @@ public class TileFactory {
     public static TileFactory getInstance() {
         // Retrieves the singleton instance of TileFactory.
         if(instance == null) {
-            instance = new TileFactory(PATH + "public/tiles.json");
+            instance = new TileFactory("public/tiles.json");
         }
         return instance;
     }

@@ -1,130 +1,121 @@
 package it.polimi.galaxy_trucker.client.controllers.shipBuilding;
 
 import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.VirtualServer;
-import it.polimi.galaxy_trucker.common.messages.shipBuilding.TileFixedMessage;
-import it.polimi.galaxy_trucker.common.messages.shipBuilding.TileReturnedMessage;
-import it.polimi.galaxy_trucker.common.messages.shipBuilding.TileTakenMessage;
-import javafx.geometry.Bounds;
+import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
+import javafx.event.Event;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import static it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController.*;
 
-public class TileManager    {
+public class TileManager {
 
-    public static final String TILESPATH = "/textures/tiles/";
+    TileEffectManager tileEffectManager = new TileEffectManager();
 
-    private final AnchorPane mainContentPane;
+    protected static final String TILES_PATH = "/textures/tiles/";
+    private static final double TILE_SIZE = 83.5;
+
+    private static final int TILES_AREA_MIN_X = 712;
+    private static final int TILES_AREA_MAX_X = 1300;
+    private static final int TILES_AREA_MIN_Y = 170;
+    private static final int TILES_AREA_MAX_Y = 700;
+
     private final GridPane gridPane;
-    private final Rectangle selectedTileSlot;
+    private final Rectangle focusSlot;
+    private final StackPane reservedSlot0;
+    private final StackPane reservedSlot1;
+
+    private ImageView selectedTile = null;
+    private final ImageView[] reservedTiles = new ImageView[2];
+
+    private static final Set<StackPane> validCells = new HashSet<>();
 
     private Integer gridX = null, gridY = null;
 
     private final VirtualServer virtualServer = VirtualServer.getInstance();
 
-    public TileManager(AnchorPane mainContentPane, GridPane gridPane, Rectangle selectedTileSlot) {
-        this.mainContentPane = mainContentPane;
+    public TileManager(GridPane gridPane, Rectangle focusSlot, StackPane reservedSlot0, StackPane reservedSlot1) {
         this.gridPane = gridPane;
-        this.selectedTileSlot = selectedTileSlot;
+        this.focusSlot = focusSlot;
+        this.reservedSlot0 = reservedSlot0;
+        this.reservedSlot1 = reservedSlot1;
     }
 
-    public void enableEvents (ImageView tileImage) {
+    public ImageView generateTile(int id, Image backTexture) {
+
+        ImageView tile = new ImageView(backTexture);
+        tile.setId(String.valueOf(id));
+        tile.setFitWidth(TILE_SIZE);
+        tile.setFitHeight(TILE_SIZE);
+        tile.setCursor(Cursor.HAND);
+
+        tileEffectManager.applyDropShadowEffect(tile, false);
+
+        double randomX = Math.random() * (TILES_AREA_MAX_X - TILES_AREA_MIN_X) + TILES_AREA_MIN_X;
+        double randomY = Math.random() * (TILES_AREA_MAX_Y - TILES_AREA_MIN_Y) + TILES_AREA_MIN_Y;
+        tile.setLayoutX(randomX);
+        tile.setLayoutY(randomY);
+
+        tile.setTranslateX(1500 - tile.getLayoutX() * .7);
+        tile.setTranslateY(100 - tile.getLayoutY() * .7);
+        tile.setScaleX(1.5);
+        tile.setScaleY(1.5);
+        tile.setOpacity(0.4);
 
         final double[] offsetX = new double[1];
         final double[] offsetY = new double[1];
         final double[] pressX = new double[1];
         final double[] pressY = new double[1];
 
-        tileImage.setOnMousePressed(event -> {
-            tileImage.toFront();
-            offsetX[0] = event.getSceneX() - tileImage.getLayoutX();
-            offsetY[0] = event.getSceneY() - tileImage.getLayoutY();
+        tile.setOnMousePressed(event -> {
+            tile.toFront();
+            offsetX[0] = event.getSceneX() - tile.getLayoutX();
+            offsetY[0] = event.getSceneY() - tile.getLayoutY();
             pressX[0] = event.getSceneX();
             pressY[0] = event.getSceneY();
         });
 
-        tileImage.setOnMouseDragged(event -> {
-            tileImage.setLayoutX(event.getSceneX() - offsetX[0]);
-            tileImage.setLayoutY(event.getSceneY() - offsetY[0]);
+        tile.setOnMouseDragged(event -> {
+            tile.setLayoutX(event.getSceneX() - offsetX[0]);
+            tile.setLayoutY(event.getSceneY() - offsetY[0]);
 
-            if (tileImage.getLayoutX() < 712) tileImage.setLayoutX(712);
-            if (tileImage.getLayoutX() > 1300) tileImage.setLayoutX(1300);
-            if (tileImage.getLayoutY() > 700) tileImage.setLayoutY(700);
-            if (tileImage.getLayoutY() < 170) tileImage.setLayoutY(170);
-
+            if (tile.getLayoutX() < TILES_AREA_MIN_X) tile.setLayoutX(TILES_AREA_MIN_X);
+            if (tile.getLayoutX() > TILES_AREA_MAX_X) tile.setLayoutX(TILES_AREA_MAX_X);
+            if (tile.getLayoutY() < TILES_AREA_MIN_Y) tile.setLayoutY(TILES_AREA_MIN_Y);
+            if (tile.getLayoutY() > TILES_AREA_MAX_Y) tile.setLayoutY(TILES_AREA_MAX_Y);
         });
 
-        tileImage.setOnMouseReleased(event -> {
+        tile.setOnMouseReleased(event -> {
             double deltaX = event.getSceneX() - pressX[0];
             double deltaY = event.getSceneY() - pressY[0];
             if (Math.hypot(deltaX, deltaY) < 5) {
-                finalizeSelectedTile();
-                virtualServer.sendMessage(new TileTakenMessage(null, Integer.parseInt(tileImage.getId())));
+                handlePreviousSelectedTile();
+                virtualServer.sendMessage(new TileTakenMessage(null, Integer.parseInt(tile.getId())));
             }
         });
-
-    }
-
-    protected void takeTile(ImageView tile) {
-
-        tile.setImage(new Image(Objects.requireNonNull(getClass().getResource(TILESPATH + "tile_" + tile.getId() + ".png")).toExternalForm()));
-        tile.toFront();
-
-        selectedTile = tile;
-
-        // move a tile from the choosing pit to the Focus spot
-        moveToSelectedSlot();
-
-        // disable mouse events on the imageView in the Focus spot
-        selectedTile.setDisable(true);
-
-        // disable the events on the placedImageView so it doesn't activate the animation back to the focus spot
-
-        // by doing this we permanently fix the previously added tile to the cardboard when bringing a tile from the choosing pot to the focus spot
-        // we remove the rectangle of the grid pane in the position of the imageView placed, not allowing it to be clicked anymore.
-    }
-
-    protected void finalizeSelectedTile() {
-
-        if(selectedTile == null) return;
-
-        if(gridX == null && gridY == null) {
-            // returns the tile to the table
-            selectedTile.setDisable(true);
-            virtualServer.sendMessage(new TileReturnedMessage(0));
-        }
-        else {
-            // fixes the tile to the ship
-            selectedTile.setDisable(true);
-            selectedTile.setEffect(null);
-            int degrees = (int)selectedTile.getRotate();
-            int rotation = ((degrees / 90) % 4 + 4) % 4;
-
-            updateAdjacentCells(gridX, gridY);
-            virtualServer.sendMessage(new TileFixedMessage(0, gridX, gridY, rotation));
-            gridX = gridY = null;
-        }
-
-        selectedTileSlot.setCursor(Cursor.DEFAULT);
-        selectedTile = null;
+        return tile;
     }
 
     public void initializeGridPane(BoardType shipType) {
         for (int y = 0; y < 5; y++) {
             for (int x = 0; x < 7; x++) {
-                if (isInsideShip(shipType, x, y)) {
+                if (isCellValid(shipType, x, y)) {
 
                     StackPane cell = new StackPane();
-                    cell.setStyle("-fx-background-color: red; -fx-background-radius: 5");
+                    cell.setStyle("-fx-background-color: rgba(255, 255, 255, .2); -fx-background-radius: 5");
+                    cell.setOpacity(0);
 
                     gridPane.add(cell, x, y);
 
@@ -135,39 +126,112 @@ public class TileManager    {
                         int colIndex = GridPane.getColumnIndex(cell) != null ? GridPane.getColumnIndex(cell) : 0;
                         int rowIndex = GridPane.getRowIndex(cell) != null ? GridPane.getRowIndex(cell) : 0;
 
-                        if(gridX != null && gridY != null && gridX == colIndex && gridY == rowIndex) {
-                            moveToSelectedSlot();
-                            return;
-                        }
+                        double cellX = gridPane.getLayoutX() + cell.getLayoutX();
+                        double cellY = gridPane.getLayoutY() + cell.getLayoutY();
 
-                        gridX = GridPane.getColumnIndex(cell) != null ? GridPane.getColumnIndex(cell) : 0;
-                        gridY = GridPane.getRowIndex(cell) != null ? GridPane.getRowIndex(cell) : 0;
-
-                        Bounds boundsInScene = cell.localToScene(cell.getBoundsInLocal());
-                        double cellX = boundsInScene.getMinX() - mainContentPane.getLayoutX();
-                        double cellY = boundsInScene.getMinY() - mainContentPane.getLayoutY();
-
-                        // moving tile from Focus spot to the cardboard socket
-                        animationHandler.animateImageToPosition(selectedTile, cellX, cellY, 1, selectedTile.getRotate(), 150, 300);
-
-                        animationHandler.animateShadowEffect(selectedTile);
-
-                        selectedTileSlot.setCursor(Cursor.HAND);
-                        selectedTile.setMouseTransparent(true);
+                        handleSlotClicked(colIndex, rowIndex, cellX, cellY);
                     });
                 }
             }
         }
+        // initialize with the center cabin tile
+        updateValidCells(3, 2);
+
+        String color = ClientSession.getPlayerInfo().getColor().toLowerCase();
+        Image image = new Image(Objects.requireNonNull(getClass().getResource(TILES_PATH + "tile_starter_cabin_" + color + ".png")).toExternalForm());
+        ImageView starterCabin = new ImageView(image);
+        starterCabin.setFitWidth(TILE_SIZE);
+        starterCabin.setFitHeight(TILE_SIZE);
+        gridPane.add(starterCabin, 3, 2);
+        starterCabin.setTranslateX(-400);
+        starterCabin.setTranslateY(100);
+        starterCabin.setRotate(Math.random() * 360 - 180);
+        animationHandler.animateImageToPosition(starterCabin, starterCabin.getLayoutX(), starterCabin.getLayoutY(), 1, 0, 1200, 1200);
     }
 
-    public void moveToSelectedSlot() {
+    protected void takeTile(ImageView tile) {
+
+        tile.setImage(new Image(Objects.requireNonNull(getClass().getResource(TILES_PATH + "tile_" + tile.getId() + ".png")).toExternalForm()));
+        tile.toFront();
+
+        selectedTile = tile;
+
+        // move a tile from the choosing pit to the Focus spot
+        moveSelectedToFocusSlot();
+
+        // disable mouse events on the imageView in the Focus spot
+        selectedTile.setDisable(true);
+
+        // by doing this we permanently fix the previously added tile to the cardboard when bringing a tile from the choosing pot to the focus spot
+        // we remove the rectangle of the grid pane in the position of the imageView placed, not allowing it to be clicked anymore.
+    }
+
+    public void handlePreviousSelectedTile() {
+
+        if(selectedTile == null) return;
+
+        if(gridX == null || gridY == null) {
+            handleUnplacedTile();
+        }
+        else if(gridY == -1) {
+            handleReservedTile();
+        }
+        else {
+            handlePlacedTile();
+        }
+
+        selectedTile.setDisable(true);
+        focusSlot.setDisable(true);
+        focusSlot.setCursor(Cursor.DEFAULT);
+        selectedTile = null;
+    }
+
+    private void handleUnplacedTile() {
+        // tile was not placed on the grid
+        if(isHoldingReservedTile()) {
+            // if it is a reserved tile, it returns to its slot
+            moveReservedTile();
+        }
+        else {
+            // otherwise it puts it back to the table
+            selectedTile.setMouseTransparent(false);
+            virtualServer.sendMessage(new TileReturnedMessage());
+        }
+    }
+    private void handleReservedTile() {
+        // saves the tile to reserved tile
+        if(gridX < 0 || gridX > 1) {
+            Logger.logError("Out of bounds index for selected tile: " + gridX);
+            return;
+        }
+        removeTileFromReservedSlots();
+        reservedTiles[gridX] = selectedTile;
+        tileEffectManager.applyReservedEffect(selectedTile);
+        virtualServer.sendMessage(new ReserveTileMessage(gridX));
+    }
+    private void handlePlacedTile() {
+        // fixes the tile to the ship
+        selectedTile.setEffect(null);
+        int degrees = (int)selectedTile.getRotate();
+        int rotation = ((degrees / 90) % 4 + 4) % 4;
+
+        removeTileFromReservedSlots();
+        updateValidCells(gridX, gridY);
+        virtualServer.sendMessage(new TileFixedMessage(gridX, gridY, rotation));
+        gridX = gridY = null;
+    }
+
+    public void moveSelectedToFocusSlot() {
         gridX = gridY = null;
         if(selectedTile == null) return;
-        selectedTile.setMouseTransparent(false);
-        animationHandler.animateImageToPosition(selectedTile, selectedTileSlot.getLayoutX(), selectedTileSlot.getLayoutY(), 1.7, 0,500, 500);
+        tileEffectManager.applyDropShadowEffect(selectedTile, isHoldingReservedTile());
+        showValidCells();
+        focusSlot.setDisable(true);
+        focusSlot.setCursor(Cursor.DEFAULT);
+        animationHandler.animateImageToPosition(selectedTile, focusSlot.getLayoutX(), focusSlot.getLayoutY(), 1.7, 0,500, 500);
     }
 
-    private boolean isInsideShip(BoardType shipType, int x, int y) {
+    private boolean isCellValid(BoardType shipType, int x, int y) {
         if(y < 0 || x < 0 || y >= 5 || x >= 7) return false;
         if(shipType == BoardType.LEARNING || shipType == BoardType.LEVEL_ONE) {
             int[][] type1 = {
@@ -192,7 +256,11 @@ public class TileManager    {
         throw new RuntimeException("Invalid ship type: " + shipType);
     }
 
-    public void updateAdjacentCells(int x, int y) {
+    public void rotateSelectedTile(double angle) {
+        animationHandler.rotateTile(selectedTile, angle);
+    }
+
+    public void updateValidCells(int x, int y) {
         for (Node node : gridPane.getChildren()) {
             if (node instanceof StackPane cell) {
                 int nodeCol = GridPane.getColumnIndex(cell) != null ? GridPane.getColumnIndex(cell) : 0;
@@ -206,12 +274,18 @@ public class TileManager    {
                 }
             }
         }
-
-        validCells.forEach(cell -> {
-            cell.setStyle("-fx-background-color: rgba(255, 255, 255, .2);");
-            cell.setCursor(Cursor.HAND);
-        });
         removePaneFromGrid(x, y);
+    }
+
+    public void showValidCells() {
+        validCells.forEach(cell -> animationHandler.playShowSlot(cell));
+        animationHandler.playShowSlot(reservedSlot0);
+        animationHandler.playShowSlot(reservedSlot1);
+    }
+    public void hideValidCells() {
+        validCells.forEach(cell -> animationHandler.playHideSlot(cell));
+        animationHandler.playHideSlot(reservedSlot0);
+        animationHandler.playHideSlot(reservedSlot1);
     }
 
     private void removePaneFromGrid(int x, int y) {
@@ -232,6 +306,78 @@ public class TileManager    {
         if (nodeToRemove != null) {
             validCells.remove(nodeToRemove);
             gridPane.getChildren().remove(nodeToRemove);
+        }
+    }
+
+    private boolean isHoldingReservedTile() {
+        if(selectedTile == null) return false;
+        for(ImageView reservedTile : reservedTiles) {
+            if(reservedTile != null && reservedTile == selectedTile) return true;
+        }
+        return false;
+    }
+
+    public void onReservedSlotClick(Event event) {
+
+        Node slotNode = (Node) event.getSource();
+        int slotId = Integer.parseInt((slotNode).getId());
+
+
+        if(selectedTile != null && (reservedTiles[slotId] == null || reservedTiles[slotId] == selectedTile)) {
+            // moves the selected tile to the reserved slot.
+
+            handleSlotClicked(slotId, -1, slotNode.getLayoutX(), slotNode.getLayoutY());
+        }
+        else if(reservedTiles[slotId] != null && reservedTiles[slotId] != selectedTile) {
+            handlePreviousSelectedTile();
+            selectedTile = reservedTiles[slotId];
+            virtualServer.sendMessage(new UseReservedTileMessage(slotId));
+            moveSelectedToFocusSlot();
+        }
+    }
+
+    private void handleSlotClicked(int colIndex, int rowIndex, double layoutX, double layoutY) {
+
+        if (gridX != null && gridY != null&& gridX == colIndex && gridY == rowIndex ) {
+            moveSelectedToFocusSlot();
+            return;
+        }
+
+        gridX = colIndex;
+        gridY = rowIndex;
+
+        // moving tile from Focus spot to the reserved slot
+        animationHandler.animateImageToPosition(selectedTile, layoutX, layoutY, 1, selectedTile.getRotate(), 250, 400);
+
+        tileEffectManager.applySelectedEffect(selectedTile, isHoldingReservedTile());
+
+        focusSlot.setDisable(false);
+        focusSlot.setCursor(Cursor.HAND);
+        selectedTile.setMouseTransparent(true);
+    }
+
+    private void moveReservedTile() {
+        if(selectedTile == null) return;
+
+        Node slot = null;
+        if(reservedTiles[0] != null && reservedTiles[0] == selectedTile) {
+            slot = reservedSlot0;
+        } else if(reservedTiles[1] != null && reservedTiles[1] == selectedTile) {
+            slot = reservedSlot1;
+        }
+        if(slot == null) {
+            Logger.logWarning("Reserved tile " + selectedTile.getId() + " is already in the grid");
+            return;
+        }
+        virtualServer.sendMessage(new ReserveTileMessage(Integer.parseInt(slot.getId())));
+        animationHandler.animateImageToPosition(selectedTile, slot.getLayoutX(), slot.getLayoutY(), 1, selectedTile.getRotate(), 250, 400);
+    }
+
+    private void removeTileFromReservedSlots() {
+        for(int slotId = 0; slotId < reservedTiles.length; slotId++) {
+            if(reservedTiles[slotId] != null && reservedTiles[slotId] == selectedTile) {
+                reservedTiles[slotId] = null;
+            }
         }
     }
 }

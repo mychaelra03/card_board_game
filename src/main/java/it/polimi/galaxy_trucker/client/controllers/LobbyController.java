@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.client.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.BoardType;
 import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
@@ -34,6 +35,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -53,6 +55,7 @@ public class LobbyController implements VirtualServerAware {
     @FXML private Label readyCounter;
 
     @FXML private ImageView boardImage;
+    @FXML private Label boardName;
 
     @FXML private VBox playerList;
 
@@ -202,12 +205,14 @@ public class LobbyController implements VirtualServerAware {
             case "boardType" -> {
 
                 BoardTypeMessage boardTypeMessage = mapper.readValue(cmd, BoardTypeMessage.class);
-                String path = switch (boardTypeMessage.getBoardType()) {
+                BoardType boardType = boardTypeMessage.getBoardType();
+                String path = switch (boardType) {
                     case LEARNING, LEVEL_ONE -> "/textures/cardboards/showcase_1.png";
                     case LEVEL_TWO -> "/textures/cardboards/showcase_2.png";
                 };
                 Image board = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
                 boardImage.setImage(board);
+                boardName.setText(LanguageManager.get("label." + boardType));
             }
 
             case "chatMessage" -> {

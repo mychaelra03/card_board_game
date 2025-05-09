@@ -9,9 +9,11 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.util.List;
@@ -54,6 +56,7 @@ public class CardsPopupController implements PopupAware {
                 ImageView card = new ImageView(loadCardImage(1, levelOneCard));
                 card.setPreserveRatio(true);
                 card.setFitHeight(400);
+                addShadowEffect(card);
                 cardBox.getChildren().add(card);
             }
         }
@@ -62,6 +65,7 @@ public class CardsPopupController implements PopupAware {
                 ImageView card = new ImageView(loadCardImage(2, levelTwoCard));
                 card.setPreserveRatio(true);
                 card.setFitHeight(400);
+                addShadowEffect(card);
                 cardBox.getChildren().add(card);
             }
         }
@@ -96,6 +100,7 @@ public class CardsPopupController implements PopupAware {
         parallelTransition.setOnFinished(_ -> closeButton.setDisable(false));
         parallelTransition.play();
     }
+
     private void playClosingCardAnimation() {
         double boxWidth = cardBox.getWidth();
         double centerX = boxWidth / 2;
@@ -116,5 +121,15 @@ public class CardsPopupController implements PopupAware {
 
         parallelTransition.setOnFinished(_ -> popup.playClosingAnimation());
         parallelTransition.play();
+    }
+
+    private void addShadowEffect(ImageView card) {
+        DropShadow shadow = new DropShadow();
+        shadow.setColor(new Color(.2, .2, .2, .8));
+        shadow.setWidth(100);
+        shadow.setHeight(100);
+        shadow.setRadius(20);
+
+        card.setEffect(shadow);
     }
 }

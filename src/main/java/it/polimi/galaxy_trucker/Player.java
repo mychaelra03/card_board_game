@@ -4,6 +4,7 @@ import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.server.model.tiles.*;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 
 import static it.polimi.galaxy_trucker.Player.PlayerState.*;
@@ -29,11 +30,10 @@ public class Player {
     private int position;
 
     private PlayerState playerState = IDLE;
+    private final Integer[] reservedTiles;
     private boolean admin;
 
     private List<BlockType> cargoPool;
-
-    private int chosenPlanet;
 
     public Player(String username, int[] profilePictureIds) {
         this.username = username;
@@ -42,6 +42,8 @@ public class Player {
         this.shipBoard = null;
         this.credits = 0;
         this.position = 0;
+        this.reservedTiles = new Integer[2];
+        Arrays.fill(reservedTiles, null);
         this.admin = false;
     }
     public Player(String username, int[] profilePictureIds, ShipBoard shipBoard) {
@@ -100,12 +102,6 @@ public class Player {
 
     public void setTile(int x, int y, int tileId, int rotation) {
         shipBoard.setTile(x, y, tileId, rotation);
-    }
-    public int popPrivateTile(int index) {
-        return shipBoard.popPrivateTile(index);
-    }
-    public void pushPrivateTile(int index, int tileId) {
-        shipBoard.pushPrivateTile(index, tileId);
     }
     public int getTotalTileCount() {
         return shipBoard.getTotalTileCount();
@@ -175,6 +171,24 @@ public class Player {
     }
 
     // NEW METHODS
+
+    public void reserveTile(int tileId, int index) {
+        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: " + index + ".");
+        if(reservedTiles[index] != null) throw new IllegalArgumentException("Slot occupied.");
+        reservedTiles[index] = tileId;
+    }
+    public int useReservedTile(int index) {
+        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: " + index + ".");
+        if(reservedTiles[index] == null) throw new IllegalArgumentException("Slot is empty.");
+        int tile = reservedTiles[index];
+        reservedTiles[index] = null;
+        return tile;
+    }
+    public Integer getPrivateTile(int index) {
+        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: " + index + ".");
+        return reservedTiles[index];
+    }
+
     public void ensureCrewRemovedAt(Point cabinCoords, int index) {
         CrewType removedMember = shipBoard.removeCrewMemberAt(cabinCoords.x, cabinCoords.y, index);
         if(removedMember == null) throw new IllegalArgumentException("Cabin tile does not have a crew member at index " + index + ".");

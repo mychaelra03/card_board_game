@@ -2,18 +2,14 @@ package it.polimi.galaxy_trucker.client.controllers.shipBuilding;
 
 import it.polimi.galaxy_trucker.client.ClientSession;
 import javafx.animation.*;
-import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.effect.BlurType;
-import javafx.scene.effect.InnerShadow;
-import javafx.scene.image.Image;
+import javafx.scene.effect.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-
-import java.util.Objects;
 
 public class AnimationHandler {
     private final AnchorPane mainContentPane;
@@ -25,6 +21,7 @@ public class AnimationHandler {
 
     public void animateImageToPosition(ImageView image, double targetX, double targetY, double scaling, double rotation, int duration, int scaleDuration) {
 
+        image.toFront();
         mainContentPane.setDisable(true);
 
         TranslateTransition translate = new TranslateTransition(Duration.millis(duration), image);
@@ -40,7 +37,6 @@ public class AnimationHandler {
 
         ParallelTransition animation = new ParallelTransition(translate, rotate, scale);
 
-
         // Re-enable interaction after animation completes
         animation.setOnFinished(_ -> mainContentPane.setDisable(false));
         animation.play();
@@ -48,16 +44,15 @@ public class AnimationHandler {
     }
 
 
-    public void rotateTile(ImageView selectedImageView, ImageView placedImageView, double angle) {
-        ImageView imageToRotate = selectedImageView != null ? selectedImageView : placedImageView;
+    public void rotateTile(ImageView tile, double angle) {
 
-        RotateTransition rotateTransition = new RotateTransition(Duration.millis(100), imageToRotate);
+        RotateTransition rotateTransition = new RotateTransition(Duration.millis(100), tile);
         rotateTransition.setByAngle(angle);
         rotateTransition.play();
         rotateTransition.setOnFinished(_ -> {
-            double rotation = imageToRotate.getRotate();
+            double rotation = tile.getRotate();
             rotation = ((rotation + 90) % 360 + 360) % 360 - 90;
-            imageToRotate.setRotate(rotation);
+            tile.setRotate(rotation);
         });
     }
 
@@ -170,25 +165,16 @@ public class AnimationHandler {
         animation.play();
     }
 
-    public void animateShadowEffect(ImageView imageView) {
-        InnerShadow innerShadow = new InnerShadow();
-        innerShadow.setColor(Color.TRANSPARENT);
-        innerShadow.setRadius(127);
-        innerShadow.setBlurType(BlurType.GAUSSIAN);
-        innerShadow.setChoke(1);
-        innerShadow.setWidth(255);
-        innerShadow.setHeight(255);
-        imageView.setEffect(innerShadow);
-
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(50), event -> {
-                    double time = (System.currentTimeMillis() % 2000) / 2000.0 * Math.PI * 2;
-                    double opacity = 0.2 + 0.1 * Math.sin(time); // Cycles between 0.1 and 0.3
-                    innerShadow.setColor(new Color(1, 1, 1, opacity));
-                })
-        );
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+    public void playShowSlot(StackPane cell) {
+        cell.setCursor(Cursor.HAND);
+        FadeTransition fade = new FadeTransition(Duration.millis(100), cell);
+        fade.setToValue(1);
+        fade.play();
     }
-
+    public void playHideSlot(StackPane cell) {
+        cell.setCursor(Cursor.DEFAULT);
+        FadeTransition fade = new FadeTransition(Duration.millis(100), cell);
+        fade.setToValue(0);
+        fade.play();
+    }
 }

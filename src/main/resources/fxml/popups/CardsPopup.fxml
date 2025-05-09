@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
@@ -12,9 +13,13 @@
             <Insets bottom="20.0" left="20.0" right="35.0" top="20.0" />
         </padding>
     </HBox>
-    <Button fx:id="closeButton" cancelButton="true" defaultButton="true" onAction="#onClose" style="-fx-background-color: gold; -fx-font-weight: bold; -fx-font-size: 20;" text="%button.close">
+    <Button fx:id="closeButton" cancelButton="true" defaultButton="true" onAction="#onClose" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-background-radius: 15;" text="%button.close">
         <cursor>
             <Cursor fx:constant="HAND" />
         </cursor>
     </Button>
+    <stylesheets>
+        <URL value="@../../css/default.css" />
+        <URL value="@../../css/popup.css" />
+    </stylesheets>
 </VBox>

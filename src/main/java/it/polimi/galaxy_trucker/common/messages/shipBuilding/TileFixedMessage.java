@@ -5,21 +5,15 @@ import it.polimi.galaxy_trucker.common.messages.GameMessage;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TileFixedMessage implements GameMessage {
-    int tileId;
     int x, y;
     int rotation;
 
     public TileFixedMessage() {}
 
-    public TileFixedMessage(int tileId, int x, int y, int rotation) {
-        this.tileId = tileId;
+    public TileFixedMessage(int x, int y, int rotation) {
         this.x = x;
         this.y = y;
         this.rotation = rotation;
-    }
-
-    public int getTileId() {
-        return tileId;
     }
 
     public int getX() {

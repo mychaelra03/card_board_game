@@ -10,29 +10,24 @@ import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
+import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import java.util.*;
 
+import static it.polimi.galaxy_trucker.client.controllers.shipBuilding.TileManager.TILES_PATH;
+
 public class ShipBuildingController implements VirtualServerAware {
-
-    public static final String TILE_PATH = "/textures/tiles/";
-    public static final double TILE_SIZE = 83.5;
-
-    protected static ImageView selectedTile = null;
-
-    protected static Set<StackPane> validCells = new HashSet<>();
 
     private final VirtualServer virtualServer = VirtualServer.getInstance();
 
@@ -46,7 +41,10 @@ public class ShipBuildingController implements VirtualServerAware {
     @FXML private ImageView cardPile1;
     @FXML private ImageView cardPile2;
 
-    @FXML private Rectangle selectedTileSlot;
+    @FXML private StackPane reservedSlot0;
+    @FXML private StackPane reservedSlot1;
+
+    @FXML private Rectangle focusSlot;
 
     @FXML private Button settingsButton;
     @FXML private GridPane gridPane;
@@ -62,67 +60,43 @@ public class ShipBuildingController implements VirtualServerAware {
     public void initialize() {
 
         animationHandler = new AnimationHandler(mainContentPane);
-        tileManager = new TileManager(mainContentPane, gridPane, selectedTileSlot);
+        tileManager = new TileManager(gridPane, focusSlot, reservedSlot0, reservedSlot1);
 
         cardsMap.put(0, cardPile0);
         cardsMap.put(1, cardPile1);
         cardsMap.put(2, cardPile2);
 
-        Image backTexture = new Image(Objects.requireNonNull(getClass().getResource(TILE_PATH + "tile_back.png")).toExternalForm());
+        Image backTexture = new Image(Objects.requireNonNull(getClass().getResource(TILES_PATH + "tile_back.png")).toExternalForm());
 
         // initialize covered tiles
         List<ImageView> tileList = new ArrayList<>();
-        for(int i = 1; i<151; i++) {
 
-            ImageView tile = new ImageView();
-            tile.setId(String.valueOf(i));
-            tile.setImage(backTexture);
-            tile.setFitWidth(TILE_SIZE);
-            tile.setFitHeight(TILE_SIZE);
-            tile.setCursor(Cursor.HAND);
-            tile.setLayoutX((Math.random() * 588) + 712);
-            tile.setLayoutY((Math.random() * 530) + 180);
-            tile.setTranslateX(1500 - tile.getLayoutX() * .7);
-            tile.setTranslateY(100 - tile.getLayoutY() * .7);
-            tile.setScaleX(1.5);
-            tile.setScaleY(1.5);
-            tile.setOpacity(0.4);
-
-            DropShadow dropShadow = new DropShadow();
-            dropShadow.setColor(new Color(.2, .2, .2, .8));
-            dropShadow.setWidth(40);
-            dropShadow.setHeight(40);
-            dropShadow.setRadius(20);
-            tile.setEffect(dropShadow);
+        for(int id = 1; id < 151; id++) {
+            ImageView tile = tileManager.generateTile(id, backTexture);
 
             tileList.add(tile);
-            tileMap.put(i, tile);
-
-            tileManager.enableEvents(tile);
+            tileMap.put(id, tile);
         }
+
         Collections.shuffle(tileList);
+        mainContentPane.getChildren().addAll(tileList);
 
         for(int i = 0; i < tileList.size(); i++) {
             ImageView tile = tileList.get(i);
-            animationHandler.playTileReturn(tile, i * 20);
+            animationHandler.playTileReturn(tile, i * 15);
         }
-        mainContentPane.getChildren().addAll(tileList);
-
-        // initialize tiles sockets on board
-
 
         rightButton.setOnAction(this::onClickTurnTileRight);
         leftButton.setOnAction(this::onClickTurnTileLeft);
 
-        selectedTileSlot.setOnMouseReleased(_ -> tileManager.moveToSelectedSlot());
+        focusSlot.setOnMouseClicked(_ -> tileManager.moveSelectedToFocusSlot());
 
         settingsButton.setOnAction(_ -> Popup.newSettingsPopup().show(rootPane, mainContentPane));
 
-        Image image = new Image(Objects.requireNonNull(getClass().getResource(TILE_PATH + "tile_starter_cabin_green.png")).toExternalForm());
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(TILE_SIZE);
-        imageView.setFitHeight(TILE_SIZE);
-        gridPane.add(imageView, 3, 2);
+        reservedSlot0.setOnMouseClicked(event -> tileManager.onReservedSlotClick(event));
+        reservedSlot1.setOnMouseClicked(event -> tileManager.onReservedSlotClick(event));
+
+        Platform.runLater(() -> Popup.newCountdownPopup(5).show(rootPane, mainContentPane));
     }
 
 
@@ -175,20 +149,27 @@ public class ShipBuildingController implements VirtualServerAware {
                 };
                 Image board = new Image(Objects.requireNonNull(getClass().getResourceAsStream(boardPath)));
                 shipBoardImage.setImage(board);
+                FadeTransition boardFade = new FadeTransition(Duration.millis(1000), shipBoardImage);
+                boardFade.setToValue(1);
+                boardFade.play();
+                ScaleTransition boardScale = new ScaleTransition(Duration.millis(1000), shipBoardImage);
+                boardScale.setFromX(1.2);
+                boardScale.setFromY(1.2);
+                boardScale.setToX(1);
+                boardScale.setToY(1);
+                boardScale.play();
 
                 String pilePath = switch (shipType) {
                     case LEARNING, LEVEL_ONE -> "/textures/cards/card_pile_level_1.png";
                     case LEVEL_TWO -> "/textures/cards/card_pile_level_2.png";
                 };
                 Image pile = new Image(Objects.requireNonNull(getClass().getResourceAsStream(pilePath)));
-                cardPile0.setImage(pile);
-                cardPile1.setImage(pile);
-                cardPile2.setImage(pile);
+                cardsMap.forEach((id, card) -> {
+                    card.setImage(pile);
+                    animationHandler.playCardsReturn(card, 500 + id * 150);
+                });
 
                 tileManager.initializeGridPane(shipType);
-
-                // initialize with the center cabin tile
-                tileManager.updateAdjacentCells(3, 2);
             }
 
             case "tileTaken" -> {
@@ -243,19 +224,21 @@ public class ShipBuildingController implements VirtualServerAware {
     }
 
     @FXML
-    public void onClickCardPile(Event event) {
-        tileManager.finalizeSelectedTile();
+    public void onCardPileClick(Event event) {
+        tileManager.handlePreviousSelectedTile();
+
+        tileManager.hideValidCells();
         String pileId = ((Node) event.getSource()).getId();
         virtualServer.sendMessage(new CardsTakenMessage(null, Integer.parseInt(pileId)));
     }
 
     @FXML
     public void onClickTurnTileRight(Event event) {
-        animationHandler.rotateTile(selectedTile, selectedTile, 90);
+        tileManager.rotateSelectedTile(90);
     }
 
     @FXML
     public void onClickTurnTileLeft(Event event) {
-        animationHandler.rotateTile(selectedTile, selectedTile, -90);
+        tileManager.rotateSelectedTile(-90);
     }
 }

@@ -11,7 +11,6 @@ import java.util.*;
 
 public class CardFactory {
 
-    private static final String PATH = "it/polimi/galaxy_trucker/";
     private static CardFactory instance;
     private final Map<String, List<JsonNode>> cardsByGroup;
     private final ObjectMapper mapper;
@@ -28,7 +27,7 @@ public class CardFactory {
     public static CardFactory getInstance() {
         // Retrieves the singleton instance of CardFactory.
         if(instance == null) {
-            instance = new CardFactory(PATH + "public/cards.json");
+            instance = new CardFactory("public/cards.json");
         }
 
         return instance;

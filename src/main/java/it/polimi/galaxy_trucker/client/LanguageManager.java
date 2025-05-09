@@ -5,10 +5,9 @@ import java.util.ResourceBundle;
 
 public class LanguageManager {
 
-    private static final String LANG_PATH = "it.polimi.galaxy_trucker.lang";
     private static Locale currentLocale = Locale.ENGLISH;
     private static Locale pendingLocale = currentLocale;
-    private static ResourceBundle bundle = ResourceBundle.getBundle(LANG_PATH + ".messages", currentLocale);
+    private static ResourceBundle bundle = ResourceBundle.getBundle("lang.messages", currentLocale);
 
     public static void setPendingLocale(Locale locale) {
         pendingLocale = locale;
@@ -24,7 +23,7 @@ public class LanguageManager {
     public static void applyPendingLocale() {
         if (pendingLocale != currentLocale) {
             currentLocale = pendingLocale;
-            bundle = ResourceBundle.getBundle(LANG_PATH + ".messages", currentLocale);
+            bundle = ResourceBundle.getBundle("lang.messages", currentLocale);
         }
     }
 

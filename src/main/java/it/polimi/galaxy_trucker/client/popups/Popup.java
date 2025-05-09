@@ -44,7 +44,7 @@ public class Popup {
 
     private Popup(String fxmlFile, Object... args) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/polimi/galaxy_trucker/popups/" + fxmlFile + ".fxml"), LanguageManager.getBundle());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popups/" + fxmlFile + ".fxml"), LanguageManager.getBundle());
             Node content = loader.load();
 
             controller = loader.getController();
@@ -75,6 +75,7 @@ public class Popup {
         BoxBlur blur = new BoxBlur(5, 5, 5);
         if (originalEffect != null) blur.setInput(originalEffect);
         mainContentPane.setEffect(blur);
+        mainContentPane.setMouseTransparent(true);
 
         overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
         overlay.setOnMouseClicked(_ -> close());
@@ -104,6 +105,7 @@ public class Popup {
             closingAnimation.setOnFinished(_ -> {
                 rootPane.getChildren().removeAll(overlay, content);
                 mainContentPane.setEffect(originalEffect);
+                mainContentPane.setMouseTransparent(false);
                 originalEffect = null;
             });
 
@@ -131,6 +133,10 @@ public class Popup {
     }
     public static Popup newCardsPopup(int[] levelOneCards) {
         return new Popup("CardsPopup", levelOneCards);
+    }
+
+    public static Popup newCountdownPopup(int duration) {
+        return new Popup("CountdownPopup", duration);
     }
 
 

@@ -55,7 +55,7 @@ public class GameModel {
         this.boardType = boardType;
     }
     public void cycleBoard(BoardSelectMessage.Action action) {
-        BoardType[] cycleTypes = {BoardType.LEARNING, BoardType.LEVEL_TWO};
+        BoardType[] cycleTypes = BoardType.values();
 
         int currentIndex = Arrays.asList(cycleTypes).indexOf(boardType);
 
