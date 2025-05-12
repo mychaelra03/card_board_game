@@ -5,6 +5,7 @@ import it.polimi.galaxy_trucker.common.messages.GameMessage;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BoardSelectMessage implements GameMessage {
+
     public enum Action {
         PREVIOUS, NEXT
     }

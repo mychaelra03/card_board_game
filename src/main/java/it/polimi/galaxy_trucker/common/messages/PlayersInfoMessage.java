@@ -6,6 +6,7 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayersInfoMessage implements GameMessage {
+
     private List<PlayerInfo> players;
     private String username;
     private String type = "playersInfo";

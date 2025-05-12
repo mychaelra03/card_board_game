@@ -5,6 +5,7 @@ import it.polimi.galaxy_trucker.common.messages.GameMessage;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatMessage implements GameMessage {
+
     private String sender;
     private String color;
     private String message;

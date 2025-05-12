@@ -5,6 +5,7 @@ import it.polimi.galaxy_trucker.BoardType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BoardTypeMessage implements GameMessage {
+
     private BoardType boardType;
 
     public BoardTypeMessage() {}

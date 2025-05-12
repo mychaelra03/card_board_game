@@ -5,6 +5,7 @@ import it.polimi.galaxy_trucker.GameModel;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStateMessage implements GameMessage {
+
     private GameModel.GameState gameState;
 
     public GameStateMessage() {}

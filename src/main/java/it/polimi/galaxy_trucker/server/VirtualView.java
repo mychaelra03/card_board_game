@@ -3,7 +3,7 @@ package it.polimi.galaxy_trucker.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.server.controller.Controller;
+import it.polimi.galaxy_trucker.server.controller.MainController;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,9 +13,9 @@ public class VirtualView extends Thread {
     BufferedReader in;
     PrintWriter out;
     Socket clientSocket;
-    Controller controller;
+    MainController controller;
 
-    public VirtualView(Socket clientSocket, Controller controller) {
+    public VirtualView(Socket clientSocket, MainController controller) {
         this.clientSocket = clientSocket;
         this.controller = controller;
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.BoardType;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.client.*;
+import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
@@ -108,10 +109,21 @@ public class ShipBuildingController implements VirtualServerAware {
             switch (type) {
 
                 case "gameState" -> {
-                    GameStateMessage gameStateMessage = mapper.readValue(cmd, GameStateMessage.class);
+                    GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
 
-                    if (gameStateMessage.getGameState() != GameModel.GameState.FLIGHT_PHASE) throw new IllegalStateException("Invalid game state");
-                    Platform.runLater(() -> SceneSwitch.switchScene("ApplyingCardsScene"));
+                    if (message.getGameState() != GameModel.GameState.FLIGHT_PHASE) throw new IllegalStateException("Invalid game state");
+
+                    virtualServer.setCallBack(null);
+                    Platform.runLater(() -> SceneSwitch.switchScene("FlightScene"));
+                    return;
+                }
+
+                case "gameReset" -> {
+                    GameResetMessage message = mapper.readValue(cmd, GameResetMessage.class);
+
+                    virtualServer.setCallBack(null);
+                    PendingPopup.set(Popup.newAlertPopup("title.player_left", "description.player_left", message.getPlayerName()));
+                    Platform.runLater(() -> SceneSwitch.switchScene("LobbyScene"));
                     return;
                 }
             }

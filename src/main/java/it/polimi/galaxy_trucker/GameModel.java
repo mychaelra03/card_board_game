@@ -119,13 +119,21 @@ public class GameModel {
 
     public void removePlayer(Player player) {
         if(!players.contains(player)) throw new IllegalArgumentException("Player " + player.getName() + " not found.");
+
         players.remove(player);
+
         if(player.isAdmin() && !players.isEmpty()) players.getFirst().setAdmin(true);
 
-        if(!players.isEmpty()) eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
-        else {
+        if (!players.isEmpty()) {
+            if (gameState != GameState.LOBBY) {
+                Logger.logInfo("A player left during the game. Returning to lobby...");
+                eventDispatcher.fireEvent(new GameResetEvent(player.getName()));
+                resetToLobby();
+            }
+            eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
+        } else {
             Logger.logInfo("All players have left the game. Resetting game state.");
-            reset();
+            resetCompletely();
         }
     }
 
@@ -311,20 +319,21 @@ public class GameModel {
         }
     }
 
-    public void reset() {
-        this.boardType = BoardType.LEVEL_TWO;
-        this.players.clear();
-        this.availableTiles.clear();
-        for (int i = 0; i < 152; i++) {
-            availableTiles.add(i);
-        }
-        this.availableCardPiles.clear();
-        for (int i = 0; i < 3; i++) {
-            availableCardPiles.add(i);
-        }
+    private void resetToLobby() {
+        this.gameState = GameState.LOBBY;
+        for (Player player : players) player.setState(IDLE);
         this.deck.clear();
         this.cardPiles = null;
-        this.gameState = GameState.LOBBY;
+        this.availableTiles.clear();
+        for (int i = 0; i < 152; i++) availableTiles.add(i);
+        this.availableCardPiles.clear();
+        for (int i = 0; i < 3; i++) availableCardPiles.add(i);
+    }
+
+    public void resetCompletely() {
+        resetToLobby();
+        this.players.clear();
+        this.boardType = BoardType.LEVEL_TWO;
     }
 
     private List<PlayerInfo> getPlayersInfo(){

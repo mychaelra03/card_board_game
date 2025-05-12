@@ -76,6 +76,9 @@ public class LobbyController implements VirtualServerAware {
 
     @FXML
     public void initialize() {
+
+        Platform.runLater(() -> PendingPopup.tryShow(rootPane, mainContentPane));
+
         chatVbox.setPadding(new Insets(10, 5, 10, 5));
         chatScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         chatScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -262,7 +265,7 @@ public class LobbyController implements VirtualServerAware {
 
             Text username = new Text(playerInfo.getUsername());
             username.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
-            username.setFill(Color.GOLD);
+            username.setFill(Color.BLACK);
             TextFlow usernameText = new TextFlow(username);
             usernameText.setPrefHeight(Region.USE_COMPUTED_SIZE);
             usernameText.setMaxHeight(Region.USE_PREF_SIZE);

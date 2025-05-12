@@ -27,23 +27,26 @@
             <StackPane.margin>
                <Insets top="20.0" />
             </StackPane.margin></ImageView>
-         <Button fx:id="prevMapButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="40.0" style="-fx-font-size: 18;" text="⬅" StackPane.alignment="CENTER_LEFT">
+         <Button fx:id="prevMapButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="45.0" style="-fx-font-size: 18;" text="⬅" StackPane.alignment="CENTER_LEFT">
             <StackPane.margin>
                <Insets left="15.0" />
             </StackPane.margin>
          </Button>
-         <Button fx:id="nextMapButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="40.0" style="-fx-font-size: 18;" text="➡" StackPane.alignment="CENTER_RIGHT">
+         <Button fx:id="nextMapButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="45.0" style="-fx-font-size: 18;" text="➡" StackPane.alignment="CENTER_RIGHT">
             <StackPane.margin>
                <Insets right="15.0" />
             </StackPane.margin>
          </Button>
-         <Label fx:id="boardName" style="-fx-font-size: 20; -fx-font-weight: bold;" styleClass="white-label" text="Default">
+         <Label fx:id="boardName" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-background-color: rgba(255,255,255,.2); -fx-background-radius: 5;" styleClass="white-label" text="Default">
             <StackPane.margin>
                <Insets />
             </StackPane.margin>
             <effect>
                <DropShadow height="50.0" radius="24.5" width="50.0" />
-            </effect></Label>
+            </effect>
+            <padding>
+               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding></Label>
       </StackPane>
       <VBox fx:id="playerList" layoutX="41.0" layoutY="95.0" prefHeight="430.0" prefWidth="330.0" spacing="10.0" styleClass="region" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="30.0">
          <padding>
