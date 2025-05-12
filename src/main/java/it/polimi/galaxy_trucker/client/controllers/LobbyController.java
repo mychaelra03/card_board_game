@@ -107,9 +107,10 @@ public class LobbyController implements VirtualServerAware {
             String type = mapper.readTree(cmd).get("type").asText();
             switch (type) {
                 case "kicked" -> {
-                    VirtualServer.getInstance().setCallBack(null);
+                    //VirtualServer.getInstance().setCallBack(null);
                     PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.kicked"));
-                    Platform.runLater(() -> SceneSwitch.switchScene("LoginScene"));
+                    virtualServer.close();
+                    //Platform.runLater(() -> SceneSwitch.switchScene("LoginScene"));
                     return;
                 }
                 case "gameState" -> {
@@ -171,16 +172,18 @@ public class LobbyController implements VirtualServerAware {
                 int currentCount = Integer.parseInt(playerCounter.getText().split(" / ")[0]);
                 if (playersInfo.size() != currentCount) {
                     Label msg = new Label();
+                    msg.setStyle("-fx-font-weight: bold; -fx-background-radius: 5; -fx-font-size: 14px;");
+
                     if (playersInfo.size() > currentCount) {
                         msg.setText(MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername()));
                         msg.setTextFill(Color.GREEN);
-                        msg.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-                        msg.setStyle("-fx-font-weight: bold; -fx-background-color: rgba(0,128,0,0.1); -fx-background-radius: 5");
+                        msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(0,128,0,0.1);");
                     } else {
                         msg.setText(MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername()));
                         msg.setTextFill(Color.RED);
-                        msg.setStyle("-fx-font-weight: bold; -fx-background-color: rgba(255,0,0,0.1); -fx-background-radius: 5");
+                        msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(255,0,0,0.1);");
                     }
+                    msg.setPadding(new Insets(2, 0, 2, 0));
                     msg.setPrefWidth(chatScrollPane.getWidth());
                     msg.setAlignment(Pos.CENTER);
 
@@ -252,25 +255,27 @@ public class LobbyController implements VirtualServerAware {
         for (PlayerInfo playerInfo : playersInfo) {
             boolean isCurrentUser = playerInfo.getUsername().equals(thisPlayer.getUsername());
 
-            StackPane profilePicture = ClientSession.getPlayerProfilePicture(playerInfo.getUsername(), 50);
+            StackPane profilePicture = ClientSession.getPlayerProfilePicture(playerInfo.getUsername(), 65);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
             Text username = new Text(playerInfo.getUsername());
-            username.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+            username.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+            username.setFill(Color.GOLD);
             TextFlow usernameText = new TextFlow(username);
             usernameText.setPrefHeight(Region.USE_COMPUTED_SIZE);
             usernameText.setMaxHeight(Region.USE_PREF_SIZE);
             usernameText.setTextAlignment(TextAlignment.LEFT);
             if (isCurrentUser) {
                 Text self = new Text(" (" + LanguageManager.get("text.you") + ")");
-                self.setStyle("-fx-font-size: 14px;");
+                self.setStyle("-fx-font-size: 18px;");
                 self.setFill(Color.GRAY);
                 usernameText.getChildren().add(self);
             }
 
             Label readyLabel = new Label();
+            readyLabel.setStyle("-fx-font-size: 16px");
             if (playerInfo.isReady()) {
                 readyLabel.setText(LanguageManager.get("label.player_ready"));
                 readyLabel.setTextFill(Color.GREEN);
@@ -328,6 +333,7 @@ public class LobbyController implements VirtualServerAware {
 
             MenuItem promote = new MenuItem(LanguageManager.get("menu_item.promote"));
             MenuItem kick = new MenuItem(LanguageManager.get("menu_item.kick"));
+            promote.setStyle("-fx-text-fill: white; -fx-background-color: transparent;");
 
             promote.setOnAction(_ -> {
                 playerInfo.setType("promotePlayer");
@@ -340,7 +346,7 @@ public class LobbyController implements VirtualServerAware {
 
             contextMenu.getItems().addAll(promote, kick);
 
-            contextMenu.show(dotsButton, Side.BOTTOM, 0, 0);
+            contextMenu.show(dotsButton, Side.RIGHT, 0, 0);
         });
         HBox.setMargin(dotsButton, new Insets(0, 16, 0, 0));
         return dotsButton;
@@ -348,13 +354,14 @@ public class LobbyController implements VirtualServerAware {
 
     @FXML
     private void onEnterKeyPressed(KeyEvent event) {
-        if(event.getCode() == KeyCode.ENTER) {
+        if (event.getCode() == KeyCode.ENTER) sendChatMessage();
+    }
 
-            String message = chatTextField.getText().trim();
-            chatTextField.setText("");
-            if(message.isEmpty()) return;
-            ChatMessage chatMessage = new ChatMessage(message);
-            this.virtualServer.sendMessage(chatMessage);
-        }
+    public void sendChatMessage() {
+        String message = chatTextField.getText().trim();
+        if (message.isEmpty()) return;
+
+        chatTextField.clear();
+        virtualServer.sendMessage(new ChatMessage(message));
     }
 }

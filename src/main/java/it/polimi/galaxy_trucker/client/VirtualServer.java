@@ -53,7 +53,6 @@ public class VirtualServer {
 
     public void listenForMessages() {
         Logger.logInfo("ClientThread started");
-        VirtualServer virtualServer = VirtualServer.getInstance();
 
         try {
             while (true) {
@@ -61,22 +60,24 @@ public class VirtualServer {
                 Logger.logDebug("RECEIVED MESSAGE: " + msg);
                 if (msg == null) {
                     Logger.logInfo("Client disconnected normally.");
+                    PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.server_closed"));
                     break;
                 }
-                virtualServer.handleMessageFromServer(msg);
+                handleMessageFromServer(msg);
             }
         } catch (SocketException e) {
-            if (disconnecting){
-                Logger.logInfo("Client disconnected normally.");
+            if (disconnecting) {
+                Logger.logInfo("Client disconnected itself normally.");
             } else {
-                PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.connection_lost"));
-                Platform.runLater(() -> SceneSwitch.switchScene("LoginScene"));
                 Logger.logWarning("Client forcibly disconnected.");
+                PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.connection_lost"));
             }
         } catch (IOException e) {
             Logger.logError("IOException: " + e.getMessage());
+            //PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.unexpected_error"));
         } finally {
             close();
+            Platform.runLater(() -> SceneSwitch.switchScene("LoginScene"));
         }
     }
 

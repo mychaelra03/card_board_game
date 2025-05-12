@@ -41,8 +41,8 @@ public class SettingsController implements PopupAware {
 
     @FXML
     public void onMainMenuPressed() {
-        VirtualServer.getInstance().setCallBack(null);
-        SceneSwitch.switchScene("LoginScene");
+        VirtualServer virtualServer = VirtualServer.getInstance();
+        virtualServer.close();
     }
 
     @FXML

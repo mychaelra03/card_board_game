@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.server.controller.Controller;
 
 import java.io.*;
 import java.net.Socket;
@@ -47,7 +48,7 @@ public class VirtualView extends Thread {
                     Logger.logInfo("Client disconnected.");
                     break;
                 }
-                this.controller.processCmd(this, msg);
+                this.controller.processCommand(this, msg);
             }
 
         } catch (SocketException e) {
@@ -68,12 +69,14 @@ public class VirtualView extends Thread {
         this.controller.removeClient(this);
 
         try {
+
+            if (in != null) in.close();
+            if (out != null) out.close();
+
             if (clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();
                 Logger.logDebug("Client connection closed");
             }
-            if (in != null) in.close();
-            if (out != null) out.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);

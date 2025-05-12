@@ -71,7 +71,7 @@ public class ShipBuildingController implements VirtualServerAware {
         // initialize covered tiles
         List<ImageView> tileList = new ArrayList<>();
 
-        for(int id = 1; id < 151; id++) {
+        for(int id = 0; id < 152; id++) {
             ImageView tile = tileManager.generateTile(id, backTexture);
 
             tileList.add(tile);
@@ -110,7 +110,7 @@ public class ShipBuildingController implements VirtualServerAware {
                 case "gameState" -> {
                     GameStateMessage gameStateMessage = mapper.readValue(cmd, GameStateMessage.class);
 
-                    if (gameStateMessage.getGameState() != GameModel.GameState.APPLYING_CARDS) throw new IllegalStateException("Invalid game state");
+                    if (gameStateMessage.getGameState() != GameModel.GameState.FLIGHT_PHASE) throw new IllegalStateException("Invalid game state");
                     Platform.runLater(() -> SceneSwitch.switchScene("ApplyingCardsScene"));
                     return;
                 }

@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.server.controller.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;

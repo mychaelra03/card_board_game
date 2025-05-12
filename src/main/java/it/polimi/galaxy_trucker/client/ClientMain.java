@@ -13,14 +13,6 @@ public class ClientMain extends Application {
     @Override
     public void start(Stage stage) {
 
-        Font.loadFont(getClass().getResourceAsStream("/fonts/Rajdhani-Regular.ttf"), 12);
-        Font.loadFont(getClass().getResourceAsStream("/fonts/Rajdhani-Bold.ttf"), 12);
-        Font.loadFont(getClass().getResourceAsStream("/fonts/Orbitron-Regular.ttf"), 12);
-        Font.loadFont(getClass().getResourceAsStream("/fonts/Orbitron-Bold.ttf"), 12);
-        Font.loadFont(getClass().getResourceAsStream("/fonts/Mr Headlines Fancy.ttf"), 12);
-        Font.loadFont(getClass().getResourceAsStream("/fonts/chango one.otf"), 12);
-        Font.loadFont(getClass().getResourceAsStream("/fonts/SourGummy-Regular.ttf"), 12);
-        Font.loadFont(getClass().getResourceAsStream("/fonts/SourGummy-Bold.ttf"), 12);
         Font.loadFont(getClass().getResourceAsStream("/fonts/DynaPuff-Regular.ttf"), 12);
         Font.loadFont(getClass().getResourceAsStream("/fonts/DynaPuff-Bold.ttf"), 12);
 

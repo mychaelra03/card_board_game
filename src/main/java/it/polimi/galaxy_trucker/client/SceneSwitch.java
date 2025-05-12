@@ -13,12 +13,15 @@ import java.util.ResourceBundle;
 
 public class SceneSwitch {
     private static Stage primaryStage;
+    private static String currentFxml = null;
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
     }
 
     public static void switchScene(String fxmlFile) {
+        if (fxmlFile.equals(currentFxml)) return;
+
         URL resource = SceneSwitch.class.getResource("/fxml/scenes/" + fxmlFile + ".fxml");
 
         Parent root;
@@ -42,6 +45,7 @@ public class SceneSwitch {
 
         Scene newScene = new Scene(root);
         primaryStage.setScene(newScene);
+        currentFxml = fxmlFile;
 
         if (!primaryStage.isShowing()) primaryStage.show();
     }

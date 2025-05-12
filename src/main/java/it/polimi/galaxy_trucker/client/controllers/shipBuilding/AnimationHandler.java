@@ -151,9 +151,9 @@ public class AnimationHandler {
                 if(node instanceof StackPane profilePic) {
                     FadeTransition fade = new FadeTransition(Duration.millis(duration), profilePic);
                     fade.setToValue(0);
-                    fade.setOnFinished(_ -> cardSlot.getChildren().remove(node));
                     TranslateTransition translate = new TranslateTransition(Duration.millis(duration), profilePic);
                     translate.setToY(-20);
+                    fade.setOnFinished(_ -> cardSlot.getChildren().remove(node));
                     new ParallelTransition(fade, translate).play();
                 }
             }

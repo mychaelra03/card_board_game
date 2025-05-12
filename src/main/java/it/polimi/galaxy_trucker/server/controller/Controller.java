@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker.server;
+package it.polimi.galaxy_trucker.server.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,6 +12,7 @@ import it.polimi.galaxy_trucker.common.messages.lobby.ChatMessage;
 import it.polimi.galaxy_trucker.common.messages.lobby.KickedMessage;
 import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
+import it.polimi.galaxy_trucker.server.VirtualView;
 import it.polimi.galaxy_trucker.server.events.*;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsReturnedEvent;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsTakenEvent;
@@ -82,12 +83,18 @@ public class Controller {
     }
 
 
-    public void processCmd(VirtualView senderVirtualView, String json) throws JsonProcessingException {
+    public void processCommand(VirtualView senderVirtualView, String json) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode cmd = mapper.readTree(json);
         String type = cmd.get("type").asText();
 
+//        switch (gameModel.getGameState()) {
+//            case LOBBY -> LobbyHandler.handle(cmd);
+//            case BUILDING_SHIPS -> ShipBuildingHandler.handle(cmd);
+//            case FLIGHT_PHASE -> CardHandler.handle(cmd);
+//            case GAME_OVER -> GameOverHandler.handle(cmd);
+//        }
         switch (type) {
             case "playerInfo" -> {
 

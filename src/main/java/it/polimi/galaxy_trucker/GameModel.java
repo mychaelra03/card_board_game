@@ -27,12 +27,12 @@ public class GameModel {
     private final Set<Integer> availableCardPiles;
 
     public enum GameState {
-        WAITING_FOR_PLAYERS,
+        LOBBY,
         BUILDING_SHIPS,
-        APPLYING_CARDS,
+        FLIGHT_PHASE,
         GAME_OVER
     }
-    private GameState gameState = WAITING_FOR_PLAYERS;
+    private GameState gameState = LOBBY;
 
     public GameModel() {
         this.boardType = BoardType.LEVEL_TWO;
@@ -82,7 +82,7 @@ public class GameModel {
     }
 
     public LobbyJoinResponse.JoinStatus canAddPlayer(Player player) {
-        if(gameState != WAITING_FOR_PLAYERS) return LobbyJoinResponse.JoinStatus.GAME_STARTED;
+        if(gameState != LOBBY) return LobbyJoinResponse.JoinStatus.GAME_STARTED;
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
         if(players.size() >= 4) return LobbyJoinResponse.JoinStatus.LOBBY_FULL;
 
@@ -94,7 +94,7 @@ public class GameModel {
 
 
     public void addPlayer(Player player) {
-        verifyGameState(WAITING_FOR_PLAYERS);
+        verifyGameState(LOBBY);
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
         LobbyJoinResponse.JoinStatus canAddPlayer = canAddPlayer(player);
         if(canAddPlayer != LobbyJoinResponse.JoinStatus.SUCCESS) throw new IllegalStateException("Can't add player :" + canAddPlayer);
@@ -122,7 +122,11 @@ public class GameModel {
         players.remove(player);
         if(player.isAdmin() && !players.isEmpty()) players.getFirst().setAdmin(true);
 
-        eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
+        if(!players.isEmpty()) eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
+        else {
+            Logger.logInfo("All players have left the game. Resetting game state.");
+            reset();
+        }
     }
 
     private void assignFirstAvailableColor(Player player) {
@@ -285,7 +289,7 @@ public class GameModel {
         }
     }
 
-    protected final void setGameState(GameState state) {
+    private void setGameState(GameState state) {
         this.gameState = state;
         switch(state) {
             case BUILDING_SHIPS -> {
@@ -298,10 +302,29 @@ public class GameModel {
         }
         eventDispatcher.fireEvent(new GameStateUpdateEvent(state));
     }
-    protected final void verifyGameState(GameState expectedState) {
+    public GameState getGameState() {
+        return gameState;
+    }
+    private void verifyGameState(GameState expectedState) {
         if(gameState != expectedState) {
             throw new IllegalStateException("Expected state: " + expectedState + ". Current state: " + gameState + ".");
         }
+    }
+
+    public void reset() {
+        this.boardType = BoardType.LEVEL_TWO;
+        this.players.clear();
+        this.availableTiles.clear();
+        for (int i = 0; i < 152; i++) {
+            availableTiles.add(i);
+        }
+        this.availableCardPiles.clear();
+        for (int i = 0; i < 3; i++) {
+            availableCardPiles.add(i);
+        }
+        this.deck.clear();
+        this.cardPiles = null;
+        this.gameState = GameState.LOBBY;
     }
 
     private List<PlayerInfo> getPlayersInfo(){
