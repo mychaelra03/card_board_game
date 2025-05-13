@@ -87,7 +87,7 @@ public class LobbyController implements VirtualServerAware {
 
         chatScrollPane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         chatVbox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        settingsButton.setOnAction(event -> Popup.newSettingsPopup().show(rootPane, mainContentPane));
+        settingsButton.setOnAction(event -> Popup.newSettingsPopup().show());
 
         prevMapButton.setOnAction(_ -> {
             cooldownButton(prevMapButton, .1);
@@ -203,7 +203,7 @@ public class LobbyController implements VirtualServerAware {
                 int readyRequired = Math.max(2, playersInfo.size());
                 readyCounter.setText(readyCount + " / " + readyRequired);
 
-                readyButton.setText(thisPlayer.isReady()? LanguageManager.get("button.cancel") : LanguageManager.get("button.ready"));
+                readyButton.setText(thisPlayer.isReady()? LanguageManager.get("button.ready_cancel") : LanguageManager.get("button.ready"));
 
                 updatePlayerList(playersInfo, thisPlayer);
             }
@@ -265,7 +265,7 @@ public class LobbyController implements VirtualServerAware {
 
             Text username = new Text(playerInfo.getUsername());
             username.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
-            username.setFill(Color.BLACK);
+            username.setFill(Color.WHITE);
             TextFlow usernameText = new TextFlow(username);
             usernameText.setPrefHeight(Region.USE_COMPUTED_SIZE);
             usernameText.setMaxHeight(Region.USE_PREF_SIZE);

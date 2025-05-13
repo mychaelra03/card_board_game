@@ -1,7 +1,9 @@
 package it.polimi.galaxy_trucker.client;
 
+import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -24,9 +26,14 @@ public class ClientMain extends Application {
 
         SceneSwitch.switchScene("LoginScene");
 
-        stage.setOnCloseRequest(_ -> {
+        stage.setOnCloseRequest(event -> {
+            event.consume();
             Logger.logInfo("Window is closing...");
-            VirtualServer.getInstance().close();
+            Popup.newConfirmationPopup("prompt.close_game", () -> {
+                VirtualServer.getInstance().close();
+                Platform.exit();
+                System.exit(0);
+            }).show();
         });
 
         stage.show();

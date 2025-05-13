@@ -4,6 +4,7 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,11 +17,11 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController">
+<StackPane fx:id="rootPane" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController">
     <AnchorPane fx:id="mainContentPane" mouseTransparent="true" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-size: cover; -fx-background-repeat: no-repeat;">
         <Button fx:id="leftButton" layoutX="192.0" layoutY="680.0" mnemonicParsing="false" onAction="#onClickTurnTileLeft" prefWidth="60.0" text="%button.left" />
         <Button fx:id="rightButton" layoutX="452.0" layoutY="680.0" mnemonicParsing="false" onAction="#onClickTurnTileRight" prefWidth="60.0" text="%button.right" />
-        <Rectangle fx:id="focusSlot" arcHeight="5.0" fill="#1f93ff00" height="80.0" layoutX="312.0" layoutY="637.0" scaleX="1.7" scaleY="1.7" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-height: 5; -fx-arc-width: 5;" width="80.0" AnchorPane.bottomAnchor="83.0" />
+        <Rectangle fx:id="focusSlot" fill="TRANSPARENT" height="80.0" layoutX="312.0" layoutY="637.0" scaleX="1.7" scaleY="1.7" stroke="#ffffffcc" strokeType="INSIDE" strokeWidth="2.0" style="-fx-arc-height: 5; -fx-arc-width: 5;" width="80.0" AnchorPane.bottomAnchor="83.0" />
         <ImageView fx:id="shipBoardImage" fitHeight="473.0" fitWidth="641.0" layoutX="30.0" layoutY="120.0" opacity="0.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@../../textures/cardboards/shipboard_2.png" />
          <effect>
@@ -72,6 +73,9 @@
                <image>
                   <Image url="@../../textures/icons/settingsIcon2.png" />
                </image>
+               <effect>
+                  <ColorAdjust brightness="0.9" />
+               </effect>
             </ImageView>
          </graphic>
       </Button>

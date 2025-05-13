@@ -21,9 +21,7 @@ public class AlertPopupController implements PopupAware {
 
     @FXML
     public void onClose() {
-        if (popup != null) {
-            popup.playClosingAnimation();
-        }
+        if (popup != null) popup.playClosingAnimation();
     }
 
     @Override

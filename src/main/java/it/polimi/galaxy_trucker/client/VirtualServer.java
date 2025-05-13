@@ -13,9 +13,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class VirtualServer {
-    Socket clientSocket;
-    BufferedReader in = null;
-    PrintWriter out = null;
+    private Socket clientSocket;
+    private BufferedReader in = null;
+    private PrintWriter out = null;
+    private long lastPingTime;
 
     private UICallBack UICallBack;
     private final Queue<String> messageQueue = new LinkedList<>();
@@ -54,15 +55,21 @@ public class VirtualServer {
     public void listenForMessages() {
         Logger.logInfo("ClientThread started");
 
+        lastPingTime = System.currentTimeMillis();
+        Thread watchdog = getWatchdog();
+        watchdog.start();
+
         try {
             while (true) {
                 String msg = in.readLine();
                 Logger.logDebug("RECEIVED MESSAGE: " + msg);
+
                 if (msg == null) {
                     Logger.logInfo("Client disconnected normally.");
                     PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.server_closed"));
                     break;
                 }
+
                 handleMessageFromServer(msg);
             }
         } catch (SocketException e) {
@@ -79,6 +86,24 @@ public class VirtualServer {
             close();
             Platform.runLater(() -> SceneSwitch.switchScene("LoginScene"));
         }
+    }
+
+    private Thread getWatchdog() {
+        Thread watchdog = new Thread(() -> {
+            try {
+                while (!disconnecting) {
+                    Thread.sleep(2000);
+                    if (System.currentTimeMillis() - lastPingTime > 4000) {
+                        Logger.logWarning("No ping received, assuming disconnection.");
+                        PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.connection_lost"));
+                        close();
+                        break;
+                    }
+                }
+            } catch (InterruptedException ignored) {}
+        });
+        watchdog.setDaemon(true);
+        return watchdog;
     }
 
     public void close() {
@@ -109,15 +134,22 @@ public class VirtualServer {
     }
 
     public void handleMessageFromServer(String msg) {
-        UICallBack callBack;
+        try {
+            String type = new ObjectMapper().readTree(msg).get("type").asText();
+            if (type.equals("ping")) {
+                lastPingTime = System.currentTimeMillis();
+                return;
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         synchronized(this) {
-            callBack = this.UICallBack;
-            if (callBack != null) {
-                dispatchToUI(callBack, msg);
+            if (UICallBack != null) {
+                dispatchToUI(UICallBack, msg);
             } else {
                 messageQueue.add(msg);
             }
-
         }
     }
 

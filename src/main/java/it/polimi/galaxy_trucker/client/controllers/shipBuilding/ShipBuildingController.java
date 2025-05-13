@@ -92,12 +92,12 @@ public class ShipBuildingController implements VirtualServerAware {
 
         focusSlot.setOnMouseClicked(_ -> tileManager.moveSelectedToFocusSlot());
 
-        settingsButton.setOnAction(_ -> Popup.newSettingsPopup().show(rootPane, mainContentPane));
+        settingsButton.setOnAction(_ -> Popup.newSettingsPopup().show());
 
         reservedSlot0.setOnMouseClicked(event -> tileManager.onReservedSlotClick(event));
         reservedSlot1.setOnMouseClicked(event -> tileManager.onReservedSlotClick(event));
 
-        Platform.runLater(() -> Popup.newCountdownPopup(5).show(rootPane, mainContentPane));
+        Platform.runLater(() -> Popup.newCountdownPopup(5).show());
     }
 
 
@@ -228,7 +228,7 @@ public class ShipBuildingController implements VirtualServerAware {
 
                 CardsMessage message = mapper.readValue(cmd, CardsMessage.class);
 
-                Popup.newCardsPopup(message.getLevelOneCards(), message.getLevelTwoCards()).show(rootPane, mainContentPane);
+                Popup.newCardsPopup(message.getLevelOneCards(), message.getLevelTwoCards()).show();
             }
 
             default -> Logger.logError("Unrecognized command: " + type);

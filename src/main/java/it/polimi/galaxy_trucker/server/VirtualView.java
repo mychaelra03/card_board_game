@@ -3,17 +3,22 @@ package it.polimi.galaxy_trucker.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.PingMessage;
 import it.polimi.galaxy_trucker.server.controller.MainController;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class VirtualView extends Thread {
-    BufferedReader in;
-    PrintWriter out;
-    Socket clientSocket;
-    MainController controller;
+    private final BufferedReader in;
+    private final PrintWriter out;
+    private final Socket clientSocket;
+    private final MainController controller;
+    private Timer pingTimer;
 
     public VirtualView(Socket clientSocket, MainController controller) {
         this.clientSocket = clientSocket;
@@ -40,6 +45,8 @@ public class VirtualView extends Thread {
     }
 
     public void run() {
+        startPingLoop();
+
         try {
             while (true) {
                 String msg = in.readLine();
@@ -64,6 +71,16 @@ public class VirtualView extends Thread {
         }
     }
 
+    private void startPingLoop() {
+        pingTimer = new Timer(true);
+        pingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                sendMessage(new PingMessage());
+            }
+        }, 3000, 3000);  // send every 3s
+    }
+
     public void close() {
 
         this.controller.removeClient(this);
@@ -77,6 +94,7 @@ public class VirtualView extends Thread {
                 clientSocket.close();
                 Logger.logDebug("Client connection closed");
             }
+            if (pingTimer != null) pingTimer.cancel();
 
         } catch (IOException e) {
             throw new RuntimeException(e);

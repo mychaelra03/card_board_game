@@ -3,9 +3,6 @@
 }
 
 #mainContentPane {
-    /*-fx-background-color: #424a5e;*/
-    /*-fx-background-color: #c5dced;*/
-    -fx-background-color: white;
     -fx-background-image: url('../textures/backgrounds/background.png');
     -fx-background-size: auto;
     -fx-background-repeat: no-repeat;
@@ -32,7 +29,7 @@
     -fx-background-color: gold;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
-    -fx-font-weight: bold;
+    /*-fx-font-weight: bold;*/
     -fx-background-radius: 10;
     -fx-border-radius: 10;
 }

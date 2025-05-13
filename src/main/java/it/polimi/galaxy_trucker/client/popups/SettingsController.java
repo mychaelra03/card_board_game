@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.client.popups;
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import it.polimi.galaxy_trucker.client.VirtualServer;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,7 +20,6 @@ public class SettingsController implements PopupAware {
     @FXML private Label languageNoteLabel;
 
     @FXML private Button mainMenuButton;
-    @FXML private Button closeGameButton;
 
     private boolean isMainMenu = false;
 
@@ -41,22 +41,23 @@ public class SettingsController implements PopupAware {
 
     @FXML
     public void onMainMenuPressed() {
-        VirtualServer virtualServer = VirtualServer.getInstance();
-        virtualServer.close();
+        Popup.newConfirmationPopup("prompt.main_menu", () -> {
+            VirtualServer.getInstance().close();
+        }).show();
     }
 
     @FXML
     public void onCloseGamePressed() {
-        Stage stage = (Stage) closeGameButton.getScene().getWindow();
-        WindowEvent closeEvent = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
-        Event.fireEvent(stage, closeEvent);
+        Popup.newConfirmationPopup("prompt.close_game", () -> {
+            VirtualServer.getInstance().close();
+            Platform.exit();
+            System.exit(0);
+        }).show();
     }
 
     @FXML
     public void onClose() {
-        if (popup != null) {
-            popup.playClosingAnimation();
-        }
+        if (popup != null) popup.playClosingAnimation();
     }
 
     @Override

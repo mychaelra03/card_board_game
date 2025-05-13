@@ -49,4 +49,8 @@ public class SceneSwitch {
 
         if (!primaryStage.isShowing()) primaryStage.show();
     }
+
+    public static Stage getStage() {
+        return primaryStage;
+    }
 }

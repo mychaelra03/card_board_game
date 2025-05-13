@@ -112,18 +112,22 @@ public class MainController {
 
 
     private void broadcastMessage(Object message) {
-        for (VirtualView virtualView : playerMap.keySet()) {
-            virtualView.sendMessage(message);
+        synchronized (playerMap) {
+            for (VirtualView virtualView : playerMap.keySet()) {
+                virtualView.sendMessage(message);
+            }
         }
     }
 
 
 
     public void removeClient(VirtualView virtualView) {
-        if(playerMap.containsKey(virtualView)) {
-            String playerName = playerMap.get(virtualView).getName();
-            playerMap.remove(virtualView);
-            this.gameModel.removePlayer(playerName);
+        synchronized (playerMap) {
+            if(playerMap.containsKey(virtualView)) {
+                String playerName = playerMap.get(virtualView).getName();
+                playerMap.remove(virtualView);
+                this.gameModel.removePlayer(playerName);
+            }
         }
     }
 }
