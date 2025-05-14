@@ -1,10 +1,10 @@
-package it.polimi.galaxy_trucker.cards;
+package it.polimi.galaxy_trucker.server.model.cards;
 
-import it.polimi.galaxy_trucker.CardFactory;
-import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.server.model.CardFactory;
+import it.polimi.galaxy_trucker.server.model.GameModel;
 import org.junit.jupiter.api.Test;
 
-import static it.polimi.galaxy_trucker.BoardType.*;
+import static it.polimi.galaxy_trucker.server.model.BoardType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CardFactoryTest {

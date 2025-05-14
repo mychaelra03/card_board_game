@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker;
+package it.polimi.galaxy_trucker.server.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

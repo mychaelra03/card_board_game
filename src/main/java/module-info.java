@@ -7,8 +7,6 @@ module it.polimi.galaxy_trucker {
     requires java.desktop;
     requires java.sql;
 
-    opens it.polimi.galaxy_trucker to javafx.fxml;
-    exports it.polimi.galaxy_trucker;
     exports it.polimi.galaxy_trucker.server.model.tiles;
     exports it.polimi.galaxy_trucker.server.model.cards;
     opens it.polimi.galaxy_trucker.server.model.cards to com.fasterxml.jackson.databind;
@@ -33,4 +31,6 @@ module it.polimi.galaxy_trucker {
     opens it.polimi.galaxy_trucker.common.messages.lobby to com.fasterxml.jackson.databind;
     exports it.polimi.galaxy_trucker.common.messages.login;
     opens it.polimi.galaxy_trucker.common.messages.login to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.server.model;
+    opens it.polimi.galaxy_trucker.server.model to javafx.fxml;
 }

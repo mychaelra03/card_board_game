@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker;
+package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.server.model.tiles.*;
@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.Player.PlayerState.*;
+import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 
 public class Player {
 
@@ -18,6 +18,7 @@ public class Player {
         IDLE,
         READY_TO_PLAY,
         BUILDING_SHIP,
+        DONE_BUILDING,
         RESOLVING_CARD,
         ELIMINATED
     }

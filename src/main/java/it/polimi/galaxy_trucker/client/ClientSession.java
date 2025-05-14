@@ -47,6 +47,10 @@ public class ClientSession {
         players.clear();
     }
 
+    public static int getPlayerCount() {
+        return players.size();
+    }
+
     public static StackPane getPlayerProfilePicture(String username, double size) {
         PlayerInfo playerInfo = players.get(username);
         if(playerInfo == null) return null;

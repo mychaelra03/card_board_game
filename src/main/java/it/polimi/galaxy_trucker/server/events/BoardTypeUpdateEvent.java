@@ -1,9 +1,9 @@
 package it.polimi.galaxy_trucker.server.events;
 
-import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.server.model.BoardType;
 
 public class BoardTypeUpdateEvent extends EventModel {
-    public final BoardType boardType;
+    private final BoardType boardType;
 
     public BoardTypeUpdateEvent(BoardType boardType) {
         this.boardType = boardType;

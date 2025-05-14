@@ -20,7 +20,7 @@
                <Cursor fx:constant="HAND" />
            </cursor>
         </Button>
-        <Button cancelButton="true" defaultButton="true" onAction="#onConfirm" style="-fx-font-size: 14;" text="%button.confirm">
+        <Button onAction="#onConfirm" style="-fx-font-size: 14;" text="%button.confirm">
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>

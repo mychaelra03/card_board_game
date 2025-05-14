@@ -63,33 +63,11 @@ public class Popup {
         }
     }
 
-//    public void show(StackPane rootPane, AnchorPane mainContentPane) {
-//        this.rootPane = rootPane;
-//        this.mainContentPane = mainContentPane;
-//
-//        ParallelTransition openingAnimation = getOpeningAnimation();
-//
-//        rootPane.getChildren().addAll(overlay, content);
-//        openingAnimation.play();
-//
-//        originalEffect = mainContentPane.getEffect();
-//        BoxBlur blur = new BoxBlur(5, 5, 5);
-//        if (originalEffect != null) blur.setInput(originalEffect);
-//        mainContentPane.setEffect(blur);
-//        mainContentPane.setMouseTransparent(true);
-//
-//        overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
-//        overlay.setOnMouseClicked(_ -> close());
-//
-//        Scene scene = rootPane.getScene();
-//        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-//            if (event.getCode() == KeyCode.ESCAPE) {
-//                close();
-//            }
-//        });
-//    }
-
     public void show() {
+        if (controller instanceof PopupAware controllerAware) {
+            if(controllerAware.isPopupVisible()) return;
+            controllerAware.setPopupVisible(true);
+        }
         Scene scene = SceneSwitch.getStage().getScene();
         if (!(scene.getRoot() instanceof StackPane rootPane)) {
             throw new IllegalStateException("Popup requires scene root to be a StackPane");
@@ -131,11 +109,11 @@ public class Popup {
         closingAnimation.setOnFinished(_ -> {
             rootPane.getChildren().removeAll(overlay, content);
             clearBlur();
+            if (controller instanceof PopupAware controllerAware) controllerAware.setPopupVisible(false);
         });
 
         closingAnimation.play();
     }
-
 
     public static Popup newSettingsPopup(boolean isMainMenu) {
         return new Popup("SettingsPopup", isMainMenu);
@@ -154,12 +132,9 @@ public class Popup {
     public static Popup newCardsPopup(int[] levelOneCards, int[] levelTwoCards) {
         return new Popup("CardsPopup", levelOneCards, levelTwoCards);
     }
-    public static Popup newCardsPopup(int[] levelOneCards) {
-        return new Popup("CardsPopup", levelOneCards);
-    }
 
-    public static Popup newCountdownPopup(int duration) {
-        return new Popup("CountdownPopup", duration);
+    public static Popup newCountdownPopup(String text, int duration) {
+        return new Popup("CountdownPopup", text, duration);
     }
 
     public static Popup newConfirmationPopup(String prompt, Runnable action) {

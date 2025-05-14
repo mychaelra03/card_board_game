@@ -3,11 +3,11 @@ package it.polimi.galaxy_trucker.client.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
-import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
@@ -34,8 +34,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -110,16 +108,17 @@ public class LobbyController implements VirtualServerAware {
             String type = mapper.readTree(cmd).get("type").asText();
             switch (type) {
                 case "kicked" -> {
-                    //VirtualServer.getInstance().setCallBack(null);
                     PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.kicked"));
                     virtualServer.close();
-                    //Platform.runLater(() -> SceneSwitch.switchScene("LoginScene"));
                     return;
                 }
                 case "gameState" -> {
-                    GameStateMessage gameStateMessage = mapper.readValue(cmd, GameStateMessage.class);
+                    GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
 
-                    if (gameStateMessage.getGameState() != GameModel.GameState.BUILDING_SHIPS) throw new IllegalStateException("Invalid game state");
+                    if (message.getGameState() != GameModel.GameState.WAITING) {
+                        Logger.logError("Invalid game state");
+                        return;
+                    }
                     virtualServer.setCallBack(null);
                     Platform.runLater(() -> SceneSwitch.switchScene("ShipBuildingScene"));
                     return;
@@ -213,7 +212,9 @@ public class LobbyController implements VirtualServerAware {
                 BoardTypeMessage boardTypeMessage = mapper.readValue(cmd, BoardTypeMessage.class);
                 BoardType boardType = boardTypeMessage.getBoardType();
                 String path = switch (boardType) {
-                    case LEARNING, LEVEL_ONE -> "/textures/cardboards/showcase_1.png";
+
+                    case LEARNING -> "/textures/cardboards/showcase_L.png";
+                    case LEVEL_ONE -> "/textures/cardboards/showcase_1.png";
                     case LEVEL_TWO -> "/textures/cardboards/showcase_2.png";
                 };
                 Image board = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
@@ -296,8 +297,8 @@ public class LobbyController implements VirtualServerAware {
 
             if (playerInfo.isAdmin()) {
                 ImageView adminCrown = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/crownIcon.png"))));
-                adminCrown.setFitHeight(15);
-                adminCrown.setFitWidth(15);
+                adminCrown.setFitHeight(25);
+                adminCrown.setFitWidth(25);
                 HBox.setMargin(adminCrown, new Insets(0, 18, 0, 0));
                 playerBox.getChildren().add(adminCrown);
             }
@@ -318,8 +319,8 @@ public class LobbyController implements VirtualServerAware {
     private Button getDotsButton(PlayerInfo playerInfo) {
 
         ImageView dotsImage = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/dotsMenuIcon.png"))));
-        dotsImage.setFitHeight(15);
-        dotsImage.setFitWidth(15);
+        dotsImage.setFitHeight(25);
+        dotsImage.setFitWidth(25);
         dotsImage.setPreserveRatio(true);
 
         Button dotsButton = new Button("", dotsImage);

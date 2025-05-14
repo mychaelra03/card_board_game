@@ -1,6 +1,8 @@
 package it.polimi.galaxy_trucker;
 
-import static it.polimi.galaxy_trucker.BoardType.LEVEL_TWO;
+import it.polimi.galaxy_trucker.server.model.ShipBoard;
+
+import static it.polimi.galaxy_trucker.server.model.BoardType.LEVEL_TWO;
 
 public class DefaultShipBoards {
 

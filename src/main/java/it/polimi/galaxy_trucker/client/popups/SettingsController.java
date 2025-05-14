@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.client.popups;
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import it.polimi.galaxy_trucker.client.VirtualServer;
+import it.polimi.galaxy_trucker.common.Logger;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import javafx.stage.WindowEvent;
 public class SettingsController implements PopupAware {
 
     private Popup popup;
+    private static boolean isPopupVisible = false;
 
     @FXML private Label languageLabel;
     @FXML private Button languageButton;
@@ -42,6 +44,7 @@ public class SettingsController implements PopupAware {
     @FXML
     public void onMainMenuPressed() {
         Popup.newConfirmationPopup("prompt.main_menu", () -> {
+            Logger.logInfo("Returning to main menu...");
             VirtualServer.getInstance().close();
         }).show();
     }
@@ -49,6 +52,7 @@ public class SettingsController implements PopupAware {
     @FXML
     public void onCloseGamePressed() {
         Popup.newConfirmationPopup("prompt.close_game", () -> {
+            Logger.logInfo("Closing game...");
             VirtualServer.getInstance().close();
             Platform.exit();
             System.exit(0);
@@ -83,5 +87,15 @@ public class SettingsController implements PopupAware {
         languageNoteLabel.setText(isCurrent ? "" : LanguageManager.get("label.language_note"));
 
         mainMenuButton.setDisable(isMainMenu);
+    }
+
+    @Override
+    public void setPopupVisible(boolean visible) {
+        isPopupVisible = visible;
+    }
+
+    @Override
+    public boolean isPopupVisible() {
+        return isPopupVisible;
     }
 }

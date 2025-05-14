@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.server.model.cards.projectile;
 
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.Player;
 
 public abstract class Projectile {
 

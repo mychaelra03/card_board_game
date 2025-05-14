@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker;
+package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.server.model.tiles.*;
 import org.junit.jupiter.api.Test;
@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import java.awt.Point;
 import java.util.Set;
 
-import static it.polimi.galaxy_trucker.BoardType.*;
+import static it.polimi.galaxy_trucker.server.model.BoardType.*;
 import static it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.*;
 import static it.polimi.galaxy_trucker.server.model.tiles.CargoTile.CargoType.*;
 import static it.polimi.galaxy_trucker.server.model.tiles.Connector.*;
-import static it.polimi.galaxy_trucker.ShipBoard.*;
+import static it.polimi.galaxy_trucker.server.model.ShipBoard.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ShipBoardTest {

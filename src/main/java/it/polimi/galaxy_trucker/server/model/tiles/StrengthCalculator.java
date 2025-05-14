@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.server.model.tiles;
 
-import it.polimi.galaxy_trucker.ShipBoard;
+import it.polimi.galaxy_trucker.server.model.ShipBoard;
 
 import static it.polimi.galaxy_trucker.server.model.tiles.CrewType.*;
 

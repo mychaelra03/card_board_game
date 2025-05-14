@@ -1,7 +1,6 @@
 package it.polimi.galaxy_trucker.common.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import it.polimi.galaxy_trucker.GameModel;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameResetMessage implements GameMessage {

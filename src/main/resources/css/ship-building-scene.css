@@ -18,13 +18,15 @@
     -fx-font-weight: bold;
 }
 
+.label:disabled {
+    -fx-opacity: 1;
+}
+
 .board-buttons {
     -fx-background-color: gold;
     -fx-background-radius: 10px;
-    -fx-background-insets: 0;
     -fx-border-color: #ffae00;
     -fx-border-radius: 10px;
-    -fx-border-insets: 0;
     -fx-text-fill: black;
     -fx-font-size: 30px;
     -fx-font-weight: bold;

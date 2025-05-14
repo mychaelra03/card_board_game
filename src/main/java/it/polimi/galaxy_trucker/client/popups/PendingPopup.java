@@ -17,4 +17,8 @@ public class PendingPopup {
             popup = null;
         }
     }
+
+    public static void clear() {
+        popup = null;
+    }
 }

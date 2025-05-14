@@ -1,21 +1,21 @@
-package it.polimi.galaxy_trucker;
+package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
 import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
 import it.polimi.galaxy_trucker.server.events.*;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsReturnedEvent;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsTakenEvent;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.TileReturnedEvent;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.TileTakenEvent;
+import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static it.polimi.galaxy_trucker.GameModel.GameState.*;
-import static it.polimi.galaxy_trucker.Player.PlayerState.*;
+import static it.polimi.galaxy_trucker.server.model.GameModel.GameState.*;
+import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 
 public class GameModel {
     private BoardType boardType;
@@ -23,20 +23,27 @@ public class GameModel {
     private List<Card> deck;
     private List<List<Card>> cardPiles;
 
+    private final EventDispatcher eventDispatcher = new EventDispatcher();
+
     private final Set<Integer> availableTiles;
     private final Set<Integer> availableCardPiles;
+    private final Set<Integer> availablePositions;
+
+    private final BuildingTimerHandler timerHandler = new BuildingTimerHandler(20, eventDispatcher, this::onTimerFinished);
+    private Boolean timerFlipAvailable = false;
 
     public enum GameState {
         LOBBY,
         BUILDING_SHIPS,
         FLIGHT_PHASE,
+        WAITING,
         GAME_OVER
     }
     private GameState gameState = LOBBY;
 
     public GameModel() {
-        this.boardType = BoardType.LEVEL_TWO;
         this.players = new ArrayList<>();
+        this.boardType = BoardType.LEVEL_TWO;
         this.availableTiles = new HashSet<>();
         for (int i = 0; i < 152; i++) {
             availableTiles.add(i);
@@ -45,8 +52,10 @@ public class GameModel {
         for (int i = 0; i < 3; i++) {
             availableCardPiles.add(i);
         }
+        this.availablePositions = new HashSet<>();
         this.deck = new ArrayList<>();
     }
+
 
     public BoardType getBoardType() {
         return boardType;
@@ -165,7 +174,7 @@ public class GameModel {
             if(p.isReady()) playersReady++;
         }
         if(players.size() > 1 && playersReady == players.size()) {
-            setGameState(BUILDING_SHIPS);
+            setGameStateAfterWait(5, BUILDING_SHIPS);
         } else {
             eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), ""));
         }
@@ -199,11 +208,13 @@ public class GameModel {
     }
 
 
-    public boolean TryTakeTile(String playerName, int id) {
+    public boolean TryTakeTile(Player player, int id) {
+        if(player.getState() != BUILDING_SHIP) return false;
+
         synchronized (availableTiles) {
             if (!availableTiles.contains(id)) return false;
             availableTiles.remove(id);
-            eventDispatcher.fireEvent(new TileTakenEvent(playerName, id));
+            eventDispatcher.fireEvent(new TileTakenEvent(player.getName(), id));
             return true;
         }
     }
@@ -218,11 +229,13 @@ public class GameModel {
             eventDispatcher.fireEvent(new TileReturnedEvent(id));
         }
     }
-    public boolean tryTakeCardPile(String playerName, int id) {
+    public boolean tryTakeCardPile(Player player, int id) {
+        if(player.getState() != BUILDING_SHIP) return false;
+
         synchronized (availableCardPiles) {
             if (!availableCardPiles.contains(id)) return false;
             availableCardPiles.remove(id);
-            eventDispatcher.fireEvent(new CardsTakenEvent(playerName, id));
+            eventDispatcher.fireEvent(new CardsTakenEvent(player.getName(), id));
             return true;
         }
     }
@@ -298,17 +311,16 @@ public class GameModel {
     }
 
     private void setGameState(GameState state) {
+        GameState previousGameState = gameState;
         this.gameState = state;
         switch(state) {
             case BUILDING_SHIPS -> {
-                generateDeck();
-                players.forEach(player -> {
-                    player.setState(BUILDING_SHIP);
-                    player.setNewShipBoard(boardType);
-                });
+                timerFlipAvailable = true;
+                flipTimer(false);
             }
         }
-        eventDispatcher.fireEvent(new GameStateUpdateEvent(state));
+
+        eventDispatcher.fireEvent(new GameStateUpdateEvent(previousGameState, gameState));
     }
     public GameState getGameState() {
         return gameState;
@@ -316,6 +328,84 @@ public class GameModel {
     private void verifyGameState(GameState expectedState) {
         if(gameState != expectedState) {
             throw new IllegalStateException("Expected state: " + expectedState + ". Current state: " + gameState + ".");
+        }
+    }
+
+    private void setGameStateAfterWait(int seconds, GameState nextState) {
+        setGameState(WAITING);
+        switch(nextState) {
+            case BUILDING_SHIPS -> {
+                generateDeck();
+                for (Player player : players) {
+                    player.setState(BUILDING_SHIP);
+                    player.setNewShipBoard(boardType);
+                }
+                for (int i = 1; i <= players.size(); i++) {
+                    availablePositions.add(i);
+                }
+            }
+        }
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(() -> {
+            if(gameState == WAITING) setGameState(nextState);
+            scheduler.shutdown();
+        }, seconds, TimeUnit.SECONDS);
+    }
+
+    public void flipTimer(boolean hasPlayerFinished) {
+        synchronized (timerHandler) {
+            if(!timerFlipAvailable) return;
+            if(!hasPlayerFinished && timerHandler.getTimesFlipped() >= boardType.getBuildingTimersCount() - 1) return;
+            timerFlipAvailable = false;
+            timerHandler.start();
+        }
+    }
+
+    private void onTimerFinished() {
+        synchronized (timerHandler) {
+            if(timerHandler.getTimesFlipped() < boardType.getBuildingTimersCount()) {
+                timerFlipAvailable = true;
+                eventDispatcher.fireEvent(new TimerFinishedEvent(false));
+            } else {
+                if (!availablePositions.isEmpty()) {
+
+                    List<Player> stillBuilding = players.stream()
+                            .filter(p -> p.getState() == Player.PlayerState.BUILDING_SHIP).toList();
+
+                    List<Integer> remainingPositions = new ArrayList<>(availablePositions);
+                    Collections.shuffle(remainingPositions);
+
+                    for (int i = 0; i < stillBuilding.size() && i < remainingPositions.size(); i++) {
+                        Player player = stillBuilding.get(i);
+                        int positionIndex = remainingPositions.get(i);
+
+                        player.setState(DONE_BUILDING);
+                        player.setPosition(boardType.getStartingPosition(positionIndex));
+                        availablePositions.remove(positionIndex);
+
+                        eventDispatcher.fireEvent(new DoneBuildingEvent(player.getName(), positionIndex));
+                    }
+                }
+                eventDispatcher.fireEvent(new TimerFinishedEvent(true));
+                setGameStateAfterWait(5, FLIGHT_PHASE);
+            }
+        }
+    }
+
+    public void claimPosition(Player player, int positionIndex) {
+        if(player.getState() != BUILDING_SHIP) return;
+        synchronized (availablePositions) {
+            if(!availablePositions.contains(positionIndex)) return;
+
+            player.setState(DONE_BUILDING);
+            player.setPosition(boardType.getStartingPosition(positionIndex));
+            availablePositions.remove(positionIndex);
+
+            eventDispatcher.fireEvent(new DoneBuildingEvent(player.getName(), positionIndex));
+            if(availablePositions.isEmpty()) {
+                timerHandler.reset();
+                setGameStateAfterWait(5, FLIGHT_PHASE);
+            }
         }
     }
 
@@ -328,6 +418,8 @@ public class GameModel {
         for (int i = 0; i < 152; i++) availableTiles.add(i);
         this.availableCardPiles.clear();
         for (int i = 0; i < 3; i++) availableCardPiles.add(i);
+        this.timerFlipAvailable = false;
+        timerHandler.reset();
     }
 
     public void resetCompletely() {
@@ -344,8 +436,6 @@ public class GameModel {
     private PlayerInfo getPlayerInfo(Player player) {
         return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor().toString(),player.isAdmin(),player.isReady());
     }
-
-    private final EventDispatcher eventDispatcher = new EventDispatcher();
 
     public <T extends EventModel> void addEventListener(Class<T> eventType, ModelEventListener<T> listener) {
         eventDispatcher.addListener(eventType, listener);

@@ -1,7 +1,7 @@
 package it.polimi.galaxy_trucker.server.model.cards.projectile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.Player;
 
 import static it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.Size.SMALL;
 

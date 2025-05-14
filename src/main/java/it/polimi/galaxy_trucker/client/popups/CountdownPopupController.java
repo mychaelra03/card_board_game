@@ -26,8 +26,10 @@ public class CountdownPopupController implements PopupAware {
     @FXML private Label countdownLabel;
 
     private Popup popup;
+    private static boolean isPopupVisible = false;
 
-    private AnchorPane mainContentPane;
+    @FXML private Label label;
+
     private int secondsLeft = 10;
 
     @Override
@@ -40,10 +42,18 @@ public class CountdownPopupController implements PopupAware {
 
     @Override
     public void initialize(Object... args) {
-        if(args != null && args.length > 0 && args[0] instanceof Integer duration) {
-            secondsLeft = duration;
+        if (args == null || args.length == 0) {
+            Logger.logWarning("No arguments provided");
+            return;
         }
 
+        if (args[0] instanceof String promptText) {
+            label.setText(LanguageManager.get(promptText.trim()));
+        }
+
+        if(args.length > 1 && args[1] instanceof Integer duration) {
+            secondsLeft = duration;
+        }
         startCountdown();
     }
 
@@ -68,5 +78,15 @@ public class CountdownPopupController implements PopupAware {
         st.play();
 
         secondsLeft--;
+    }
+
+    @Override
+    public void setPopupVisible(boolean visible) {
+        isPopupVisible = visible;
+    }
+
+    @Override
+    public boolean isPopupVisible() {
+        return isPopupVisible;
     }
 }

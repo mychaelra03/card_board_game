@@ -28,8 +28,8 @@ public class ClientMain extends Application {
 
         stage.setOnCloseRequest(event -> {
             event.consume();
-            Logger.logInfo("Window is closing...");
             Popup.newConfirmationPopup("prompt.close_game", () -> {
+                Logger.logInfo("Closing game...");
                 VirtualServer.getInstance().close();
                 Platform.exit();
                 System.exit(0);

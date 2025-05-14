@@ -2,13 +2,9 @@ package it.polimi.galaxy_trucker.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.GameModel;
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.GameModel;
+import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
-import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
-import it.polimi.galaxy_trucker.common.messages.lobby.ChatMessage;
-import it.polimi.galaxy_trucker.common.messages.lobby.KickedMessage;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.VirtualView;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
@@ -40,9 +36,9 @@ public class ShipBuildingHandler extends CommandHandler {
                 TileTakenMessage message = mapper.convertValue(cmd, TileTakenMessage.class);
 
                 int id = message.getTileId();
-                String playerName = playerMap.get(senderView).getName();
+                Player player = playerMap.get(senderView);
 
-                if(gameModel.TryTakeTile(playerName, id)) {
+                if(gameModel.TryTakeTile(player, id)) {
                     tileMap.put(senderView, id);
                 }
             }
@@ -107,9 +103,9 @@ public class ShipBuildingHandler extends CommandHandler {
                 CardsTakenMessage cardsTakenMessage = mapper.convertValue(cmd, CardsTakenMessage.class);
 
                 int id = cardsTakenMessage.getPileId();
-                String playerName = playerMap.get(senderView).getName();
+                Player player = playerMap.get(senderView);
 
-                if(gameModel.tryTakeCardPile(playerName, id)) {
+                if(gameModel.tryTakeCardPile(player, id)) {
                     cardsMap.put(senderView, id);
 
                     List<Card> pile = gameModel.getPile(id);
@@ -133,6 +129,23 @@ public class ShipBuildingHandler extends CommandHandler {
                 cardsMap.remove(senderView);
 
                 gameModel.returnCardPile(pileId);
+            }
+
+            case "timerFlipped" -> {
+
+                boolean hasPlayerFinishedBuilding = playerMap.get(senderView).getState() == Player.PlayerState.DONE_BUILDING;
+
+                gameModel.flipTimer(hasPlayerFinishedBuilding);
+            }
+
+            case "doneBuilding" -> {
+
+                DoneBuildingMessage message = mapper.convertValue(cmd, DoneBuildingMessage.class);
+
+                int positionIndex = message.getPositionIndex();
+                Player player = playerMap.get(senderView);
+
+                gameModel.claimPosition(player, positionIndex);
             }
 
             default -> Logger.logError("Unrecognized command: " + type);

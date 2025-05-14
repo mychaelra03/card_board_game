@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.server.model.cards;
 
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.CannonTile;
 
 import java.awt.*;

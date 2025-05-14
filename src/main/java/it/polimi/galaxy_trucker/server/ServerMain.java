@@ -1,7 +1,7 @@
 package it.polimi.galaxy_trucker.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.server.controller.MainController;
 

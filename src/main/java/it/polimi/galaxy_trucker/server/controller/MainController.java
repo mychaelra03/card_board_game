@@ -3,20 +3,16 @@ package it.polimi.galaxy_trucker.server.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.GameModel;
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
+import it.polimi.galaxy_trucker.server.model.GameModel;
+import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
-import it.polimi.galaxy_trucker.common.messages.lobby.KickedMessage;
 import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.VirtualView;
 import it.polimi.galaxy_trucker.server.events.*;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsReturnedEvent;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.CardsTakenEvent;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.TileReturnedEvent;
-import it.polimi.galaxy_trucker.server.events.shipBuilding.TileTakenEvent;
-import it.polimi.galaxy_trucker.GameModel.*;
+import it.polimi.galaxy_trucker.server.model.GameModel.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +31,14 @@ public class MainController {
                 GameState.LOBBY, new LobbyHandler(gameModel, playerMap),
                 GameState.BUILDING_SHIPS, new ShipBuildingHandler(gameModel, playerMap),
                 GameState.FLIGHT_PHASE, new FlightHandler(gameModel, playerMap),
+                GameState.WAITING, new WaitingHandler(gameModel, playerMap),
                 GameState.GAME_OVER, new GameOverHandler(gameModel, playerMap)
         );
+
+        addEventListeners();
+    }
+
+    private void addEventListeners() {
 
         gameModel.addEventListener(PlayersUpdateEvent.class, this::handlePlayersUpdate);
         gameModel.addEventListener(BoardTypeUpdateEvent.class, this::handleBoardTypeUpdate);
@@ -46,6 +48,9 @@ public class MainController {
         gameModel.addEventListener(CardsTakenEvent.class, this::handleCardsTaken);
         gameModel.addEventListener(CardsReturnedEvent.class, this::handleCardReturned);
         gameModel.addEventListener(GameResetEvent.class, this::handleGameReset);
+        gameModel.addEventListener(TimerStartEvent.class, this::handleTimerStart);
+        gameModel.addEventListener(TimerFinishedEvent.class, this::handleTimerFinished);
+        gameModel.addEventListener(DoneBuildingEvent.class, this::handleDoneBuilding);
     }
 
     public void processCommand(VirtualView senderVirtualView, String json) throws JsonProcessingException {
@@ -89,8 +94,10 @@ public class MainController {
     private void handleGameStateUpdate(GameStateUpdateEvent event) {
         Logger.logInfo("Updated game state: " + event.getGameState());
         broadcastMessage(new GameStateMessage(event.getGameState()));
-        if(event.getGameState() == GameModel.GameState.BUILDING_SHIPS) {
-            broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
+        if(event.getGameState() == GameState.WAITING) {
+            if(event.getPreviousGameState() == GameState.LOBBY) {
+                broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
+            }
         }
     }
     private void handleTileTaken(TileTakenEvent event) {
@@ -108,6 +115,18 @@ public class MainController {
     private void handleCardReturned(CardsReturnedEvent event) {
         Logger.logDebug("Cards returned: " + event.getPileId());
         broadcastMessage(new CardsReturnedMessage(event.getPileId()));
+    }
+    private void handleTimerStart(TimerStartEvent event) {
+        Logger.logDebug("Started timer " + event.getTimesFlipped() + " of " + event.getDuration() + " seconds");
+        broadcastMessage(new TimerStartMessage(event.getDuration(), event.getTimesFlipped()));
+    }
+    private void handleTimerFinished(TimerFinishedEvent event) {
+        Logger.logDebug(event.isFinalFlip()? "Final timer ended" : "Timer ended");
+        broadcastMessage(new TimerFinishedMessage(event.isFinalFlip()));
+    }
+    private void handleDoneBuilding(DoneBuildingEvent event) {
+        Logger.logDebug(event.getPlayerName() + " finished building and took position " + event.getPosition());
+        broadcastMessage(new DoneBuildingMessage(event.getPlayerName(), event.getPosition()));
     }
 
 

@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.client.controllers.shipBuilding;
 
-import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.VirtualServer;
 import it.polimi.galaxy_trucker.common.Logger;

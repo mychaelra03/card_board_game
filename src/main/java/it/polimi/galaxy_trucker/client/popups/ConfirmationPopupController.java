@@ -7,11 +7,13 @@ import javafx.scene.control.Label;
 
 public class ConfirmationPopupController implements PopupAware {
 
-    @FXML private Label prompt;
+    @FXML
+    private Label prompt;
 
     private Runnable onConfirmAction = null;
 
     private Popup popup;
+    private static boolean isPopupVisible = false;
 
     @Override
     public void bindPopup(Popup popup) {
@@ -22,6 +24,7 @@ public class ConfirmationPopupController implements PopupAware {
     public void onClose() {
         if (popup != null) popup.playClosingAnimation();
     }
+
     @FXML
     public void onConfirm() {
         if (popup != null) popup.playClosingAnimation();
@@ -30,17 +33,28 @@ public class ConfirmationPopupController implements PopupAware {
 
     @Override
     public void initialize(Object... args) {
-        if(args == null || args.length == 0) {
+
+        if (args == null || args.length == 0) {
             Logger.logWarning("No arguments provided");
             return;
         }
 
-        if(args[0] instanceof String promptText) {
+        if (args[0] instanceof String promptText) {
             prompt.setText(LanguageManager.get(promptText.trim()));
         }
 
         if (args.length > 1 && args[1] instanceof Runnable action) {
             this.onConfirmAction = action;
         }
+    }
+
+    @Override
+    public void setPopupVisible(boolean visible) {
+        isPopupVisible = visible;
+    }
+
+    @Override
+    public boolean isPopupVisible() {
+        return isPopupVisible;
     }
 }

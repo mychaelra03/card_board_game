@@ -1,13 +1,13 @@
 package it.polimi.galaxy_trucker.server.model.cards.projectile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.Player;
-import it.polimi.galaxy_trucker.ShipBoard;
+import it.polimi.galaxy_trucker.server.model.Player;
+import it.polimi.galaxy_trucker.server.model.ShipBoard;
 
 import static it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.Size.LARGE;
 import static it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.Size.SMALL;
-import static it.polimi.galaxy_trucker.ShipBoard.DefendingCannonType.DOUBLE;
-import static it.polimi.galaxy_trucker.ShipBoard.DefendingCannonType.SINGLE;
+import static it.polimi.galaxy_trucker.server.model.ShipBoard.DefendingCannonType.DOUBLE;
+import static it.polimi.galaxy_trucker.server.model.ShipBoard.DefendingCannonType.SINGLE;
 
 public class Meteor extends Projectile {
 
