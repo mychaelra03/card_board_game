@@ -1,8 +1,8 @@
-package it.polimi.galaxy_trucker.cards;
+package it.polimi.galaxy_trucker.server.model.cards;
 
-import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.server.model.cards.*;
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.CannonShot;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Meteor;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
@@ -13,7 +13,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.BoardType.*;
+import static it.polimi.galaxy_trucker.server.model.BoardType.*;
 import static it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule.*;
 import static it.polimi.galaxy_trucker.server.model.tiles.BlockType.*;
 import static it.polimi.galaxy_trucker.server.model.tiles.Connector.*;

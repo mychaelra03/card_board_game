@@ -5,6 +5,7 @@ import it.polimi.galaxy_trucker.common.messages.GameMessage;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LobbyJoinResponse implements GameMessage {
+
     public enum JoinStatus {
         SUCCESS, LOBBY_FULL, NAME_TAKEN, GAME_STARTED
     }

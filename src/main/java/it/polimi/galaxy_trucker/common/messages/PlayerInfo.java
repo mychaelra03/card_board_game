@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayerInfo implements GameMessage {
+
     private String username;
     private int[] profilePicIds;
     private String color;

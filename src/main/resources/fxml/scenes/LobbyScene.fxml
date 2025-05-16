@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.layout.HBox?>
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.LobbyController">
    <children>
       <AnchorPane fx:id="mainContentPane" prefHeight="720.0" prefWidth="911.0" stylesheets="@../../css/lobby-scene.css">
@@ -22,7 +23,7 @@
             <URL value="@../../css/default.css" />
             <URL value="@../../css/lobby-scene.css" />
          </stylesheets>
-         <Region layoutX="264.0" layoutY="28.0" prefHeight="359.0" prefWidth="624.0" styleClass="region" AnchorPane.leftAnchor="264.0" AnchorPane.rightAnchor="28.0" AnchorPane.topAnchor="28.0" />
+         <Region layoutX="264.0" layoutY="28.0" prefHeight="359.0" prefWidth="624.0" styleClass="region" />
       
          <!-- Color selection -->
          <!--<VBox layoutX="620.0" layoutY="469.0" spacing="10" AnchorPane.leftAnchor="620.0" AnchorPane.topAnchor="469.0">
@@ -34,21 +35,21 @@
          </VBox>-->
       
          <!-- Ready Button -->
-         <Button fx:id="readyButton" layoutX="579.0" layoutY="622.0" prefHeight="79.0" prefWidth="316.0" text="%button.ready" AnchorPane.bottomAnchor="19.0" AnchorPane.leftAnchor="579.0" AnchorPane.rightAnchor="16.0" />
-         <Button fx:id="prevMapButton" layoutX="273.0" layoutY="195.0" text="←" AnchorPane.leftAnchor="273.0" AnchorPane.topAnchor="195.0" />
+         <Button fx:id="readyButton" layoutX="579.0" layoutY="622.0" prefHeight="79.0" prefWidth="316.0" text="%button.ready" />
+         <Button fx:id="prevMapButton" layoutX="273.0" layoutY="195.0" text="←" />
          <ImageView fx:id="boardImage" fitHeight="300" fitWidth="500" layoutX="329.0" layoutY="58.0" />
-         <Button fx:id="nextMapButton" layoutX="839.0" layoutY="195.0" text="→" AnchorPane.rightAnchor="38.0" AnchorPane.topAnchor="195.0" />
-         <Region layoutX="23.0" layoutY="405.0" prefHeight="247.0" prefWidth="518.0" styleClass="region" />
-         <TextField fx:id="chatTextField" layoutX="23.0" layoutY="662.0" onKeyPressed="#onEnterKeyPressed" prefHeight="28.0" prefWidth="469.0" promptText="Type a message..." AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="23.0" />
-         <Region layoutX="23.0" layoutY="29.0" prefHeight="356.0" prefWidth="218.0" styleClass="region" AnchorPane.bottomAnchor="335.0" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="29.0" />
-         <Label layoutX="38.0" layoutY="50.0" styleClass="whiteLabel" text="Players logged:" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="50.0">
+         <Button fx:id="nextMapButton" layoutX="839.0" layoutY="195.0" text="→" />
+         <Region layoutX="34.0" layoutY="405.0" prefHeight="247.0" prefWidth="518.0" styleClass="region" />
+         <TextField fx:id="chatTextField" layoutX="34.0" layoutY="662.0" onKeyPressed="#onEnterKeyPressed" prefHeight="28.0" prefWidth="469.0" promptText="Type a message..." />
+         <Region layoutX="23.0" layoutY="33.0" prefHeight="352.0" prefWidth="218.0" styleClass="region" />
+         <Label layoutX="38.0" layoutY="50.0" text="Players logged:">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
          <Label fx:id="readyCounter" alignment="CENTER" prefHeight="40.0" prefWidth="100.0" text="0 / 4" textAlignment="CENTER" AnchorPane.bottomAnchor="110.0" AnchorPane.rightAnchor="30.0" />
-         <Button fx:id="leftButton1" layoutX="497.0" layoutY="662.0" onAction="#onEnterKeyPressed" prefHeight="26.0" prefWidth="43.0" text="↑" AnchorPane.bottomAnchor="32.0" AnchorPane.leftAnchor="497.0" />
-         <Label fx:id="playerCounter" alignment="CENTER_RIGHT" layoutX="176.0" layoutY="349.0" prefHeight="17.0" prefWidth="50.0" styleClass="whiteLabel" text="0 / 4" textFill="WHITE" AnchorPane.bottomAnchor="354.0" AnchorPane.leftAnchor="176.0" />
+         <Button fx:id="leftButton1" layoutX="508.0" layoutY="662.0" prefHeight="26.0" prefWidth="43.0" text="↑" />
+         <Label fx:id="playerCounter" alignment="CENTER_RIGHT" layoutX="176.0" layoutY="349.0" prefHeight="17.0" prefWidth="50.0" text="0 / 4" textFill="WHITE" />
          <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" layoutX="189.0" layoutY="35.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;">
             <cursor>
                <Cursor fx:constant="HAND" />
@@ -61,18 +62,15 @@
                </ImageView>
             </graphic>
          </Button>
-         <Label fx:id="boardName" layoutX="606.0" layoutY="233.0" styleClass="whiteLabel" text="Default" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="233.0">
-            <font>
-               <Font size="18.0" />
-            </font></Label>
-         <VBox fx:id="playerList" layoutX="41.0" layoutY="95.0" prefHeight="247.0" prefWidth="183.0" AnchorPane.bottomAnchor="378.0" AnchorPane.leftAnchor="41.0" AnchorPane.topAnchor="95.0">
+         <Label fx:id="boardName" layoutX="720.0" layoutY="282.0" text="Default" />
+         <VBox fx:id="playerList" layoutX="41.0" layoutY="95.0" prefHeight="247.0" prefWidth="183.0">
             <padding>
                <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
             </padding>
          </VBox>
 
-         <ScrollPane fx:id="chatScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" layoutX="37.0" layoutY="417.0" prefHeight="220.0" prefWidth="490.0" style="-fx-border-color: gold; -fx-border-radius: 5; -fx-background-color: rgba(54, 0, 122, 1); -fx-background-insets: 0; -fx-background-radius: 0;" AnchorPane.bottomAnchor="83.0" AnchorPane.leftAnchor="37.0">
-            <VBox fx:id="chatVbox" spacing="2" style="-fx-background-color: rgba(54, 0, 122, 1); -fx-background-insets: 0; -fx-background-radius: 0;">
+         <ScrollPane fx:id="chatScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" layoutX="48.0" layoutY="419.0" prefHeight="220.0" prefWidth="490.0" style="-fx-border-color: gray; -fx-border-radius: 5; -fx-background-color: transparent;" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="48.0">
+            <VBox fx:id="chatVbox" spacing="2" style="-fx-background-color: transparent;">
                <padding>
                   <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
                </padding>
@@ -81,6 +79,16 @@
                <Insets />
             </VBox.margin>
          </ScrollPane>
-      </AnchorPane>
-   </children>
+      <VBox>
+         <HBox spacing="5.0">
+            <TextField fx:id="chatTextField" onKeyPressed="#onEnterKeyPressed" prefHeight="35.0" promptText="%text_field.type_message" style="-fx-font-size: 14;" styleClass="textField" HBox.hgrow="ALWAYS">
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor>
+            </TextField>
+            <Button onAction="#sendChatMessage" prefHeight="35.0" prefWidth="50.0" style="-fx-font-size: 16;" text="↑" />
+         </HBox>
+      </VBox>
+      <Label layoutX="48.0" layoutY="60.0" style="-fx-font-size: 18; -fx-font-weight: bold;" styleClass="white-label" text="%label.selected_board" AnchorPane.leftAnchor="450.0" AnchorPane.topAnchor="50.0" />
+   </AnchorPane>
 </StackPane>

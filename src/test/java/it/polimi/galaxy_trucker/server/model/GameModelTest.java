@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker;
+package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.server.model.tiles.CrewType;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.Arrays;
 
 import static it.polimi.galaxy_trucker.DefaultShipBoards.defaultShipBoard;
-import static it.polimi.galaxy_trucker.Player.PlayerState.*;
+import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameModelTest {

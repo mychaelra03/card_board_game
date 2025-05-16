@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.client.controllers.shipBuilding;
 
-import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.VirtualServer;
 import it.polimi.galaxy_trucker.common.Logger;
@@ -24,7 +24,7 @@ public class TileManager {
 
     TileEffectManager tileEffectManager = new TileEffectManager();
 
-    protected static final String TILES_PATH = "/textures/tiles/";
+    public static final String TILES_PATH = "/textures/tiles/";
     private static final double TILE_SIZE = 83.5;
 
     private static final int TILES_AREA_MIN_X = 712;
@@ -149,7 +149,7 @@ public class TileManager {
         animationHandler.animateImageToPosition(starterCabin, starterCabin.getLayoutX(), starterCabin.getLayoutY(), 1, 0, 1200, 1200);
     }
 
-    protected void takeTile(ImageView tile) {
+    public void takeTile(ImageView tile) {
 
         tile.setImage(new Image(Objects.requireNonNull(getClass().getResource(TILES_PATH + "tile_" + tile.getId() + ".png")).toExternalForm()));
         tile.toFront();

@@ -3,11 +3,11 @@ package it.polimi.galaxy_trucker.client.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
-import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
@@ -34,8 +34,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -76,6 +74,9 @@ public class LobbyController implements VirtualServerAware {
 
     @FXML
     public void initialize() {
+
+        Platform.runLater(() -> PendingPopup.tryShow(rootPane, mainContentPane));
+
         chatVbox.setPadding(new Insets(10, 5, 10, 5));
         chatScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         chatScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -84,7 +85,7 @@ public class LobbyController implements VirtualServerAware {
 
         chatScrollPane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         chatVbox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        settingsButton.setOnAction(event -> Popup.newSettingsPopup().show(rootPane, mainContentPane));
+        settingsButton.setOnAction(event -> Popup.newSettingsPopup().show());
 
         prevMapButton.setOnAction(_ -> {
             cooldownButton(prevMapButton, .1);
@@ -107,15 +108,17 @@ public class LobbyController implements VirtualServerAware {
             String type = mapper.readTree(cmd).get("type").asText();
             switch (type) {
                 case "kicked" -> {
-                    VirtualServer.getInstance().setCallBack(null);
                     PendingPopup.set(Popup.newAlertPopup("title.disconnected", "description.kicked"));
-                    Platform.runLater(() -> SceneSwitch.switchScene("LoginScene"));
+                    virtualServer.close();
                     return;
                 }
                 case "gameState" -> {
-                    GameStateMessage gameStateMessage = mapper.readValue(cmd, GameStateMessage.class);
+                    GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
 
-                    if (gameStateMessage.getGameState() != GameModel.GameState.BUILDING_SHIPS) throw new IllegalStateException("Invalid game state");
+                    if (message.getGameState() != GameModel.GameState.WAITING) {
+                        Logger.logError("Invalid game state");
+                        return;
+                    }
                     virtualServer.setCallBack(null);
                     Platform.runLater(() -> SceneSwitch.switchScene("ShipBuildingScene"));
                     return;
@@ -171,16 +174,18 @@ public class LobbyController implements VirtualServerAware {
                 int currentCount = Integer.parseInt(playerCounter.getText().split(" / ")[0]);
                 if (playersInfo.size() != currentCount) {
                     Label msg = new Label();
+                    msg.setStyle("-fx-font-weight: bold; -fx-background-radius: 5; -fx-font-size: 14px;");
+
                     if (playersInfo.size() > currentCount) {
                         msg.setText(MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername()));
                         msg.setTextFill(Color.GREEN);
-                        msg.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-                        msg.setStyle("-fx-font-weight: bold; -fx-background-color: rgba(0,128,0,0.1); -fx-background-radius: 5");
+                        msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(0,128,0,0.1);");
                     } else {
                         msg.setText(MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername()));
                         msg.setTextFill(Color.RED);
-                        msg.setStyle("-fx-font-weight: bold; -fx-background-color: rgba(255,0,0,0.1); -fx-background-radius: 5");
+                        msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(255,0,0,0.1);");
                     }
+                    msg.setPadding(new Insets(2, 0, 2, 0));
                     msg.setPrefWidth(chatScrollPane.getWidth());
                     msg.setAlignment(Pos.CENTER);
 
@@ -197,7 +202,7 @@ public class LobbyController implements VirtualServerAware {
                 int readyRequired = Math.max(2, playersInfo.size());
                 readyCounter.setText(readyCount + " / " + readyRequired);
 
-                readyButton.setText(thisPlayer.isReady()? LanguageManager.get("button.cancel") : LanguageManager.get("button.ready"));
+                readyButton.setText(thisPlayer.isReady()? LanguageManager.get("button.ready_cancel") : LanguageManager.get("button.ready"));
 
                 updatePlayerList(playersInfo, thisPlayer);
             }
@@ -207,7 +212,9 @@ public class LobbyController implements VirtualServerAware {
                 BoardTypeMessage boardTypeMessage = mapper.readValue(cmd, BoardTypeMessage.class);
                 BoardType boardType = boardTypeMessage.getBoardType();
                 String path = switch (boardType) {
-                    case LEARNING, LEVEL_ONE -> "/textures/cardboards/showcase_1.png";
+
+                    case LEARNING -> "/textures/cardboards/showcase_L.png";
+                    case LEVEL_ONE -> "/textures/cardboards/showcase_1.png";
                     case LEVEL_TWO -> "/textures/cardboards/showcase_2.png";
                 };
                 Image board = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
@@ -252,25 +259,27 @@ public class LobbyController implements VirtualServerAware {
         for (PlayerInfo playerInfo : playersInfo) {
             boolean isCurrentUser = playerInfo.getUsername().equals(thisPlayer.getUsername());
 
-            StackPane profilePicture = ClientSession.getPlayerProfilePicture(playerInfo.getUsername(), 50);
+            StackPane profilePicture = ClientSession.getPlayerProfilePicture(playerInfo.getUsername(), 65);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
             Text username = new Text(playerInfo.getUsername());
-            username.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+            username.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+            username.setFill(Color.WHITE);
             TextFlow usernameText = new TextFlow(username);
             usernameText.setPrefHeight(Region.USE_COMPUTED_SIZE);
             usernameText.setMaxHeight(Region.USE_PREF_SIZE);
             usernameText.setTextAlignment(TextAlignment.LEFT);
             if (isCurrentUser) {
                 Text self = new Text(" (" + LanguageManager.get("text.you") + ")");
-                self.setStyle("-fx-font-size: 14px;");
+                self.setStyle("-fx-font-size: 18px;");
                 self.setFill(Color.GRAY);
                 usernameText.getChildren().add(self);
             }
 
             Label readyLabel = new Label();
+            readyLabel.setStyle("-fx-font-size: 16px");
             if (playerInfo.isReady()) {
                 readyLabel.setText(LanguageManager.get("label.player_ready"));
                 readyLabel.setTextFill(Color.GREEN);
@@ -288,8 +297,8 @@ public class LobbyController implements VirtualServerAware {
 
             if (playerInfo.isAdmin()) {
                 ImageView adminCrown = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/crownIcon.png"))));
-                adminCrown.setFitHeight(15);
-                adminCrown.setFitWidth(15);
+                adminCrown.setFitHeight(25);
+                adminCrown.setFitWidth(25);
                 HBox.setMargin(adminCrown, new Insets(0, 18, 0, 0));
                 playerBox.getChildren().add(adminCrown);
             }
@@ -310,8 +319,8 @@ public class LobbyController implements VirtualServerAware {
     private Button getDotsButton(PlayerInfo playerInfo) {
 
         ImageView dotsImage = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/icons/dotsMenuIcon.png"))));
-        dotsImage.setFitHeight(15);
-        dotsImage.setFitWidth(15);
+        dotsImage.setFitHeight(25);
+        dotsImage.setFitWidth(25);
         dotsImage.setPreserveRatio(true);
 
         Button dotsButton = new Button("", dotsImage);
@@ -328,6 +337,7 @@ public class LobbyController implements VirtualServerAware {
 
             MenuItem promote = new MenuItem(LanguageManager.get("menu_item.promote"));
             MenuItem kick = new MenuItem(LanguageManager.get("menu_item.kick"));
+            promote.setStyle("-fx-text-fill: white; -fx-background-color: transparent;");
 
             promote.setOnAction(_ -> {
                 playerInfo.setType("promotePlayer");
@@ -340,7 +350,7 @@ public class LobbyController implements VirtualServerAware {
 
             contextMenu.getItems().addAll(promote, kick);
 
-            contextMenu.show(dotsButton, Side.BOTTOM, 0, 0);
+            contextMenu.show(dotsButton, Side.RIGHT, 0, 0);
         });
         HBox.setMargin(dotsButton, new Insets(0, 16, 0, 0));
         return dotsButton;
@@ -348,13 +358,14 @@ public class LobbyController implements VirtualServerAware {
 
     @FXML
     private void onEnterKeyPressed(KeyEvent event) {
-        if(event.getCode() == KeyCode.ENTER) {
+        if (event.getCode() == KeyCode.ENTER) sendChatMessage();
+    }
 
-            String message = chatTextField.getText().trim();
-            chatTextField.setText("");
-            if(message.isEmpty()) return;
-            ChatMessage chatMessage = new ChatMessage(message);
-            this.virtualServer.sendMessage(chatMessage);
-        }
+    public void sendChatMessage() {
+        String message = chatTextField.getText().trim();
+        if (message.isEmpty()) return;
+
+        chatTextField.clear();
+        virtualServer.sendMessage(new ChatMessage(message));
     }
 }

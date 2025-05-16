@@ -1,10 +1,11 @@
 package it.polimi.galaxy_trucker.common.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import it.polimi.galaxy_trucker.BoardType;
+import it.polimi.galaxy_trucker.server.model.BoardType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BoardTypeMessage implements GameMessage {
+
     private BoardType boardType;
 
     public BoardTypeMessage() {}

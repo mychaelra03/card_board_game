@@ -13,6 +13,7 @@ public class AlertPopupController implements PopupAware {
     @FXML private Label description;
 
     private Popup popup;
+    private static boolean isPopupVisible = false;
 
     @Override
     public void bindPopup(Popup popup) {
@@ -21,9 +22,7 @@ public class AlertPopupController implements PopupAware {
 
     @FXML
     public void onClose() {
-        if (popup != null) {
-            popup.playClosingAnimation();
-        }
+        if (popup != null) popup.playClosingAnimation();
     }
 
     @Override
@@ -43,5 +42,15 @@ public class AlertPopupController implements PopupAware {
                 description.setText(LanguageManager.get(descriptionText.trim()));
             }
         }
+    }
+
+    @Override
+    public void setPopupVisible(boolean visible) {
+        isPopupVisible = visible;
+    }
+
+    @Override
+    public boolean isPopupVisible() {
+        return isPopupVisible;
     }
 }

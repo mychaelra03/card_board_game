@@ -1,13 +1,15 @@
 package it.polimi.galaxy_trucker;
 
-import static it.polimi.galaxy_trucker.BoardType.LEVEL_TWO;
+import it.polimi.galaxy_trucker.server.model.ShipBoard;
+
+import static it.polimi.galaxy_trucker.server.model.BoardType.LEVEL_TWO;
 
 public class DefaultShipBoards {
 
     // helper class for generating default shipboards.
 
     static public ShipBoard defaultShipBoard(int id){
-        //1st shipB
+        // 1st ship
         ShipBoard shipBoard1 = new ShipBoard(LEVEL_TWO);
 
         shipBoard1.setTile(4,2,58,0);
@@ -36,7 +38,7 @@ public class DefaultShipBoards {
         shipBoard1.setTile(5,4,85,0);
         shipBoard1.setTile(6,4,84,0);
 
-        // 2nd shipB
+        // 2nd ship
         ShipBoard shipBoard2 = new ShipBoard(LEVEL_TWO);
 
         shipBoard2.setTile(3,3,80,0);

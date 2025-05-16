@@ -3,7 +3,7 @@ package it.polimi.galaxy_trucker.server.model.tiles;
 public class StartingCabinTile extends CabinTile {
 
     public StartingCabinTile() {
-        super(0, new Connector[]{Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL});
+        super(-1, new Connector[]{Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL,Connector.UNIVERSAL});
     }
 
     @Override

@@ -1,6 +1,7 @@
 package it.polimi.galaxy_trucker.client.popups;
 
 import it.polimi.galaxy_trucker.client.LanguageManager;
+import it.polimi.galaxy_trucker.client.SceneSwitch;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -16,15 +17,15 @@ import javafx.animation.*;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Popup {
 
     private final Node content;
     private final Region overlay;
-    private Effect originalEffect;
 
-    private StackPane rootPane;
-    private AnchorPane mainContentPane;
+    private final Map<Node, Effect> originalEffects = new HashMap<>();
 
     private Object controller = null;
     private boolean isClosing = false;
@@ -62,25 +63,26 @@ public class Popup {
         }
     }
 
-    public void show(StackPane rootPane, AnchorPane mainContentPane) {
-        this.rootPane = rootPane;
-        this.mainContentPane = mainContentPane;
+    public void show() {
+        if (controller instanceof PopupAware controllerAware) {
+            if(controllerAware.isPopupVisible()) return;
+            controllerAware.setPopupVisible(true);
+        }
+        Scene scene = SceneSwitch.getStage().getScene();
+        if (!(scene.getRoot() instanceof StackPane rootPane)) {
+            throw new IllegalStateException("Popup requires scene root to be a StackPane");
+        }
 
         ParallelTransition openingAnimation = getOpeningAnimation();
 
         rootPane.getChildren().addAll(overlay, content);
         openingAnimation.play();
 
-        originalEffect = mainContentPane.getEffect();
-        BoxBlur blur = new BoxBlur(5, 5, 5);
-        if (originalEffect != null) blur.setInput(originalEffect);
-        mainContentPane.setEffect(blur);
-        mainContentPane.setMouseTransparent(true);
+        applyBlur(rootPane);
 
         overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
         overlay.setOnMouseClicked(_ -> close());
 
-        Scene scene = rootPane.getScene();
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
                 close();
@@ -99,20 +101,19 @@ public class Popup {
     }
 
     public void playClosingAnimation() {
-        if (rootPane != null && mainContentPane != null) {
-            ParallelTransition closingAnimation = getClosingAnimation();
+        StackPane rootPane = getRootPane();
+        if(rootPane == null) return;
 
-            closingAnimation.setOnFinished(_ -> {
-                rootPane.getChildren().removeAll(overlay, content);
-                mainContentPane.setEffect(originalEffect);
-                mainContentPane.setMouseTransparent(false);
-                originalEffect = null;
-            });
+        ParallelTransition closingAnimation = getClosingAnimation();
 
-            closingAnimation.play();
-        }
+        closingAnimation.setOnFinished(_ -> {
+            rootPane.getChildren().removeAll(overlay, content);
+            clearBlur();
+            if (controller instanceof PopupAware controllerAware) controllerAware.setPopupVisible(false);
+        });
+
+        closingAnimation.play();
     }
-
 
     public static Popup newSettingsPopup(boolean isMainMenu) {
         return new Popup("SettingsPopup", isMainMenu);
@@ -131,14 +132,47 @@ public class Popup {
     public static Popup newCardsPopup(int[] levelOneCards, int[] levelTwoCards) {
         return new Popup("CardsPopup", levelOneCards, levelTwoCards);
     }
-    public static Popup newCardsPopup(int[] levelOneCards) {
-        return new Popup("CardsPopup", levelOneCards);
+
+    public static Popup newCountdownPopup(String text, int duration) {
+        return new Popup("CountdownPopup", text, duration);
     }
 
-    public static Popup newCountdownPopup(int duration) {
-        return new Popup("CountdownPopup", duration);
+    public static Popup newConfirmationPopup(String prompt, Runnable action) {
+        return new Popup("ConfirmationPopup", prompt, action);
     }
 
+
+    private StackPane getRootPane() {
+        Scene scene = SceneSwitch.getStage().getScene();
+        if (!(scene.getRoot() instanceof StackPane rootPane)) {
+            throw new IllegalStateException("Popup requires scene root to be a StackPane");
+        }
+        return rootPane;
+    }
+
+    private void applyBlur(StackPane rootPane) {
+        for (Node node : rootPane.getChildren()) {
+            if (node == content || node == overlay) continue;
+
+            originalEffects.put(node, node.getEffect());
+
+            BoxBlur blur = new BoxBlur(5, 5, 5);
+            if (node.getEffect() != null) {
+                blur.setInput(node.getEffect());
+            }
+
+            node.setEffect(blur);
+            node.setMouseTransparent(true);
+        }
+    }
+
+    private void clearBlur() {
+        for (Node node : originalEffects.keySet()) {
+            node.setEffect(originalEffects.get(node));
+            node.setMouseTransparent(false);
+        }
+        originalEffects.clear();
+    }
 
     private ParallelTransition getOpeningAnimation() {
         FadeTransition fadeContent = new FadeTransition(Duration.millis(200), content);

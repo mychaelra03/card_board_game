@@ -3,18 +3,24 @@ package it.polimi.galaxy_trucker.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.PingMessage;
+import it.polimi.galaxy_trucker.server.controller.MainController;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class VirtualView extends Thread {
-    BufferedReader in;
-    PrintWriter out;
-    Socket clientSocket;
-    Controller controller;
+    private final BufferedReader in;
+    private final PrintWriter out;
+    private final Socket clientSocket;
+    private final MainController controller;
+    private Timer pingTimer;
 
-    public VirtualView(Socket clientSocket, Controller controller) {
+    public VirtualView(Socket clientSocket, MainController controller) {
         this.clientSocket = clientSocket;
         this.controller = controller;
 
@@ -33,12 +39,15 @@ public class VirtualView extends Thread {
         try {
             json = mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         this.out.println(json);
     }
 
     public void run() {
+        startPingLoop();
+
         try {
             while (true) {
                 String msg = in.readLine();
@@ -47,7 +56,7 @@ public class VirtualView extends Thread {
                     Logger.logInfo("Client disconnected.");
                     break;
                 }
-                this.controller.processCmd(this, msg);
+                this.controller.processCommand(this, msg);
             }
 
         } catch (SocketException e) {
@@ -63,17 +72,30 @@ public class VirtualView extends Thread {
         }
     }
 
+    private void startPingLoop() {
+        pingTimer = new Timer(true);
+        pingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                sendMessage(new PingMessage());
+            }
+        }, 3000, 3000);  // send every 3s
+    }
+
     public void close() {
 
         this.controller.removeClient(this);
 
         try {
+
+            if (in != null) in.close();
+            if (out != null) out.close();
+
             if (clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();
                 Logger.logDebug("Client connection closed");
             }
-            if (in != null) in.close();
-            if (out != null) out.close();
+            if (pingTimer != null) pingTimer.cancel();
 
         } catch (IOException e) {
             throw new RuntimeException(e);

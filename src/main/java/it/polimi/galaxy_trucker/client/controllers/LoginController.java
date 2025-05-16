@@ -70,7 +70,7 @@ public class LoginController implements VirtualServerAware {
         rightAccessoryBtn.setOnAction(_ -> changeAccessory(1));
         randomizeButton.setOnAction(_ -> randomizeSkin());
         playButton.setOnAction(_ -> validateAndJoin());
-        settingsButton.setOnAction(_ -> Popup.newSettingsPopup(true).show(rootPane, mainContentPane));
+        settingsButton.setOnAction(_ -> Popup.newSettingsPopup(true).show());
     }
 
     private final VirtualServer virtualServer = VirtualServer.getInstance();
@@ -177,7 +177,7 @@ public class LoginController implements VirtualServerAware {
             virtualServer.attemptConnection(hostName, portNumber);
         } catch (IOException e) {
             //showError(errorServerPort, LanguageManager.get("error.invalid_connection"));
-            Popup.newAlertPopup("title.no_server_found", "description.no_server_found").show(rootPane, mainContentPane);
+            Popup.newAlertPopup("title.no_server_found", "description.no_server_found").show();
             return;
         }
         this.virtualServer.sendMessage(playerInfo);
@@ -198,15 +198,14 @@ public class LoginController implements VirtualServerAware {
 
                 switch (joinResponse.getJoinStatus()) {
                     case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
-                    case LOBBY_FULL ->
-                            Popup.newAlertPopup("title.unable_to_connect", "description.full_lobby").show(rootPane, mainContentPane);
+                    case LOBBY_FULL -> Popup.newAlertPopup("title.unable_to_connect", "description.full_lobby").show();
                     case NAME_TAKEN -> {
                         String usedName = ClientSession.getUsername().toLowerCase();
-                        Popup.newAlertPopup("title.unable_to_connect", "description.username_used", usedName).show(rootPane, mainContentPane);
+                        Popup.newAlertPopup("title.unable_to_connect", "description.username_used", usedName).show();
                     }
-                    case GAME_STARTED ->
-                            Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show(rootPane, mainContentPane);
+                    case GAME_STARTED -> Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show();
                 }
+                PendingPopup.clear();
             }
             default -> Logger.logError("Unrecognized command: " + type);
         }

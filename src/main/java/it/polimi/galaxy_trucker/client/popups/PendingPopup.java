@@ -13,8 +13,12 @@ public class PendingPopup {
 
     public static void tryShow(StackPane rootPane, AnchorPane mainContentPane) {
         if (popup != null) {
-            popup.show(rootPane, mainContentPane);
+            popup.show();
             popup = null;
         }
+    }
+
+    public static void clear() {
+        popup = null;
     }
 }

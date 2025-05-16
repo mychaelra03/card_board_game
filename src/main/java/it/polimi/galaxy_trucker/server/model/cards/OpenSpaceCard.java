@@ -2,13 +2,13 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.EngineTile;
 
 import java.awt.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.Player.PlayerState.*;
+import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,7 +1,7 @@
 package it.polimi.galaxy_trucker.server.model.cards;
 
-import it.polimi.galaxy_trucker.GameModel;
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.GameModel;
+import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker;
+package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.server.model.tiles.*;

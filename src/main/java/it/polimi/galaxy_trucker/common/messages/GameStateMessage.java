@@ -1,10 +1,11 @@
 package it.polimi.galaxy_trucker.common.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import it.polimi.galaxy_trucker.GameModel;
+import it.polimi.galaxy_trucker.server.model.GameModel;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStateMessage implements GameMessage {
+
     private GameModel.GameState gameState;
 
     public GameStateMessage() {}

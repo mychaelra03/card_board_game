@@ -2,7 +2,7 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.Player;
+import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.BlockType;
 
 import java.awt.*;

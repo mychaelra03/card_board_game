@@ -27,6 +27,7 @@ public class CardsPopupController implements PopupAware {
     private boolean isClosing = false;
 
     private Popup popup;
+    private static boolean isPopupVisible = false;
 
     @Override
     public void bindPopup(Popup popup) {
@@ -131,5 +132,15 @@ public class CardsPopupController implements PopupAware {
         shadow.setRadius(20);
 
         card.setEffect(shadow);
+    }
+
+    @Override
+    public void setPopupVisible(boolean visible) {
+        isPopupVisible = visible;
+    }
+
+    @Override
+    public boolean isPopupVisible() {
+        return isPopupVisible;
     }
 }
