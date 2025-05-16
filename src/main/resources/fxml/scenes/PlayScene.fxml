@@ -22,19 +22,19 @@
             </ImageView>
             <Region layoutX="957.0" layoutY="89.0" prefHeight="203.0" prefWidth="303.0" styleClass="region" />
             <Region layoutX="956.0" layoutY="532.0" prefHeight="203.0" prefWidth="303.0" styleClass="region" />
-            <ImageView id="fieldImage" fitHeight="373.0" fitWidth="564.0" layoutX="353.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="fieldImage" fitHeight="373.0" fitWidth="564.0" layoutX="353.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true" />
             <Region layoutX="33.0" layoutY="54.0" prefHeight="374.0" prefWidth="282.0" styleClass="region" />
             <Button layoutX="51.0" layoutY="383.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="248.0" text="Pick" />
-            <ImageView fitHeight="315.0" fitWidth="203.0" layoutX="72.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="pileCards" fitHeight="315.0" fitWidth="203.0" layoutX="72.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../textures/cards/card_pile_level_1.png" />
                </image>
             </ImageView>
-            <ImageView id="boardImage" fitHeight="258.0" fitWidth="518.0" layoutX="380.0" layoutY="508.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView id="player1Image" fitHeight="176.0" fitWidth="263.0" layoutX="977.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView id="player2Image" fitHeight="176.0" fitWidth="263.0" layoutX="977.0" layoutY="325.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView id="player3Image" fitHeight="176.0" fitWidth="263.0" layoutX="975.0" layoutY="546.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fitHeight="230.0" fitWidth="200.0" layoutX="74.0" layoutY="499.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="boardImage" fitHeight="258.0" fitWidth="518.0" layoutX="380.0" layoutY="508.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="player1Image" fitHeight="176.0" fitWidth="263.0" layoutX="977.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="player2Image" fitHeight="176.0" fitWidth="263.0" layoutX="977.0" layoutY="325.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="player3Image" fitHeight="176.0" fitWidth="263.0" layoutX="975.0" layoutY="546.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView id="card" fitHeight="230.0" fitWidth="200.0" layoutX="74.0" layoutY="499.0" pickOnBounds="true" preserveRatio="true" />
          </children></AnchorPane>
    </children>
    <stylesheets>

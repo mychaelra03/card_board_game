@@ -27,7 +27,15 @@ import javafx.util.Duration;
 public class PlayController {
     private final VirtualServer virtualServer = VirtualServer.getInstance();
     public static AnimationHandler animationHandler;
+    @FXML private ImageView boardImage;
+    @FXML private ImageView player1Image;
+    @FXML private ImageView player2Image;
+    @FXML private ImageView player3Image;
 
+    @FXML private ImageView pileCards;
+    @FXML private ImageView card;
+
+    @FXML private Button settingsButton;
 
     public void initialize() {
 
