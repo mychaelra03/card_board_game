@@ -2,7 +2,7 @@
     -fx-font-family: "DynaPuff", "Sour Gummy", "Rajdhani", "Arial";
 }
 
-#mainContentPane {
+.contentPane {
     /*-fx-background-color: #424a5e;*/
     -fx-background-color: #c5dced;
     -fx-background-image: url('../textures/backgrounds/background.png');
@@ -11,7 +11,7 @@
     -fx-background-position: center bottom;
 }
 
-.label {
+.whiteLabel {
     -fx-text-fill: white;
 }
 
