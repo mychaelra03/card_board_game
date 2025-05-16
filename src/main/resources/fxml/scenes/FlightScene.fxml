@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.effect.ColorAdjust?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.paint.Color?>
+
+<StackPane fx:id="rootPane" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.FlightController">
+    <AnchorPane fx:id="mainContentPane" mouseTransparent="true" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-size: cover; -fx-background-repeat: no-repeat;">
+        <ImageView fx:id="shipBoardImage" fitHeight="473.0" fitWidth="641.0" layoutX="30.0" layoutY="120.0" opacity="0.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../../textures/cardboards/shipboard_2.png" />
+         <effect>
+            <DropShadow height="30.0" radius="14.5" width="30.0">
+               <color>
+                  <Color opacity="0.7480916380882263" />
+               </color>
+            </DropShadow>
+         </effect>
+        </ImageView>
+      <GridPane fx:id="gridPane" hgap="2.0" layoutX="54.0" layoutY="141.0" vgap="2.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="83.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="83.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="83.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="83.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="83.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="83.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="83.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="83.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="83.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="83.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="83.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="83.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+      </GridPane>
+      <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;" AnchorPane.leftAnchor="620.0" AnchorPane.topAnchor="30.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <graphic>
+             <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                 <effect>
+                     <ColorAdjust brightness="0.9" />
+                 </effect>
+                 <Image url="@../../textures/icons/settingsIcon2.png" />
+             </ImageView>
+         </graphic>
+      </Button>
+      <stylesheets>
+         <URL value="@../../css/default.css" />
+         <URL value="@../../css/ship-building-scene.css" />
+      </stylesheets>
+    </AnchorPane>
+</StackPane>

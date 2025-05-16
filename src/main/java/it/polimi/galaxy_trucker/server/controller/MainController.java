@@ -3,6 +3,8 @@ package it.polimi.galaxy_trucker.server.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage;
+import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.server.model.Player;
@@ -15,6 +17,7 @@ import it.polimi.galaxy_trucker.server.events.*;
 import it.polimi.galaxy_trucker.server.model.GameModel.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainController {
@@ -97,6 +100,20 @@ public class MainController {
         if(event.getGameState() == GameState.WAITING) {
             if(event.getPreviousGameState() == GameState.LOBBY) {
                 broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
+            }
+        }
+        else if(event.getGameState() == GameState.FLIGHT_PHASE) {
+            System.out.println("A "+ playerMap.size());
+            for(Player player : gameModel.getSortedPlayers()) {
+                System.out.println("B " + new ShipBoardMessage(player.getName(), FlightHandler.getSimplifiedShipBoard(player.getShipBoard())));
+                //broadcastMessage(new ShipBoardMessage(player.getName(), FlightHandler.getSimplifiedShipBoard(player.getShipBoard())));
+
+                System.out.println("Sending board for " + player.getName());
+                List<TileInfo> tiles = FlightHandler.getSimplifiedShipBoard(player.getShipBoard());
+                System.out.println("tiles " + tiles.size());
+                ShipBoardMessage msg = new ShipBoardMessage(player.getName(), tiles);
+                System.out.println("Content: " + msg);
+                broadcastMessage(msg);
             }
         }
     }

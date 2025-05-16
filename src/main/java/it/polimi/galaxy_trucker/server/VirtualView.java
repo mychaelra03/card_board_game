@@ -39,6 +39,7 @@ public class VirtualView extends Thread {
         try {
             json = mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         this.out.println(json);
