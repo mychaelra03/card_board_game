@@ -40,7 +40,7 @@
          <ImageView fx:id="boardImage" fitHeight="300" fitWidth="500" layoutX="329.0" layoutY="58.0" />
          <Button fx:id="nextMapButton" layoutX="839.0" layoutY="195.0" text="→" />
          <Region layoutX="34.0" layoutY="405.0" prefHeight="247.0" prefWidth="518.0" styleClass="region" />
-         <TextField fx:id="chatTextField" layoutX="34.0" layoutY="662.0" onKeyPressed="#onEnterKeyPressed" prefHeight="28.0" prefWidth="469.0" promptText="Type a message..." />
+         <!--<TextField fx:id="chatTextField" layoutX="34.0" layoutY="662.0" onKeyPressed="#onEnterKeyPressed" prefHeight="28.0" prefWidth="469.0" promptText="Type a message..." />-->
          <Region layoutX="23.0" layoutY="33.0" prefHeight="352.0" prefWidth="218.0" styleClass="region" />
          <Label layoutX="38.0" layoutY="50.0" text="Players logged:">
             <font>
@@ -91,4 +91,5 @@
       </VBox>
       <Label layoutX="48.0" layoutY="60.0" style="-fx-font-size: 18; -fx-font-weight: bold;" styleClass="white-label" text="%label.selected_board" AnchorPane.leftAnchor="450.0" AnchorPane.topAnchor="50.0" />
    </AnchorPane>
+   </children>
 </StackPane>

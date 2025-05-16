@@ -3,8 +3,6 @@ package it.polimi.galaxy_trucker.client.controllers.playBuilding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.BoardType;
-import it.polimi.galaxy_trucker.GameModel;
 import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.controllers.shipBuilding.AnimationHandler;
 import it.polimi.galaxy_trucker.client.popups.Popup;
