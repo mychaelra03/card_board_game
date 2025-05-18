@@ -123,12 +123,12 @@ public class ShipBoardTest {
         CabinTile cabin = new CabinTile(0, FULL_UNIVERSAL_CONNECTORS);
         ship.setTile(2, 2, cabin, 0);
         assertEquals(4, ship.getTotalHumanCount(), "Human count should be 4.");
-        ship.removeCrewMemberAt(2, 2, 0);
+        ship.removeCrewMemberAt(2, 2);
         assertEquals(3, ship.getTotalHumanCount(), "Human count should be 3.");
-        ship.removeCrewMemberAt(2, 2, 1);
+        ship.removeCrewMemberAt(2, 2);
         assertEquals(2, ship.getTotalHumanCount(), "Human count should be 2.");
-        assertNull(ship.removeCrewMemberAt(2,2,0), "Crew member should not exist.");
-        ship.removeCrewMemberAt(3, 2, 0);
+        assertEquals(CrewType.NONE, ship.removeCrewMemberAt(2,2), "Crew member should not exist.");
+        ship.removeCrewMemberAt(3, 2);
         assertEquals(1, ship.getTotalHumanCount(), "Human count should be 1.");
     }
 
@@ -140,7 +140,7 @@ public class ShipBoardTest {
         ship.setTile(1, 2, new AlienSupportTile(0, FULL_UNIVERSAL_CONNECTORS, CrewType.BROWN_ALIEN), 0);
         ship.setCrewTypeAt(2,2, CrewType.BROWN_ALIEN);
         assertTrue(ship.hasAlien(CrewType.BROWN_ALIEN), "Should have a brown alien after setting one.");
-        ship.setCrewTypeAt(2, 2, CrewType.HUMAN);
+        ship.setCrewTypeAt(2, 2, CrewType.DOUBLE_HUMAN);
         assertFalse(ship.hasAlien(CrewType.BROWN_ALIEN), "The alien should have been removed.");
     }
 

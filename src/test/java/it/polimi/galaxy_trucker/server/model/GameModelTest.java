@@ -219,10 +219,10 @@ class GameModelTest {
         gameModel.setPlayerPosition(player4, -3);
 
         // removes all crew members from player4
-        player4.ensureCrewRemovedAt(new Point(3,2), 0);
-        player4.ensureCrewRemovedAt(new Point(3,2), 1);
-        player4.ensureCrewRemovedAt(new Point(4,2), 0);
-        player4.ensureCrewRemovedAt(new Point(4,2), 1);
+        player4.ensureCrewRemovedAt(new Point(3,2));
+        player4.ensureCrewRemovedAt(new Point(3,2));
+        player4.ensureCrewRemovedAt(new Point(4,2));
+        player4.ensureCrewRemovedAt(new Point(4,2));
         assertEquals(0, player4.getHumanCount(), "player4's human count should be 0");
         assertEquals(1, player4.getCrewCount(), "player4's crew count should be 1 (purple alien)");
 

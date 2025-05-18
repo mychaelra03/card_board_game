@@ -85,7 +85,7 @@ public class LobbyController implements VirtualServerAware {
 
         chatScrollPane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         chatVbox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        settingsButton.setOnAction(event -> Popup.newSettingsPopup().show());
+        settingsButton.setOnAction(_ -> Popup.newSettingsPopup().show());
 
         prevMapButton.setOnAction(_ -> {
             cooldownButton(prevMapButton, .1);
@@ -145,113 +145,113 @@ public class LobbyController implements VirtualServerAware {
         });
     }
 
+    ObjectMapper mapper = new ObjectMapper();
     private void updateView(String cmd) throws JsonProcessingException {
 
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(cmd);
 
         String type = node.get("type").asText();
 
         switch (type) {
-            case "playersInfo" -> {
-
-                PlayersInfoMessage playersInfoMessage = mapper.readValue(cmd, PlayersInfoMessage.class);
-                List<PlayerInfo> playersInfo = playersInfoMessage.getPlayers();
-
-                ClientSession.updatePlayers(playersInfo);
-
-                playerList.getChildren().clear();
-
-                PlayerInfo thisPlayer = null;
-                for (PlayerInfo pi : playersInfo) {
-                    if (pi.getUsername().equals(ClientSession.getUsername())) {
-                        thisPlayer = pi;
-                        break;
-                    }
-                }
-                if(thisPlayer == null) throw new RuntimeException("This client is not in the player list.");
-
-                int currentCount = Integer.parseInt(playerCounter.getText().split(" / ")[0]);
-                if (playersInfo.size() != currentCount) {
-                    Label msg = new Label();
-                    msg.setStyle("-fx-font-weight: bold; -fx-background-radius: 5; -fx-font-size: 14px;");
-
-                    if (playersInfo.size() > currentCount) {
-                        msg.setText(MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername()));
-                        msg.setTextFill(Color.GREEN);
-                        msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(0,128,0,0.1);");
-                    } else {
-                        msg.setText(MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername()));
-                        msg.setTextFill(Color.RED);
-                        msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(255,0,0,0.1);");
-                    }
-                    msg.setPadding(new Insets(2, 0, 2, 0));
-                    msg.setPrefWidth(chatScrollPane.getWidth());
-                    msg.setAlignment(Pos.CENTER);
-
-                    chatVbox.getChildren().add(msg);
-
-                    playerCounter.setText(playersInfo.size() + " / 4");
-                }
-
-                boolean isAdmin = thisPlayer.isAdmin();
-                prevMapButton.setVisible(isAdmin);
-                nextMapButton.setVisible(isAdmin);
-
-                int readyCount = (int) playersInfo.stream().filter(PlayerInfo::isReady).count();
-                int readyRequired = Math.max(2, playersInfo.size());
-                readyCounter.setText(readyCount + " / " + readyRequired);
-
-                readyButton.setText(thisPlayer.isReady()? LanguageManager.get("button.ready_cancel") : LanguageManager.get("button.ready"));
-
-                updatePlayerList(playersInfo, thisPlayer);
-            }
-
-            case "boardType" -> {
-
-                BoardTypeMessage boardTypeMessage = mapper.readValue(cmd, BoardTypeMessage.class);
-                BoardType boardType = boardTypeMessage.getBoardType();
-                String path = switch (boardType) {
-
-                    case LEARNING -> "/textures/cardboards/showcase_L.png";
-                    case LEVEL_ONE -> "/textures/cardboards/showcase_1.png";
-                    case LEVEL_TWO -> "/textures/cardboards/showcase_2.png";
-                };
-                Image board = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
-                boardImage.setImage(board);
-                boardName.setText(LanguageManager.get("label." + boardType));
-            }
-
-            case "chatMessage" -> {
-
-                ChatMessage chatMessage = mapper.readValue(cmd, ChatMessage.class);
-
-                Label sender = new Label(chatMessage.getSender() + ":");
-                sender.setStyle("-fx-font-size: 14; -fx-font-weight: bold");
-                sender.setMinWidth(Region.USE_PREF_SIZE);
-                sender.setTextFill(Paint.valueOf(chatMessage.getColor()));
-                Label message = new Label(chatMessage.getMessage());
-                message.setWrapText(true);
-                message.setMinHeight(Region.USE_PREF_SIZE);
-                message.setTextFill(Color.BLACK);
-                message.setStyle("-fx-font-size: 14;");
-
-                StackPane profilePic = ClientSession.getPlayerProfilePicture(chatMessage.getSender(), 20);
-
-                HBox messageBox = new HBox(profilePic, sender, message);
-                messageBox.setFillHeight(true);
-                messageBox.setAlignment(Pos.TOP_LEFT);
-                messageBox.setSpacing(4);
-                if (chatMessage.getSender().equals(ClientSession.getUsername())) {
-                    sender.setText(LanguageManager.get("text.you") + ":");
-                }
-                chatVbox.getChildren().add(messageBox);
-
-                Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
-            }
-
-            default -> Logger.logError("Unrecognized command: " + type);
+            case "playersInfo" -> handlePlayersInfo(cmd);
+            case "boardType"   -> handleBoardType(cmd);
+            case "chatMessage" -> handleChatMessage(cmd);
+            default            -> Logger.logError("Unrecognized command: " + type);
         }
+    }
+
+    private void handleChatMessage(String cmd) throws JsonProcessingException {
+        ChatMessage chatMessage = mapper.readValue(cmd, ChatMessage.class);
+
+        Label sender = new Label(chatMessage.getSender() + ":");
+        sender.setStyle("-fx-font-size: 14; -fx-font-weight: bold");
+        sender.setMinWidth(Region.USE_PREF_SIZE);
+        sender.setTextFill(Paint.valueOf(chatMessage.getColor()));
+        Label message = new Label(chatMessage.getMessage());
+        message.setWrapText(true);
+        message.setMinHeight(Region.USE_PREF_SIZE);
+        message.setTextFill(Color.BLACK);
+        message.setStyle("-fx-font-size: 14;");
+
+        StackPane profilePic = ClientSession.getPlayerProfilePicture(chatMessage.getSender(), 20);
+
+        HBox messageBox = new HBox(profilePic, sender, message);
+        messageBox.setFillHeight(true);
+        messageBox.setAlignment(Pos.TOP_LEFT);
+        messageBox.setSpacing(4);
+        if (chatMessage.getSender().equals(ClientSession.getUsername())) {
+            sender.setText(LanguageManager.get("text.you") + ":");
+        }
+        chatVbox.getChildren().add(messageBox);
+
+        Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
+    }
+
+    private void handleBoardType(String cmd) throws JsonProcessingException {
+        BoardTypeMessage boardTypeMessage = mapper.readValue(cmd, BoardTypeMessage.class);
+        BoardType boardType = boardTypeMessage.getBoardType();
+        String path = switch (boardType) {
+
+            case LEARNING -> "/textures/cardboards/showcase_L.png";
+            case LEVEL_ONE -> "/textures/cardboards/showcase_1.png";
+            case LEVEL_TWO -> "/textures/cardboards/showcase_2.png";
+        };
+        Image board = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
+        boardImage.setImage(board);
+        boardName.setText(LanguageManager.get("label." + boardType));
+    }
+
+    private void handlePlayersInfo(String cmd) throws JsonProcessingException {
+        PlayersInfoMessage playersInfoMessage = mapper.readValue(cmd, PlayersInfoMessage.class);
+        List<PlayerInfo> playersInfo = playersInfoMessage.getPlayers();
+
+        ClientSession.updatePlayers(playersInfo);
+
+        playerList.getChildren().clear();
+
+        PlayerInfo thisPlayer = null;
+        for (PlayerInfo pi : playersInfo) {
+            if (pi.getUsername().equals(ClientSession.getUsername())) {
+                thisPlayer = pi;
+                break;
+            }
+        }
+        if(thisPlayer == null) throw new RuntimeException("This client is not in the player list.");
+
+        int currentCount = Integer.parseInt(playerCounter.getText().split(" / ")[0]);
+        if (playersInfo.size() != currentCount) {
+            Label msg = new Label();
+            msg.setStyle("-fx-font-weight: bold; -fx-background-radius: 5; -fx-font-size: 14px;");
+
+            if (playersInfo.size() > currentCount) {
+                msg.setText(MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername()));
+                msg.setTextFill(Color.GREEN);
+                msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(0,128,0,0.1);");
+            } else {
+                msg.setText(MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername()));
+                msg.setTextFill(Color.RED);
+                msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(255,0,0,0.1);");
+            }
+            msg.setPadding(new Insets(2, 0, 2, 0));
+            msg.setPrefWidth(chatScrollPane.getWidth());
+            msg.setAlignment(Pos.CENTER);
+
+            chatVbox.getChildren().add(msg);
+
+            playerCounter.setText(playersInfo.size() + " / 4");
+        }
+
+        boolean isAdmin = thisPlayer.isAdmin();
+        prevMapButton.setVisible(isAdmin);
+        nextMapButton.setVisible(isAdmin);
+
+        int readyCount = (int) playersInfo.stream().filter(PlayerInfo::isReady).count();
+        int readyRequired = Math.max(2, playersInfo.size());
+        readyCounter.setText(readyCount + " / " + readyRequired);
+
+        readyButton.setText(thisPlayer.isReady()? LanguageManager.get("button.ready_cancel") : LanguageManager.get("button.ready"));
+
+        updatePlayerList(playersInfo, thisPlayer);
     }
 
     private void updatePlayerList(List<PlayerInfo> playersInfo, PlayerInfo thisPlayer) {

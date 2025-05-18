@@ -143,7 +143,7 @@ public class ShipBuildingController implements VirtualServerAware {
                 case "gameState" -> {
                     GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
 
-                    if (message.getGameState() == GameModel.GameState.FLIGHT_PHASE) {
+                    if (message.getGameState() == GameModel.GameState.CORRECTING_SHIP) {
                         virtualServer.setCallBack(null);
                         Platform.runLater(() -> SceneSwitch.switchScene("FlightScene"));
                         return;
@@ -173,154 +173,148 @@ public class ShipBuildingController implements VirtualServerAware {
         });
     }
 
+    ObjectMapper mapper = new ObjectMapper();
     private void updateView(String cmd) throws JsonProcessingException {
 
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(cmd);
 
         String type = node.get("type").asText();
 
         switch (type) {
-
-            case "boardType" -> {
-
-                BoardTypeMessage boardTypeMessage = mapper.readValue(cmd, BoardTypeMessage.class);
-                BoardType shipType = boardTypeMessage.getBoardType();
-
-                updateSceneWithBoardType(shipType);
-
-                tileManager.initializeGridPane(shipType);
-            }
-
-            case "gameState" -> {
-
-                GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
-
-                switch (message.getGameState()) {
-                    case BUILDING_SHIPS -> mainContentPane.setDisable(false);
-
-                    case WAITING -> {
-                        mainContentPane.setDisable(true);
-                        tileManager.handlePreviousSelectedTile();
-                        String popupMessage = lastTimerWasFinal? "label.times_up" : "label.players_ready";
-                        Popup.newCountdownPopup(popupMessage, 5).show();
-                    }
-
-                    default -> throw new IllegalStateException("Invalid game state");
-                }
-            }
-
-            case "tileTaken" -> {
-
-                TileTakenMessage message = mapper.readValue(cmd, TileTakenMessage.class);
-
-                boolean isSelf = message.getPlayerName().equals(ClientSession.getUsername());
-                ImageView tile = tileMap.get(message.getTileId());
-
-                if (isSelf) {
-                    tileManager.takeTile(tile);
-                } else {
-                    animationHandler.playTileTaken(tile);
-                }
-            }
-
-            case "tileReturned" -> {
-
-                TileReturnedMessage message = mapper.readValue(cmd, TileReturnedMessage.class);
-
-                int tileId = message.getTileId();
-                ImageView tile = tileMap.get(tileId);
-
-                tile.setImage(new Image(Objects.requireNonNull(getClass().getResource("/textures/tiles/tile_" + tileId + ".png")).toExternalForm()));
-
-                animationHandler.playTileReturn(tile, 0);
-            }
-
-            case "cardsTaken" -> {
-
-                CardsTakenMessage message = mapper.readValue(cmd, CardsTakenMessage.class);
-
-                animationHandler.playCardsTaken(cardsMap.get(message.getPileId()), message.getPlayerName());
-            }
-
-            case "cardsReturned" -> {
-
-                CardsReturnedMessage message = mapper.readValue(cmd, CardsReturnedMessage.class);
-
-                animationHandler.playCardsReturn(cardsMap.get(message.getPileId()), 200);
-            }
-
-            case "cards" -> {
-
-                CardsMessage message = mapper.readValue(cmd, CardsMessage.class);
-
-                Popup.newCardsPopup(message.getLevelOneCards(), message.getLevelTwoCards()).show();
-            }
-
-            case "timerStart" -> {
-
-                TimerStartMessage message = mapper.readValue(cmd, TimerStartMessage.class);
-
-                timerFlipButton.setOpacity(0);
-                timerLabels.setOpacity(1);
-                timerFlipButton.setDisable(true);
-
-                startCountdown(message.getDuration());
-
-                int timesFlipped = message.getTimesFlipped();
-                if(timerSlots.containsKey(timesFlipped - 1)) {
-                    timerSlots.get(timesFlipped - 1).setOpacity(0);
-                }
-                if(timerSlots.containsKey(timesFlipped)) {
-                    timerSlots.get(timesFlipped).setOpacity(1);
-                }
-            }
-
-            case "timerFinished" -> {
-
-                TimerFinishedMessage message = mapper.readValue(cmd, TimerFinishedMessage.class);
-                lastTimerWasFinal = message.isFinalFlip();
-
-                if(!lastTimerWasFinal) {
-                    timerLabels.setOpacity(0);
-                    timerFlipButton.setOpacity(1);
-                    timerFlipButton.setDisable(false);
-                }
-            }
-
-            case "doneBuilding" -> {
-
-                DoneBuildingMessage message = mapper.readValue(cmd, DoneBuildingMessage.class);
-
-                boolean isSelf = message.getPlayerName().equals(ClientSession.getUsername());
-                Button doneButton = doneButtonsMap.get(message.getPositionIndex());
-
-                if (doneButton == null) {
-                    System.err.println("No button found for position: " + message.getPositionIndex());
-                    return;
-                }
-
-                if(isSelf) {
-                    tileMap.values().forEach(tile -> tile.setDisable(true));
-                    cardsMap.values().forEach(card -> card.setDisable(true));
-                    doneButtonsMap.values().forEach(button -> button.setDisable(true));
-                    doneLabel.setText(LanguageManager.get("label.waiting_other_players"));
-                    tileManager.hideValidCells();
-                }
-
-                doneButton.setDisable(true);
-                doneButton.setText("");
-                if(doneButton.getParent() instanceof StackPane pane) {
-                    StackPane profilePic = ClientSession.getPlayerProfilePicture(message.getPlayerName(), 40);
-                    pane.getChildren().add(profilePic);
-                }
-            }
-
-            default -> Logger.logError("Unrecognized command: " + type);
+            case "gameState"     -> handleGameState(mapper.readValue(cmd, GameStateMessage.class));
+            case "boardType"     -> handleBoardType(mapper.readValue(cmd, BoardTypeMessage.class));
+            case "tileTaken"     -> handleTileTaken(mapper.readValue(cmd, TileTakenMessage.class));
+            case "tileReturned"  -> handleTileReturned(mapper.readValue(cmd, TileReturnedMessage.class));
+            case "cardsTaken"    -> handleCardsTaken(mapper.readValue(cmd, CardsTakenMessage.class));
+            case "cardsReturned" -> handleCardsReturned(mapper.readValue(cmd, CardsReturnedMessage.class));
+            case "cards"         -> handleCards(mapper.readValue(cmd, CardsMessage.class));
+            case "timerStart"    -> handleTimerStart(mapper.readValue(cmd, TimerStartMessage.class));
+            case "timerFinished" -> handleTimerFinished(mapper.readValue(cmd, TimerFinishedMessage.class));
+            case "doneBuilding"  -> handleDoneBuilding(mapper.readValue(cmd, DoneBuildingMessage.class));
+            default              -> Logger.logError("Unrecognized command: " + type);
         }
     }
 
-    private void updateSceneWithBoardType(BoardType shipType) {
+    private void handleGameState(GameStateMessage message) {
+
+        switch (message.getGameState()) {
+            case BUILDING_SHIPS -> mainContentPane.setDisable(false);
+
+            case WAITING -> {
+                mainContentPane.setDisable(true);
+                tileManager.handlePreviousSelectedTile();
+                String popupMessage = lastTimerWasFinal? "label.times_up" : "label.players_ready";
+                Popup.newCountdownPopup(popupMessage, 5).show();
+            }
+
+            default -> throw new IllegalStateException("Invalid game state");
+        }
+    }
+
+    private void handleBoardType(BoardTypeMessage message) {
+        BoardType shipType = message.getBoardType();
+
+        updateShipBoard(shipType);
+        updateCardPiles(shipType);
+        updateTimerIcons(shipType);
+
+        if(ClientSession.getPlayerCount() < 3) done_3.setDisable(true);
+        if(ClientSession.getPlayerCount() < 4) done_4.setDisable(true);
+
+        tileManager.initializeGridPane(shipType);
+    }
+
+    private void handleTileTaken(TileTakenMessage message) {
+
+        boolean isSelf = ClientSession.isSelf(message.getPlayerName());
+        ImageView tile = tileMap.get(message.getTileId());
+
+        if (isSelf) {
+            tileManager.takeTile(tile);
+        } else {
+            animationHandler.playTileTaken(tile);
+        }
+    }
+
+    private void handleTileReturned(TileReturnedMessage message) {
+
+        int tileId = message.getTileId();
+        ImageView tile = tileMap.get(tileId);
+
+        tile.setImage(new Image(Objects.requireNonNull(getClass().getResource("/textures/tiles/tile_" + tileId + ".png")).toExternalForm()));
+
+        animationHandler.playTileReturn(tile, 0);
+    }
+
+    private void handleCardsTaken(CardsTakenMessage message) {
+
+        animationHandler.playCardsTaken(cardsMap.get(message.getPileId()), message.getPlayerName());
+    }
+
+    private void handleCardsReturned(CardsReturnedMessage message) {
+
+        animationHandler.playCardsReturn(cardsMap.get(message.getPileId()), 200);
+    }
+
+    private void handleCards(CardsMessage message) {
+
+        Popup.newCardsPopup(message.getLevelOneCards(), message.getLevelTwoCards()).show();
+    }
+
+    private void handleTimerStart(TimerStartMessage message) {
+
+        timerFlipButton.setOpacity(0);
+        timerLabels.setOpacity(1);
+        timerFlipButton.setDisable(true);
+
+        startCountdown(message.getDuration());
+
+        int timesFlipped = message.getTimesFlipped();
+        if(timerSlots.containsKey(timesFlipped - 1)) {
+            timerSlots.get(timesFlipped - 1).setOpacity(0);
+        }
+        if(timerSlots.containsKey(timesFlipped)) {
+            timerSlots.get(timesFlipped).setOpacity(1);
+        }
+    }
+
+    private void handleTimerFinished(TimerFinishedMessage message) {
+        lastTimerWasFinal = message.isFinalFlip();
+
+        if(!lastTimerWasFinal) {
+            timerLabels.setOpacity(0);
+            timerFlipButton.setOpacity(1);
+            timerFlipButton.setDisable(false);
+        }
+    }
+
+    private void handleDoneBuilding(DoneBuildingMessage message) {
+
+        boolean isSelf = message.getPlayerName().equals(ClientSession.getUsername());
+        Button doneButton = doneButtonsMap.get(message.getPositionIndex());
+
+        if (doneButton == null) {
+            System.err.println("No button found for position: " + message.getPositionIndex());
+            return;
+        }
+
+        if(isSelf) {
+            tileMap.values().forEach(tile -> tile.setDisable(true));
+            cardsMap.values().forEach(card -> card.setDisable(true));
+            doneButtonsMap.values().forEach(button -> button.setDisable(true));
+            doneLabel.setText(LanguageManager.get("label.waiting_other_players"));
+            tileManager.hideValidCells();
+        }
+
+        doneButton.setDisable(true);
+        doneButton.setText("");
+        if(doneButton.getParent() instanceof StackPane pane) {
+            StackPane profilePic = ClientSession.getPlayerProfilePicture(message.getPlayerName(), 40);
+            pane.getChildren().add(profilePic);
+        }
+    }
+
+    private void updateShipBoard(BoardType shipType) {
         String boardPath = switch (shipType) {
             case LEARNING, LEVEL_ONE -> "/textures/cardboards/shipboard_1.png";
             case LEVEL_TWO -> "/textures/cardboards/shipboard_2.png";
@@ -336,7 +330,9 @@ public class ShipBuildingController implements VirtualServerAware {
         boardScale.setToX(1);
         boardScale.setToY(1);
         boardScale.play();
+    }
 
+    private void updateCardPiles(BoardType shipType) {
         String pilePath = switch (shipType) {
             case LEARNING, LEVEL_ONE -> "/textures/cards/card_pile_level_1.png";
             case LEVEL_TWO -> "/textures/cards/card_pile_level_2.png";
@@ -346,7 +342,9 @@ public class ShipBuildingController implements VirtualServerAware {
             card.setImage(pile);
             animationHandler.playCardsReturn(card, 500 + id * 150);
         });
+    }
 
+    private void updateTimerIcons(BoardType shipType) {
         int num = shipType.getBuildingTimersCount();
         for(int i = 0; i < num; i++) {
             String iconPath = getTimerSlotIconPath(shipType, i, num);
@@ -369,9 +367,6 @@ public class ShipBuildingController implements VirtualServerAware {
             timerSlots.put(i + 1, timerIcon);
             timerBox.getChildren().add(timerPane);
         }
-
-        if(ClientSession.getPlayerCount() < 3) done_3.setDisable(true);
-        if(ClientSession.getPlayerCount() < 4) done_4.setDisable(true);
     }
 
     private static String getTimerSlotIconPath(BoardType shipType, int i, int num) {

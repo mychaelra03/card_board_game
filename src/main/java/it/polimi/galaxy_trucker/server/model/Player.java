@@ -1,11 +1,14 @@
 package it.polimi.galaxy_trucker.server.model;
 
+import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.server.model.tiles.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 
@@ -95,14 +98,14 @@ public class Player {
     public void setCargoPool(List<BlockType> cargoPool) {
         this.cargoPool = cargoPool;
     }
-    public int getCargoHoldsValue() {
-        return shipBoard.getTotalHoldsValue();
-    }
 
     // DELEGATE METHODS
 
     public void setTile(int x, int y, int tileId, int rotation) {
         shipBoard.setTile(x, y, tileId, rotation);
+    }
+    public void removeTile(int x, int y) {
+        shipBoard.removeTile(x, y);
     }
     public int getTotalTileCount() {
         return shipBoard.getTotalTileCount();
@@ -152,6 +155,20 @@ public class Player {
     public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
         return shipBoard.hasExposedConnectorInPath(source, index);
     }
+    public int getCargoHoldsValue() {
+        return shipBoard.getTotalHoldsValue();
+    }
+    public void updateConnectivity() {
+        shipBoard.updateConnectivity();
+    }
+    public Set<Point> getInvalidTiles() {
+        return shipBoard.getInvalidTiles();
+    }
+    public ShipBoard.ShipContent getShipContent() {
+        return shipBoard.getShipContent();
+    }
+
+// NEW METHODS
 
     public boolean isAdmin() {
         return admin;
@@ -166,12 +183,9 @@ public class Player {
             default -> throw new IllegalStateException("Cannot toggle ready state from " + playerState);
         }
     }
-
     public void setAdmin(boolean admin) {
         this.admin = admin;
     }
-
-    // NEW METHODS
 
     public void reserveTile(int tileId, int index) {
         if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: " + index + ".");
@@ -190,9 +204,9 @@ public class Player {
         return reservedTiles[index];
     }
 
-    public void ensureCrewRemovedAt(Point cabinCoords, int index) {
-        CrewType removedMember = shipBoard.removeCrewMemberAt(cabinCoords.x, cabinCoords.y, index);
-        if(removedMember == null) throw new IllegalArgumentException("Cabin tile does not have a crew member at index " + index + ".");
+    public void ensureCrewRemovedAt(Point cabinCoords) {
+        CrewType removedMember = shipBoard.removeCrewMemberAt(cabinCoords.x, cabinCoords.y);
+        if(removedMember == null) throw new IllegalArgumentException("Cabin tile does not have any crew members.");
     }
 
     public void ensureBatteryRemovedFrom(Point batteryCoords) {
@@ -221,6 +235,21 @@ public class Player {
 
     public void clearCargoPool() {
         this.cargoPool = null;
+    }
+
+
+    public List<TileInfo> getSimplifiedShipBoard() {
+        List<TileInfo> simplifiedShipBoard = new ArrayList<>();
+        Tile[][] tiles = shipBoard.getTiles();
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 7; x++) {
+                Tile tile = tiles[y][x];
+                if (tile != null && !(tile instanceof EmptyTile)) {
+                    simplifiedShipBoard.add(new TileInfo(tile.getId(), tile.getRotation(), x, y));
+                }
+            }
+        }
+        return simplifiedShipBoard;
     }
 
 }

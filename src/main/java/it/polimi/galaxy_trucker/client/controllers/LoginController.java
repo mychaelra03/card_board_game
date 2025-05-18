@@ -192,22 +192,21 @@ public class LoginController implements VirtualServerAware {
 
         String type = mapper.readTree(cmd).get("type").asText();
 
-        switch (type) {
-            case "lobbyJoinResponse" -> {
-                LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
+        if (type.equals("lobbyJoinResponse")) {
+            LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
 
-                switch (joinResponse.getJoinStatus()) {
-                    case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
-                    case LOBBY_FULL -> Popup.newAlertPopup("title.unable_to_connect", "description.full_lobby").show();
-                    case NAME_TAKEN -> {
-                        String usedName = ClientSession.getUsername().toLowerCase();
-                        Popup.newAlertPopup("title.unable_to_connect", "description.username_used", usedName).show();
-                    }
-                    case GAME_STARTED -> Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show();
+            switch (joinResponse.getJoinStatus()) {
+                case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
+                case LOBBY_FULL -> Popup.newAlertPopup("title.unable_to_connect", "description.full_lobby").show();
+                case NAME_TAKEN -> {
+                    String usedName = ClientSession.getUsername().toLowerCase();
+                    Popup.newAlertPopup("title.unable_to_connect", "description.username_used", usedName).show();
                 }
-                PendingPopup.clear();
+                case GAME_STARTED -> Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show();
             }
-            default -> Logger.logError("Unrecognized command: " + type);
+            PendingPopup.clear();
+        } else {
+            Logger.logError("Unrecognized command: " + type);
         }
     }
 }

@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.GameMessage;
 import it.polimi.galaxy_trucker.common.messages.PingMessage;
 import it.polimi.galaxy_trucker.server.controller.MainController;
 
@@ -33,6 +34,7 @@ public class VirtualView extends Thread {
     }
 
     public void sendMessage(Object object) {
+        if(!(object instanceof GameMessage)) Logger.logWarning("Sending a non message class.");
 
         ObjectMapper mapper = new ObjectMapper();
         String json;

@@ -67,6 +67,10 @@ public class CargoTile extends Tile {
         return total;
     }
 
+    public BlockType[] getContent() {
+        return containers;
+    }
+
     @Override
     public String getTileType() {
         return "Cargo Hold";

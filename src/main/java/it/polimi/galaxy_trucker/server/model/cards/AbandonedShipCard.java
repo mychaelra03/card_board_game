@@ -59,11 +59,11 @@ public class AbandonedShipCard extends Card {
         else setInputState(FINISHED);
     }
 
-    public void removeMemberFrom(Player caller, Point cabinCoords, int index) {
+    public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);
         verifyCaller(caller, rewardedPlayer);
         if(remainingCrewToGiveUp <= 0) throw new RuntimeException("No more crew members are required to be removed.");
-        caller.ensureCrewRemovedAt(cabinCoords, index);
+        caller.ensureCrewRemovedAt(cabinCoords);
         remainingCrewToGiveUp--;
         if(remainingCrewToGiveUp == 0) {
             setInputState(FINISHED);

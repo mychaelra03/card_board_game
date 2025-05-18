@@ -51,11 +51,11 @@ public class SlaversCard extends AbstractEnemy {
         else handleNextPlayer();
     }
 
-    public void removeMemberFrom(Player caller, Point cabinCoords, int index) {
+    public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);
         verifyCaller(caller, punishedPlayer);
         if(remainingCrewToGiveUp <= 0) throw new RuntimeException("No more crew members are required to be removed.");
-        caller.ensureCrewRemovedAt(cabinCoords, index);
+        caller.ensureCrewRemovedAt(cabinCoords);
         remainingCrewToGiveUp--;
         if(remainingCrewToGiveUp == 0 || punishedPlayer.getCrewCount() == 0) {
             setInputState(NONE);

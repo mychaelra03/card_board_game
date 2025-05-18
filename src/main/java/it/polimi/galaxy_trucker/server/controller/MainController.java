@@ -3,8 +3,8 @@ package it.polimi.galaxy_trucker.server.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage;
-import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
+import it.polimi.galaxy_trucker.common.messages.flight.*;
+import it.polimi.galaxy_trucker.server.events.flight.*;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.server.model.Player;
@@ -15,6 +15,7 @@ import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.VirtualView;
 import it.polimi.galaxy_trucker.server.events.*;
 import it.polimi.galaxy_trucker.server.model.GameModel.*;
+import it.polimi.galaxy_trucker.server.model.cards.Card;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,9 @@ public class MainController {
         this.handlerMap = Map.of(
                 GameState.LOBBY, new LobbyHandler(gameModel, playerMap),
                 GameState.BUILDING_SHIPS, new ShipBuildingHandler(gameModel, playerMap),
-                GameState.FLIGHT_PHASE, new FlightHandler(gameModel, playerMap),
+                GameState.CORRECTING_SHIP, new CorrectingShipHandler(gameModel, playerMap),
+                GameState.ASSIGNING_CREW, new AssigningCrewHandler(gameModel, playerMap),
+                GameState.PICKING_CARDS, new PickingCardsHandler(gameModel, playerMap),
                 GameState.WAITING, new WaitingHandler(gameModel, playerMap),
                 GameState.GAME_OVER, new GameOverHandler(gameModel, playerMap)
         );
@@ -54,6 +57,9 @@ public class MainController {
         gameModel.addEventListener(TimerStartEvent.class, this::handleTimerStart);
         gameModel.addEventListener(TimerFinishedEvent.class, this::handleTimerFinished);
         gameModel.addEventListener(DoneBuildingEvent.class, this::handleDoneBuilding);
+        gameModel.addEventListener(PlayerPositionUpdateEvent.class, this::handlePlayerPositionUpdate);
+        gameModel.addEventListener(ShipUpdateEvent.class, this::handleShipUpdate);
+        gameModel.addEventListener(InvalidShipEvent.class, this::handleInvalidShip);
     }
 
     public void processCommand(VirtualView senderVirtualView, String json) throws JsonProcessingException {
@@ -102,19 +108,16 @@ public class MainController {
                 broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
             }
         }
-        else if(event.getGameState() == GameState.FLIGHT_PHASE) {
-            System.out.println("A "+ playerMap.size());
+        else if(event.getGameState() == GameState.CORRECTING_SHIP) {
+            broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
             for(Player player : gameModel.getSortedPlayers()) {
-                System.out.println("B " + new ShipBoardMessage(player.getName(), FlightHandler.getSimplifiedShipBoard(player.getShipBoard())));
-                //broadcastMessage(new ShipBoardMessage(player.getName(), FlightHandler.getSimplifiedShipBoard(player.getShipBoard())));
-
-                System.out.println("Sending board for " + player.getName());
-                List<TileInfo> tiles = FlightHandler.getSimplifiedShipBoard(player.getShipBoard());
-                System.out.println("tiles " + tiles.size());
-                ShipBoardMessage msg = new ShipBoardMessage(player.getName(), tiles);
-                System.out.println("Content: " + msg);
-                broadcastMessage(msg);
+                String playerName = player.getName();
+                broadcastMessage(new ShipBoardMessage(playerName, player.getSimplifiedShipBoard()));
+                broadcastMessage(new PlayerPositionMessage(playerName, 0, player.getPosition()));
             }
+            gameModel.shuffleDeck();
+            List<Integer> cardsLevel = gameModel.getDeck().stream().map(Card::getLevel).toList();
+            broadcastMessage(new DeckLevelsMessage(cardsLevel));
         }
     }
     private void handleTileTaken(TileTakenEvent event) {
@@ -145,6 +148,17 @@ public class MainController {
         Logger.logDebug(event.getPlayerName() + " finished building and took position " + event.getPosition());
         broadcastMessage(new DoneBuildingMessage(event.getPlayerName(), event.getPosition()));
     }
+    private void handlePlayerPositionUpdate(PlayerPositionUpdateEvent event) {
+        Logger.logDebug(event.getPlayerName() + " moved from " + event.getOldPosition() + "to " + event.getNewPosition());
+        broadcastMessage(new PlayerPositionMessage(event.getPlayerName(), event.getOldPosition(), event.getNewPosition()));
+    }
+    private void handleShipUpdate(ShipUpdateEvent event) {
+        broadcastMessage(new ShipBoardMessage(event.getPlayerName(), event.getTiles()));
+    }
+    private void handleInvalidShip(InvalidShipEvent event) {
+        VirtualView virtualView = getVirtualViewByPlayerName(event.getPlayerName());
+        virtualView.sendMessage(new InvalidShipMessage(event.getPlayerName(), event.getInvalidTiles()));
+    }
 
 
     private void broadcastMessage(Object message) {
@@ -155,8 +169,6 @@ public class MainController {
         }
     }
 
-
-
     public void removeClient(VirtualView virtualView) {
         synchronized (playerMap) {
             if(playerMap.containsKey(virtualView)) {
@@ -165,5 +177,15 @@ public class MainController {
                 this.gameModel.removePlayer(playerName);
             }
         }
+    }
+
+    public VirtualView getVirtualViewByPlayerName(String username) {
+        for (Map.Entry<VirtualView, Player> entry : playerMap.entrySet()) {
+            if (entry.getValue().getName().equals(username)) {
+                return entry.getKey();
+            }
+        }
+        Logger.logError("No VirtualView found for player: " + username);
+        return null;
     }
 }

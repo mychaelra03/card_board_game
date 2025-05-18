@@ -74,7 +74,7 @@ public class ShipBoard {
         updateAlienSupport();
         // Checks if the removal of this tile left other tiles not connected to the ship.
         removedTiles++;
-        checkConnectivity();
+        updateConnectivity();
     }
 
     // BATTERY TILES
@@ -151,21 +151,21 @@ public class ShipBoard {
     public void setCrewTypeAt(int x, int y, CrewType crewType) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof CabinTile)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
-        if(crewType != CrewType.HUMAN && hasAlien(crewType)) {
+        if(crewType.isAlien() && hasAlien(crewType)) {
             for(Tile[] row : tiles) {
                 for(Tile tile : row) {
                     if(tile instanceof CabinTile cabin && cabin.hasAlien(crewType)) {
-                        cabin.setCrewType(CrewType.HUMAN);
+                        cabin.setCrewType(CrewType.DOUBLE_HUMAN);
                     }
                 }
             }
         }
         ((CabinTile)tiles[y][x]).setCrewType(crewType);
     }
-    public CrewType removeCrewMemberAt(int x, int y, int index) {
+    public CrewType removeCrewMemberAt(int x, int y) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof CabinTile cabin)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
-        return cabin.removeMember(index);
+        return cabin.removeMember();
     }
     public void applyEpidemicCard() {
         Set<CabinTile> infectedCabins = new HashSet<>();
@@ -189,7 +189,7 @@ public class ShipBoard {
             }
         }
         for(CabinTile infected : infectedCabins) {
-            infected.removeOneMember();
+            infected.removeMember();
         }
     }
 
@@ -316,6 +316,36 @@ public class ShipBoard {
 //        }
 //        return positions;
 //    }
+
+    public record BatteriesData(int x, int y, int batteries, int capacity, int rotation) {}
+    public record CrewData(int x, int y, CrewType crew) {}
+    public record CargoData(int x, int y, BlockType[] cargo, int capacity, int rotation) {}
+
+    public record ShipContent(
+            List<BatteriesData> batteriesData,
+            List<CrewData> crewData,
+            List<CargoData> cargoData
+    ) {}
+    public ShipContent getShipContent() {
+        List<BatteriesData> batteries = new ArrayList<>();
+        List<CrewData> crew = new ArrayList<>();
+        List<CargoData> cargo = new ArrayList<>();
+
+        for (int y = 0; y < tiles.length; y++) {
+            for (int x = 0; x < tiles[0].length; x++) {
+                Tile tile = tiles[y][x];
+
+                if (tile instanceof BatteriesTile batteryTile) {
+                    batteries.add(new BatteriesData(x, y, batteryTile.getStoredBatteries(), batteryTile.getCapacity(), batteryTile.getRotation()));
+                } else if (tile instanceof CabinTile cabin && cabin.hasCrew()) {
+                    crew.add(new CrewData(x, y, cabin.getCrew()));
+                } else if (tile instanceof CargoTile cargoTile && cargoTile.getHoldsValue() > 0) {
+                    cargo.add(new CargoData(x, y, cargoTile.getContent(), cargoTile.getCapacity(), cargoTile.getRotation()));
+                }
+            }
+        }
+        return new ShipContent(batteries, crew, cargo);
+    }
 
     public int getTileCount(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
         int count = 0;
@@ -543,9 +573,9 @@ public class ShipBoard {
 //        return false;
 //    }
 
-    List<List<Point>> groupsToChooseFrom;
+    //List<List<Point>> groupsToChooseFrom;
 
-    private void checkConnectivity() {
+    public void updateConnectivity() {
         // It uses a flood fill search to divide all the tiles in groups.
         // If there are more than one group, it automatically removes the ones without humans
         // and lets the player decide which one (with humans) to keep.
@@ -575,8 +605,24 @@ public class ShipBoard {
                 removeGroup(group);
             }
             if(groupsWithHumans.size() > 1) {
-                groupsToChooseFrom = groupsWithHumans;
+                //groupsToChooseFrom = groupsWithHumans;
 
+                // Find the group with the maximum number tiles
+                List<Point> largestGroup = null;
+                int maxSize = -1;
+                for (List<Point> group : groupsWithHumans) {
+                    if (group.size() > maxSize) {
+                        largestGroup = group;
+                        maxSize = group.size();
+                    }
+                }
+
+                // Remove all other human groups except the largest
+                for (List<Point> group : groupsWithHumans) {
+                    if (group != largestGroup) {
+                        removeGroup(group);
+                    }
+                }
             }
         }
     }
@@ -616,14 +662,14 @@ public class ShipBoard {
         }
     }
 
-    public void chooseGroupToKeep(int index) {
-        // Lets the player choose which group of tiles to keep.
-        if(index < 0 || index >= groupsToChooseFrom.size()) throw new IllegalArgumentException("index out of bounds.");
-        List<Point> groupToKeep = groupsToChooseFrom.get(index);
-        for(List<Point> group : groupsToChooseFrom) {
-            if(group != groupToKeep) {
-                removeGroup(group);
-            }
-        }
-    }
+//    public void chooseGroupToKeep(int index) {
+//        // Lets the player choose which group of tiles to keep.
+//        if(index < 0 || index >= groupsToChooseFrom.size()) throw new IllegalArgumentException("index out of bounds.");
+//        List<Point> groupToKeep = groupsToChooseFrom.get(index);
+//        for(List<Point> group : groupsToChooseFrom) {
+//            if(group != groupToKeep) {
+//                removeGroup(group);
+//            }
+//        }
+//    }
 }

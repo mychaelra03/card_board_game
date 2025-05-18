@@ -118,7 +118,7 @@ public class AnimationHandler {
 
         Node parent = card.getParent();
 
-        boolean isSelf = playerName.equals(ClientSession.getUsername());
+        boolean isSelf = ClientSession.isSelf(playerName);
         if(parent instanceof StackPane cardSlot && !isSelf) {
             StackPane profilePic = ClientSession.getPlayerProfilePicture(playerName, 80);
             cardSlot.getChildren().add(profilePic);

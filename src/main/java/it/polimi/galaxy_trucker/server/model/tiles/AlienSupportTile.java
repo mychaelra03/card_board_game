@@ -11,7 +11,7 @@ public class AlienSupportTile extends Tile {
 
     public AlienSupportTile(@JsonProperty("id") int id, @JsonProperty("connectors") Connector[] connectors, @JsonProperty("alienType") CrewType alienType) {
         super(id, connectors);
-        if(alienType == CrewType.HUMAN) throw new IllegalArgumentException(alienType + " is a not a valid alien type.");
+        if(!alienType.isAlien()) throw new IllegalArgumentException(alienType + " is a not a valid alien type.");
         this.alienType = alienType;
     }
 

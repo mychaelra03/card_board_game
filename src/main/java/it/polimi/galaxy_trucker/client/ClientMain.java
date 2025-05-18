@@ -40,6 +40,7 @@ public class ClientMain extends Application {
     }
 
     public static void main(String[] args) {
+        Logger.logInfo("Starting Galaxy Trucker...");
         launch();
     }
 }

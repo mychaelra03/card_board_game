@@ -9,14 +9,13 @@
     -fx-background-position: center bottom;
 }
 
-.whiteLabel {
+.white-label {
     -fx-text-fill: white;
     -fx-font-size: 16;
 }
 
 
 .region {
-    -fx-opacity: 0.5;
     -fx-border-color: white;
     -fx-background-color: rgba(86, 11, 173, 0.5);
     -fx-border-width: 1px;

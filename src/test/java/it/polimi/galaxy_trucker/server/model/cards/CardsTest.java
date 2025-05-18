@@ -60,14 +60,13 @@ class CardsTest {
 
         abShipCard.accept(player2);
 
-        abShipCard.removeMemberFrom(player2, new Point(1,2), 0);
-        assertThrows(IllegalArgumentException.class, () -> abShipCard.removeMemberFrom(player2, new Point(1,2), 0), "There should be no crew member at (1,2) index 0.");
-        abShipCard.removeMemberFrom(player2, new Point(1,2), 1);
-        abShipCard.removeMemberFrom(player2, new Point(1,3), 0);
-        abShipCard.removeMemberFrom(player2, new Point(1,3), 1);
-        abShipCard.removeMemberFrom(player2, new Point(3,2), 1);
-        abShipCard.removeMemberFrom(player2, new Point(5,2), 1);
-        assertThrows(IllegalStateException.class, () -> abShipCard.removeMemberFrom(player2, new Point(3,2), 0), "The player has already removed all the required members.");
+        abShipCard.removeMemberFrom(player2, new Point(1,2));
+        abShipCard.removeMemberFrom(player2, new Point(1,2));
+        abShipCard.removeMemberFrom(player2, new Point(1,3));
+        abShipCard.removeMemberFrom(player2, new Point(1,3));
+        abShipCard.removeMemberFrom(player2, new Point(3,2));
+        abShipCard.removeMemberFrom(player2, new Point(5,2));
+        assertThrows(IllegalStateException.class, () -> abShipCard.removeMemberFrom(player2, new Point(3,2)), "The player has already removed all the required members.");
 
         assertEquals(-3, player2.getPosition(), "player2 should be at position -3.");
         assertEquals(3, player2.getCredits(), "player2 should have gained 3 credits.");
@@ -250,9 +249,9 @@ class CardsTest {
         combatZoneCard.activateCannons(player3, 0, 0, new ArrayList<>());
         // The worst player is player3
         // He gives up 3 crew members.
-        combatZoneCard.removeMemberFrom(player3, new Point(1, 2), 0);
-        combatZoneCard.removeMemberFrom(player3, new Point(1, 2), 1);
-        combatZoneCard.removeMemberFrom(player3, new Point(3, 2), 0);
+        combatZoneCard.removeMemberFrom(player3, new Point(1, 2));
+        combatZoneCard.removeMemberFrom(player3, new Point(1, 2));
+        combatZoneCard.removeMemberFrom(player3, new Point(3, 2));
         assertEquals(7,player1.getCrewCount(),"player 1 should still have 6 crew members.");
         assertEquals(7,player2.getCrewCount(),"player 2 should still have 7 crew members.");
         assertEquals(8,player3.getCrewCount(),"player 3 should now have 8 crew members.");
@@ -590,12 +589,12 @@ class CardsTest {
         // player2 can reach cannon power 5, decides not to.
         slaversCard.activateCannons(player2, 0, 0, new ArrayList<>());
         assertEquals(8, player2.getCrewCount(), "player2 should now have 8 crew members.");
-        slaversCard.removeMemberFrom(player2, new Point(1,2), 0);
-        slaversCard.removeMemberFrom(player2, new Point(1,2), 1);
-        slaversCard.removeMemberFrom(player2, new Point(1,3), 0);
-        assertThrows(IllegalArgumentException.class, () -> slaversCard.removeMemberFrom(player2, new Point(1,1), 0));
-        slaversCard.removeMemberFrom(player2, new Point(3,2), 1);
-        assertThrows(IllegalStateException.class, () -> slaversCard.removeMemberFrom(player2, new Point(3,2), 0));
+        slaversCard.removeMemberFrom(player2, new Point(1,2));
+        slaversCard.removeMemberFrom(player2, new Point(1,2));
+        slaversCard.removeMemberFrom(player2, new Point(1,3));
+        assertThrows(IllegalArgumentException.class, () -> slaversCard.removeMemberFrom(player2, new Point(1,1)));
+        slaversCard.removeMemberFrom(player2, new Point(3,2));
+        assertThrows(IllegalStateException.class, () -> slaversCard.removeMemberFrom(player2, new Point(3,2)));
         assertEquals(4, player2.getCrewCount(), "player2 should now have 4 crew members.");
 
         // player3 goes over cannon power 5, then refuses the reward.

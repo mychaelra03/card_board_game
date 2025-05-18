@@ -13,7 +13,7 @@ public class StartingCabinTile extends CabinTile {
 
     @Override
     public void setCrewType(CrewType crewType) {
-        if(crewType != CrewType.HUMAN) throw new IllegalArgumentException("Starting cabin cannot host aliens.");
+        if(!crewType.isHuman()) throw new IllegalArgumentException("Starting cabin cannot host aliens.");
         super.setCrewType(crewType);
     }
 

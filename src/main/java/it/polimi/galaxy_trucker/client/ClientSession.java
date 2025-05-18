@@ -41,6 +41,14 @@ public class ClientSession {
         players = playersInfo.stream().collect(Collectors.toMap(PlayerInfo::getUsername, p -> p));
     }
 
+    public static boolean isSelf(String username) {
+        return username.equals(ClientSession.getUsername());
+    }
+
+    public static Set<String> getPlayerNames() {
+        return players.keySet();
+    }
+
     public static void resetData() {
         username = null;
         profilePicture = null;

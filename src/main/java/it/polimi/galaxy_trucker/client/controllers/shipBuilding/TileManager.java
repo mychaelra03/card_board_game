@@ -60,6 +60,7 @@ public class TileManager {
         tile.setFitWidth(TILE_SIZE);
         tile.setFitHeight(TILE_SIZE);
         tile.setCursor(Cursor.HAND);
+        tile.setCache(true);
 
         tileEffectManager.applyDropShadowEffect(tile, false);
 
