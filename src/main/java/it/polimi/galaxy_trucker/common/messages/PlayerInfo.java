@@ -10,7 +10,7 @@ public class PlayerInfo implements GameMessage {
     private String color;
     private boolean admin = false;
     private boolean ready = false;
-    private String type = "playerInfo";
+    private String type = "player_info";
 
     public PlayerInfo() {}
 

@@ -4,22 +4,14 @@ import it.polimi.galaxy_trucker.client.ClientSession;
 import javafx.animation.*;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.effect.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
-public class AnimationHandler {
-    private final AnchorPane mainContentPane;
+public class ShipAnim {
 
-    public AnimationHandler(AnchorPane mainContentPane) {
-        this.mainContentPane = mainContentPane;
-    }
-
-
-    public void animateImageToPosition(ImageView image, double targetX, double targetY, double scaling, double rotation, int duration, int scaleDuration) {
+    public static void animateImageToPosition(ImageView image, AnchorPane mainContentPane, double targetX, double targetY, double scaling, double rotation, int duration, int scaleDuration) {
 
         image.toFront();
         mainContentPane.setDisable(true);
@@ -44,7 +36,7 @@ public class AnimationHandler {
     }
 
 
-    public void rotateTile(ImageView tile, double angle) {
+    public static void rotateTile(ImageView tile, double angle) {
 
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(100), tile);
         rotateTransition.setByAngle(angle);
@@ -56,7 +48,7 @@ public class AnimationHandler {
         });
     }
 
-    public void playTileTaken(ImageView tile) {
+    public static void playTileTaken(ImageView tile) {
         tile.setDisable(true);
         tile.toFront();
         final double duration = 400;
@@ -78,7 +70,7 @@ public class AnimationHandler {
         animation.play();
     }
 
-    public void playTileReturn(ImageView tile, double delay) {
+    public static void playTileReturn(ImageView tile, double delay) {
         tile.setVisible(true);
         tile.toFront();
         final double duration = 600;
@@ -104,7 +96,7 @@ public class AnimationHandler {
         animation.play();
     }
 
-    public void playCardsTaken(ImageView card, String playerName) {
+    public static void playCardsTaken(ImageView card, String playerName) {
         card.setDisable(true);
 
         final double duration = 400;
@@ -136,7 +128,7 @@ public class AnimationHandler {
         new ParallelTransition(translation, cardFade).play();
     }
 
-    public void playCardsReturn(ImageView card, double delay) {
+    public static void playCardsReturn(ImageView card, double delay) {
         final double duration = 400;
 
         TranslateTransition translation = new TranslateTransition(Duration.millis(duration), card);
@@ -165,13 +157,13 @@ public class AnimationHandler {
         animation.play();
     }
 
-    public void playShowSlot(StackPane cell) {
+    public static void playShowSlot(StackPane cell) {
         cell.setCursor(Cursor.HAND);
         FadeTransition fade = new FadeTransition(Duration.millis(100), cell);
         fade.setToValue(1);
         fade.play();
     }
-    public void playHideSlot(StackPane cell) {
+    public static void playHideSlot(StackPane cell) {
         cell.setCursor(Cursor.DEFAULT);
         FadeTransition fade = new FadeTransition(Duration.millis(100), cell);
         fade.setToValue(0);

@@ -23,11 +23,10 @@ import java.util.Objects;
 
 public class CountdownPopupController implements PopupAware {
 
-    @FXML private Label countdownLabel;
-
     private Popup popup;
     private static boolean isPopupVisible = false;
 
+    @FXML private Label countdownLabel;
     @FXML private Label label;
 
     private int secondsLeft = 10;

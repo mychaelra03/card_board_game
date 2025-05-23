@@ -23,6 +23,6 @@ public class BoardSelectMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "boardSelect";
+        return "board_select";
     }
 }

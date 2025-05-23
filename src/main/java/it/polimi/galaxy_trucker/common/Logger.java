@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 
 public class Logger {
 
+    private static boolean debugMode = false;
+
     public enum LogType {
         INFO (GREEN),
         DEBUG (BLUE),
@@ -61,7 +63,7 @@ public class Logger {
     }
 
     public static void logDebug(String message) {
-        printLog(message, LogType.DEBUG);
+        if(debugMode) printLog(message, LogType.DEBUG);
     }
 
     public static void logWarning(String message) {
@@ -70,5 +72,15 @@ public class Logger {
 
     public static void logError(String message) {
         printLog(message, LogType.ERROR);
+    }
+
+
+    public static void setDebugMode(boolean debugMode) {
+        Logger.logDebug("Debug mode disabled.");
+        Logger.debugMode = debugMode;
+        Logger.logDebug("Debug mode enabled.");
+    }
+    public static boolean isDebugEnabled() {
+        return Logger.debugMode;
     }
 }

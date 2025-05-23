@@ -4,19 +4,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.messages.flight.*;
+import it.polimi.galaxy_trucker.common.messages.flight.cardActions.*;
 import it.polimi.galaxy_trucker.server.events.flight.*;
+import it.polimi.galaxy_trucker.server.events.flight.cards.*;
+import it.polimi.galaxy_trucker.server.events.lobby.BoardTypeUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
-import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
+import it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.VirtualView;
 import it.polimi.galaxy_trucker.server.events.*;
 import it.polimi.galaxy_trucker.server.model.GameModel.*;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +65,20 @@ public class MainController {
         gameModel.addEventListener(PlayerPositionUpdateEvent.class, this::handlePlayerPositionUpdate);
         gameModel.addEventListener(ShipUpdateEvent.class, this::handleShipUpdate);
         gameModel.addEventListener(InvalidShipEvent.class, this::handleInvalidShip);
+        gameModel.addEventListener(CrewUpdateEvent.class, this::handleCrewUpdate);
+        gameModel.addEventListener(CreditsUpdateEvent.class, this::handleCreditsUpdate);
+        gameModel.addEventListener(AlienCabinTilesEvent.class, this::handleAlienCabinTiles);
+        gameModel.addEventListener(CardPickedEvent.class, this::handleCardPicked);
+        gameModel.addEventListener(CardFinishedEvent.class, this::handleCardFinished);
+        gameModel.addEventListener(PlanetSelectionEvent.class, this::handlePlanetSelection);
+        gameModel.addEventListener(PlanetChosenEvent.class, this::handlePlanetChosen);
+        gameModel.addEventListener(PlanetRefusedEvent.class, this::handlePlanetRefused);
+        gameModel.addEventListener(CargoDecisionEvent.class, this::handleCargoDecision);
+        gameModel.addEventListener(CargoSwappedEvent.class, this::handleCargoSwapped);
+        gameModel.addEventListener(CargoUnloadedEvent.class, this::handleCargoUnloaded);
+        gameModel.addEventListener(CargoDoneEvent.class, this::handleCargoDone);
+        gameModel.addEventListener(CardDecisionEvent.class, this::handleCardDecision);
+
     }
 
     public void processCommand(VirtualView senderVirtualView, String json) throws JsonProcessingException {
@@ -68,105 +87,189 @@ public class MainController {
         JsonNode cmd = mapper.readTree(json);
         String type = cmd.get("type").asText();
 
-        if(type.equals("playerInfo")) {
-
-            PlayerInfo playerInfo = mapper.convertValue(cmd, PlayerInfo.class);
-
-            Player player = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
-
-            LobbyJoinResponse.JoinStatus result = gameModel.canAddPlayer(player);
-
-            senderVirtualView.sendMessage(new LobbyJoinResponse(result));
-
-            if (result == LobbyJoinResponse.JoinStatus.SUCCESS) {
-                senderVirtualView.sendMessage(new BoardTypeMessage(gameModel.getBoardType()));
-                playerMap.put(senderVirtualView, player);
-                gameModel.addPlayer(player);
-            } else senderVirtualView.close();
+        if(type.equals("player_info")) {
+            handlePlayerInfoMessage(senderVirtualView, mapper.convertValue(cmd, PlayerInfo.class));
         }
-        else handlerMap.get(gameModel.getGameState()).handle(senderVirtualView, cmd);
+        else {
+            CommandHandler handler = handlerMap.get(gameModel.getGameState());
+            if (handler != null) {
+                handler.handle(senderVirtualView, cmd);
+            } else {
+                Logger.logError("No handler for state: " + gameModel.getGameState());
+            }
+        }
     }
 
+    private void handlePlayerInfoMessage(VirtualView senderVirtualView, PlayerInfo playerInfo) {
+        Player player = new Player(playerInfo.getUsername(), playerInfo.getProfilePicIds());
+
+        JoinResponseMessage.JoinStatus result = gameModel.canAddPlayer(player);
+
+        senderVirtualView.sendMessage(new JoinResponseMessage(result));
+
+        if (result == JoinResponseMessage.JoinStatus.SUCCESS) {
+            player.assignEventDispatcher(gameModel.getEventDispatcher());
+            senderVirtualView.sendMessage(new BoardTypeMessage(gameModel.getBoardType()));
+            playerMap.put(senderVirtualView, player);
+            gameModel.addPlayer(player);
+        } else senderVirtualView.close();
+    }
+
+    // GameModel updates
 
     private void handlePlayersUpdate(PlayersUpdateEvent event) {
-        broadcastMessage(new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername()));
+        broadcast(new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername()));
     }
     private void handleGameReset(GameResetEvent event) {
         Logger.logDebug("Game resetting...");
-        broadcastMessage(new GameResetMessage(event.getPlayerName()));
-        broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
+        broadcast(new GameResetMessage(event.getPlayerName()));
+        broadcast(new BoardTypeMessage(gameModel.getBoardType()));
     }
     private void handleBoardTypeUpdate(BoardTypeUpdateEvent event) {
         Logger.logInfo("Updated board type: " + event.getBoardType());
-        broadcastMessage(new BoardTypeMessage(event.getBoardType()));
+        broadcast(new BoardTypeMessage(event.getBoardType()));
     }
     private void handleGameStateUpdate(GameStateUpdateEvent event) {
         Logger.logInfo("Updated game state: " + event.getGameState());
-        broadcastMessage(new GameStateMessage(event.getGameState()));
+        broadcast(new GameStateMessage(event.getGameState()));
         if(event.getGameState() == GameState.WAITING) {
             if(event.getPreviousGameState() == GameState.LOBBY) {
-                broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
+                broadcast(new BoardTypeMessage(gameModel.getBoardType()));
             }
         }
         else if(event.getGameState() == GameState.CORRECTING_SHIP) {
-            broadcastMessage(new BoardTypeMessage(gameModel.getBoardType()));
+            broadcast(new BoardTypeMessage(gameModel.getBoardType()));
             for(Player player : gameModel.getSortedPlayers()) {
                 String playerName = player.getName();
-                broadcastMessage(new ShipBoardMessage(playerName, player.getSimplifiedShipBoard()));
-                broadcastMessage(new PlayerPositionMessage(playerName, 0, player.getPosition()));
+                broadcast(new ShipBoardMessage(playerName, player.getSimplifiedShipBoard()));
+                broadcast(new PlayerPositionMessage(playerName, player.getPosition()));
             }
             gameModel.shuffleDeck();
             List<Integer> cardsLevel = gameModel.getDeck().stream().map(Card::getLevel).toList();
-            broadcastMessage(new DeckLevelsMessage(cardsLevel));
+            broadcast(new DeckLevelsMessage(cardsLevel));
+        }
+        else if(event.getGameState() == GameState.PICKING_CARDS) {
+            broadcast(new PickAvailableMessage(gameModel.getFirstPlayer().getName()));
         }
     }
     private void handleTileTaken(TileTakenEvent event) {
         Logger.logDebug(event.getPlayerName() + " took tile: " + event.getTileId());
-        broadcastMessage(new TileTakenMessage(event.getPlayerName(), event.getTileId()));
+        broadcast(new TileTakenMessage(event.getPlayerName(), event.getTileId()));
     }
     private void handleTileReturned(TileReturnedEvent event) {
         Logger.logDebug("Tile returned: " + event.getTileId());
-        broadcastMessage(new TileReturnedMessage(event.getTileId()));
+        broadcast(new TileReturnedMessage(event.getTileId()));
     }
     private void handleCardsTaken(CardsTakenEvent event) {
         Logger.logDebug(event.getPlayerName() + " took cards: " + event.getPileId());
-        broadcastMessage(new CardsTakenMessage(event.getPlayerName(), event.getPileId()));
+        broadcast(new CardsTakenMessage(event.getPlayerName(), event.getPileId()));
     }
     private void handleCardReturned(CardsReturnedEvent event) {
         Logger.logDebug("Cards returned: " + event.getPileId());
-        broadcastMessage(new CardsReturnedMessage(event.getPileId()));
+        broadcast(new CardsReturnedMessage(event.getPileId()));
     }
     private void handleTimerStart(TimerStartEvent event) {
         Logger.logDebug("Started timer " + event.getTimesFlipped() + " of " + event.getDuration() + " seconds");
-        broadcastMessage(new TimerStartMessage(event.getDuration(), event.getTimesFlipped()));
+        broadcast(new TimerStartMessage(event.getDuration(), event.getTimesFlipped()));
     }
     private void handleTimerFinished(TimerFinishedEvent event) {
         Logger.logDebug(event.isFinalFlip()? "Final timer ended" : "Timer ended");
-        broadcastMessage(new TimerFinishedMessage(event.isFinalFlip()));
+        broadcast(new TimerFinishedMessage(event.isFinalFlip()));
     }
     private void handleDoneBuilding(DoneBuildingEvent event) {
         Logger.logDebug(event.getPlayerName() + " finished building and took position " + event.getPosition());
-        broadcastMessage(new DoneBuildingMessage(event.getPlayerName(), event.getPosition()));
+        broadcast(new DoneBuildingMessage(event.getPlayerName(), event.getPosition()));
     }
     private void handlePlayerPositionUpdate(PlayerPositionUpdateEvent event) {
-        Logger.logDebug(event.getPlayerName() + " moved from " + event.getOldPosition() + "to " + event.getNewPosition());
-        broadcastMessage(new PlayerPositionMessage(event.getPlayerName(), event.getOldPosition(), event.getNewPosition()));
+        Logger.logDebug(event.getPlayerName() + " moved to " + event.getNewPosition());
+        broadcast(new PlayerPositionMessage(event.getPlayerName(), event.getNewPosition()));
     }
     private void handleShipUpdate(ShipUpdateEvent event) {
-        broadcastMessage(new ShipBoardMessage(event.getPlayerName(), event.getTiles()));
+        broadcast(new ShipBoardMessage(event.getPlayerName(), event.getTiles()));
     }
     private void handleInvalidShip(InvalidShipEvent event) {
         VirtualView virtualView = getVirtualViewByPlayerName(event.getPlayerName());
-        virtualView.sendMessage(new InvalidShipMessage(event.getPlayerName(), event.getInvalidTiles()));
+        virtualView.sendMessage(new TilesMessage("invalid_tiles", event.getPlayerName(), event.getInvalidTiles()));
+    }
+    private void handleCrewUpdate(CrewUpdateEvent event) {
+        broadcast(new CrewMessage(event.getPlayerName(), event.getCrew()));
+    }
+    private void handleCreditsUpdate(CreditsUpdateEvent event) {
+        broadcast(new CreditsMessage(event.getPlayerName(), event.getCredits()));
+    }
+    private void handleAlienCabinTiles(AlienCabinTilesEvent event) {
+        VirtualView virtualView = getVirtualViewByPlayerName(event.getPlayerName());
+        virtualView.sendMessage(new TilesMessage("alien_cabin_tiles", event.getPlayerName(), event.getCabinTiles()));
+    }
+    private void handleCardPicked(CardPickedEvent event) {
+        Card card = event.getCard();
+        Logger.logDebug("Card picked: " + card.getCardType() + " of level " + card.getLevel());
+        broadcast(new CardPickedMessage(card.getLevel(), card.getId()));
+    }
+    private void handleCardFinished(CardFinishedEvent event) {
+        if(!gameModel.getDeck().isEmpty()) {
+            broadcast(new PickAvailableMessage(gameModel.getFirstPlayer().getName()));
+        } else {
+            //TODO: finished
+        }
+    }
+    private void handlePlanetSelection(PlanetSelectionEvent event) {
+        List<String> planetChosenByNames = Arrays.stream(event.getPlanetChosenBy())
+                .map(p -> p != null ? p.getName() : null).toList();
+        broadcast(new PlanetSelectionMessage(event.getPlayerName(), planetChosenByNames));
+    }
+    private void handlePlanetChosen(PlanetChosenEvent event) {
+        Logger.logDebug(event.getPlayerName() + " chose planet " + event.getChosenPlanet() + ".");
+        broadcast(new PlanetChosenMessage(event.getPlayerName(), event.getChosenPlanet()));
+    }
+    private void handlePlanetRefused(PlanetRefusedEvent event) {
+        Logger.logDebug(event.getPlayerName() + " refused planet.");
+        broadcast(new PlanetRefusedMessage(event.getPlayerName()));
+    }
+    private void handleCargoDecision(CargoDecisionEvent event) {
+        for(Player player : event.getPlayers()) {
+            broadcast(new CargoDecisionMessage(player.getName(), player.getShipContent().cargoData(), player.getCargoPool()));
+        }
+    }
+    private void handleCargoSwapped(CargoSwappedEvent event) {
+        String playerName = event.getPlayer().getName();
+        sendMessageTo(playerName, new CargoSwapMessage(playerName, event.getBlockIndex(), event.getTileCoords(), event.getContainerIndex()));
+        broadcastExcept(playerName, new CargoMessage(playerName, event.getPlayer().getShipContent().cargoData()));
+    }
+    private void handleCargoUnloaded(CargoUnloadedEvent event) {
+        String playerName = event.getPlayer().getName();
+        sendMessageTo(playerName, new CargoUnloadMessage(playerName, event.getTileCoords(), event.getContainerIndex()));
+        broadcastExcept(playerName, new CargoMessage(playerName, event.getPlayer().getShipContent().cargoData()));
+    }
+    private void handleCargoDone(CargoDoneEvent event) {
+        String playerName = event.getPlayerName();
+        sendMessageTo(playerName, new CargoDoneMessage(playerName));
+    }
+    private void handleCardDecision(CardDecisionEvent event) {
+        broadcast(new CardDecisionMessage(event.getPlayerName(), null));
     }
 
 
-    private void broadcastMessage(Object message) {
+    private void broadcast(Object message) {
         synchronized (playerMap) {
             for (VirtualView virtualView : playerMap.keySet()) {
                 virtualView.sendMessage(message);
             }
         }
+    }
+
+    private void broadcastExcept(String playerName, Object message) {
+        synchronized (playerMap) {
+            for (VirtualView virtualView : playerMap.keySet()) {
+                if(playerMap.get(virtualView).getName().equals(playerName)) continue;
+                virtualView.sendMessage(message);
+            }
+        }
+    }
+
+    private void sendMessageTo(String playerName, Object message) {
+        VirtualView virtualView = getVirtualViewByPlayerName(playerName);
+        virtualView.sendMessage(message);
     }
 
     public void removeClient(VirtualView virtualView) {

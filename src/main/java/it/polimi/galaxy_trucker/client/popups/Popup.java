@@ -8,19 +8,25 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.animation.*;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Popup {
+
+    private static final List<PopupAware> activePopups = new ArrayList<>();
 
     private final Node content;
     private final Region overlay;
@@ -30,18 +36,18 @@ public class Popup {
     private Object controller = null;
     private boolean isClosing = false;
 
-    public Popup(Node content, double width, double height) {
-
-        StackPane popup = new StackPane(content);
-        popup.setPrefSize(width, height);
-        popup.setMaxSize(width, height);
-        popup.setStyle("-fx-background-color: white; -fx-background-radius: 10;");
-        StackPane.setAlignment(popup, Pos.CENTER);
-        this.content = popup;
-
-        this.overlay = new Region();
-        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.2);");
-    }
+//    public Popup(Node content, double width, double height) {
+//
+//        StackPane popup = new StackPane(content);
+//        popup.setPrefSize(width, height);
+//        popup.setMaxSize(width, height);
+//        popup.setStyle("-fx-background-color: white; -fx-background-radius: 10;");
+//        StackPane.setAlignment(popup, Pos.CENTER);
+//        this.content = popup;
+//
+//        this.overlay = new Region();
+//        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.2);");
+//    }
 
     private Popup(String fxmlFile, Object... args) {
         try {
@@ -52,6 +58,7 @@ public class Popup {
             if (controller instanceof PopupAware controllerAware) {
                 controllerAware.bindPopup(this);
                 controllerAware.initialize(args);
+                activePopups.add(controllerAware);
             }
 
             this.content = content;
@@ -104,12 +111,17 @@ public class Popup {
         StackPane rootPane = getRootPane();
         if(rootPane == null) return;
 
+        clearBlur();
+        content.setMouseTransparent(true);
+
         ParallelTransition closingAnimation = getClosingAnimation();
 
         closingAnimation.setOnFinished(_ -> {
             rootPane.getChildren().removeAll(overlay, content);
-            clearBlur();
-            if (controller instanceof PopupAware controllerAware) controllerAware.setPopupVisible(false);
+            if (controller instanceof PopupAware controllerAware) {
+                controllerAware.setPopupVisible(false);
+                activePopups.remove(controllerAware);
+            }
         });
 
         closingAnimation.play();
@@ -139,6 +151,25 @@ public class Popup {
 
     public static Popup newConfirmationPopup(String prompt, Runnable action) {
         return new Popup("ConfirmationPopup", prompt, action);
+    }
+
+    public static Popup newPlanetsCardPopup(Image cardImage, List<String> planetChosenBy) {
+        return new Popup("cards/PlanetsCardPopup", cardImage, planetChosenBy);
+    }
+
+    public static Popup newCargoDecisionPopup(StackPane ship, VBox originalShipPane, VBox blockPool) {
+        return new Popup("cards/CargoDecisionPopup", ship, originalShipPane, blockPool);
+    }
+
+    public static Popup newCardDecisionPopup(Image cardImage) {
+        return new Popup("cards/CardDecisionPopup", cardImage);
+    }
+
+    public static void closeAllPopups() {
+        for (PopupAware controller : activePopups) {
+            controller.setPopupVisible(false);
+        }
+        activePopups.clear();
     }
 
 

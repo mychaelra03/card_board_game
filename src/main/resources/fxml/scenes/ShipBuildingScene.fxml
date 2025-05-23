@@ -20,7 +20,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="rootPane" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController">
+<StackPane style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController">
     <AnchorPane fx:id="mainContentPane" disable="true" mouseTransparent="true" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-size: cover; -fx-background-repeat: no-repeat;">
         <Button fx:id="leftButton" layoutX="192.0" layoutY="680.0" mnemonicParsing="false" onAction="#onClickTurnTileLeft" prefWidth="60.0" text="%button.left" />
         <Button fx:id="rightButton" layoutX="452.0" layoutY="680.0" mnemonicParsing="false" onAction="#onClickTurnTileRight" prefWidth="60.0" text="%button.right" />

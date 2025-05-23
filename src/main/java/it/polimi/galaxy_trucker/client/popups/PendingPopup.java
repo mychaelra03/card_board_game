@@ -11,7 +11,7 @@ public class PendingPopup {
         PendingPopup.popup = popup;
     }
 
-    public static void tryShow(StackPane rootPane, AnchorPane mainContentPane) {
+    public static void tryShow() {
         if (popup != null) {
             popup.show();
             popup = null;

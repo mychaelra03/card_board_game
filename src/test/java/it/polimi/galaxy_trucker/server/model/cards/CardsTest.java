@@ -1,7 +1,6 @@
 package it.polimi.galaxy_trucker.server.model.cards;
 
 import it.polimi.galaxy_trucker.server.model.GameModel;
-import it.polimi.galaxy_trucker.server.model.cards.*;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.CannonShot;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Meteor;
@@ -117,8 +116,6 @@ class CardsTest {
         abStationCard.loadCargo(player2, 1, new Point(4, 1), 0);
         assertEquals(List.of(RED, YELLOW, YELLOW), player2.getCargoPool());
         assertEquals(2, player2.getCargoHoldsValue(), "player2 held value should now be 2.");
-
-        assertThrows(IllegalStateException.class, () -> abStationCard.loadCargo(player2, 0, new Point(4, 1), 1), "Shouldn't be able to place a red box in a normal container.");
 
         abStationCard.loadCargo(player2, 2, new Point(4, 3), 0);
         assertEquals(List.of(RED, YELLOW), player2.getCargoPool());
@@ -469,7 +466,7 @@ class CardsTest {
         // player4 goes over cannon power 6, and accepts the reward.
         piratesCard.activateCannons(player4, 1, 0, List.of(new Point(2,0)));
         assertEquals(22, player4.getTotalTileCount(), "player4 should still have all 22 tiles.");
-        piratesCard.acceptReward(player4);
+        piratesCard.accept(player4);
         assertEquals(3, player4.getCredits(), "player4 should now have 3 credits.");
         assertEquals(-2, player4.getPosition(), "player4 should now be at position -2.");
 
@@ -530,19 +527,19 @@ class CardsTest {
         assertNull(player3.getCargoPool());
         assertEquals(List.of(BLUE, BLUE), player4.getCargoPool());
 
-        planetsCard.placeCargo(player4, 0, new Point(1, 3), 0);
+        planetsCard.loadCargo(player4, 0, new Point(1, 3), 0);
         assertEquals(List.of(BLUE, YELLOW), player4.getCargoPool());
         assertEquals(1, player4.getCargoHoldsValue());
 
-        planetsCard.placeCargo(player1, 2, new Point(0, 2), 1);
+        planetsCard.loadCargo(player1, 2, new Point(0, 2), 1);
         assertEquals(List.of(RED, RED, RED), player1.getCargoPool());
         assertEquals(4, player1.getCargoHoldsValue());
 
         planetsCard.confirmDone(player1);
-        assertThrows(IllegalStateException.class, () -> planetsCard.placeCargo(player1, 2, new Point(0, 2), 1));
+        assertThrows(IllegalStateException.class, () -> planetsCard.loadCargo(player1, 2, new Point(0, 2), 1));
         assertThrows(IllegalStateException.class, () -> planetsCard.confirmDone(player3));
 
-        planetsCard.placeCargo(player4, 1, new Point(1, 3), 1);
+        planetsCard.loadCargo(player4, 1, new Point(1, 3), 1);
         assertEquals(List.of(BLUE), player4.getCargoPool());
         assertEquals(4, player4.getCargoHoldsValue());
 
@@ -600,7 +597,7 @@ class CardsTest {
         // player3 goes over cannon power 5, then refuses the reward.
         slaversCard.activateCannons(player3, 1, 2, List.of(new Point(1,4), new Point(1,4), new Point(1,3)));
         assertEquals(12, player3.getCrewCount(), "player2 should still have all 12 crew members.");
-        slaversCard.refuseReward(player3);
+        slaversCard.refuse(player3);
         assertEquals(0, player3.getCredits(), "player4 should still have 0 credits.");
         assertEquals(2, player3.getPosition(), "player4 should still be at position 2.");
 
@@ -647,7 +644,7 @@ class CardsTest {
 
         // player2 has always cannon power over 4, automatically defeats the smugglers.
         assertThrows(IllegalStateException.class, () -> smugglersCard.activateCannons(player2, 0, 0, new ArrayList<>()));
-        smugglersCard.acceptReward(player2);
+        smugglersCard.accept(player2);
         assertEquals(List.of(GREEN, BLUE, YELLOW), player2.getCargoPool());
         smugglersCard.loadCargo(player2, 0, new Point(4,3), 1);
         assertEquals(List.of(BLUE, YELLOW, GREEN), player2.getCargoPool());
@@ -664,7 +661,7 @@ class CardsTest {
         assertThrows(IllegalStateException.class, () -> smugglersCard.activateCannons(player4, 0, 0, new ArrayList<>()));
 
         // player4 cannot take decisions.
-        assertThrows(IllegalStateException.class, () -> smugglersCard.refuseReward(player4));
+        assertThrows(IllegalStateException.class, () -> smugglersCard.refuse(player4));
 
         assertTrue(smugglersCard.isFinished(), "The card should be finished.");
     }

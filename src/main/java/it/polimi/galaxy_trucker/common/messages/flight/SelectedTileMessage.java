@@ -28,6 +28,6 @@ public class SelectedTileMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "selectedTile";
+        return "selected_tile";
     }
 }

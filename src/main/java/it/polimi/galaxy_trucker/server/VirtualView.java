@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.GameMessage;
-import it.polimi.galaxy_trucker.common.messages.PingMessage;
+import it.polimi.galaxy_trucker.common.messages.SimpleMessage;
 import it.polimi.galaxy_trucker.server.controller.MainController;
 
 import java.io.*;
@@ -41,7 +41,6 @@ public class VirtualView extends Thread {
         try {
             json = mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
         this.out.println(json);
@@ -79,7 +78,7 @@ public class VirtualView extends Thread {
         pingTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                sendMessage(new PingMessage());
+                sendMessage(new SimpleMessage("ping"));
             }
         }, 3000, 3000);  // send every 3s
     }

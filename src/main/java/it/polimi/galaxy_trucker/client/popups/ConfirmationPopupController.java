@@ -7,13 +7,12 @@ import javafx.scene.control.Label;
 
 public class ConfirmationPopupController implements PopupAware {
 
-    @FXML
-    private Label prompt;
-
-    private Runnable onConfirmAction = null;
-
     private Popup popup;
     private static boolean isPopupVisible = false;
+
+    @FXML private Label prompt;
+
+    private Runnable onConfirmAction = null;
 
     @Override
     public void bindPopup(Popup popup) {

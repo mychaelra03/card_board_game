@@ -7,6 +7,8 @@ import java.awt.Point;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static it.polimi.galaxy_trucker.server.model.tiles.CrewType.*;
+
 public class ShipBoard {
 
     private final Tile[][] tiles;
@@ -129,8 +131,8 @@ public class ShipBoard {
     }
     public int getTotalCrewCount() {
         int count = getTotalHumanCount();
-        if(hasAlien(CrewType.BROWN_ALIEN)) count++;
-        if(hasAlien(CrewType.PURPLE_ALIEN)) count++;
+        if(hasAlien(BROWN_ALIEN)) count++;
+        if(hasAlien(PURPLE_ALIEN)) count++;
         return count;
     }
     public boolean hasAlien(CrewType alienType) {
@@ -149,18 +151,43 @@ public class ShipBoard {
         return ((CabinTile) tiles[y][x]).hasAlien(alienType);
     }
     public void setCrewTypeAt(int x, int y, CrewType crewType) {
+        // used in tests for easy crew setup
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
         if(!(tiles[y][x] instanceof CabinTile)) throw new IllegalArgumentException("Tile at ("+x+","+y+") is not a Cabin.");
         if(crewType.isAlien() && hasAlien(crewType)) {
             for(Tile[] row : tiles) {
                 for(Tile tile : row) {
                     if(tile instanceof CabinTile cabin && cabin.hasAlien(crewType)) {
-                        cabin.setCrewType(CrewType.DOUBLE_HUMAN);
+                        cabin.setCrewType(DOUBLE_HUMAN);
                     }
                 }
             }
         }
         ((CabinTile)tiles[y][x]).setCrewType(crewType);
+    }
+    public void cycleCrewTypeAt(int x, int y) {
+        if (!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: (" + x + "," + y + ").");
+        if (!(tiles[y][x] instanceof CabinTile cabin)) throw new IllegalArgumentException("Tile at (" + x + "," + y + ") is not a Cabin.");
+
+        CrewType current = cabin.getCrew();
+        List<CrewType> cycleOptions = cabin.getValidCrewTypesForCycle();
+
+        // Cycle to the next one
+        int nextIndex = (cycleOptions.indexOf(current) + 1) % cycleOptions.size();
+        CrewType next = cycleOptions.get(nextIndex);
+
+        // Enforce alien uniqueness if applicable
+        if (next.isAlien() && hasAlien(next)) {
+            // Remove existing alien of that type
+            for (Tile[] row : tiles) {
+                for (Tile t : row) {
+                    if (t instanceof CabinTile otherCabin && otherCabin.hasAlien(next)) {
+                        otherCabin.setCrewType(DOUBLE_HUMAN);
+                    }
+                }
+            }
+        }
+        cabin.setCrewType(next);
     }
     public CrewType removeCrewMemberAt(int x, int y) {
         if(!isInsideShip(x, y)) throw new IllegalArgumentException("Invalid coordinates: ("+x+","+y+").");
@@ -304,32 +331,35 @@ public class ShipBoard {
         }
     }
 
-//    public List<Point> getTilesPositions(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
-//        List<Point> positions = new ArrayList<>();
-//        for(int y = 0; y < tiles.length; y++) {
-//            for(int x = 0; x < tiles[0].length; x++) {
-//                Tile tile = tiles[y][x];
-//                if(tileClass.isInstance(tile) && filter.test(tile)) {
-//                    positions.add(new Point(x, y));
-//                }
-//            }
-//        }
-//        return positions;
-//    }
+    private Set<Point> getTilesPositions(Class<? extends Tile> tileClass, Predicate<Tile> filter) {
+        Set<Point> positions = new HashSet<>();
+        for(int y = 0; y < tiles.length; y++) {
+            for(int x = 0; x < tiles[0].length; x++) {
+                Tile tile = tiles[y][x];
+                if(tileClass.isInstance(tile) && filter.test(tile)) {
+                    positions.add(new Point(x, y));
+                }
+            }
+        }
+        return positions;
+    }
+    public Set<Point> getCabinTilesThatCanHostAliens() {
+        return getTilesPositions(CabinTile.class, tile -> ((CabinTile)tile).canHostAnAlienType());
+    }
 
     public record BatteriesData(int x, int y, int batteries, int capacity, int rotation) {}
     public record CrewData(int x, int y, CrewType crew) {}
     public record CargoData(int x, int y, BlockType[] cargo, int capacity, int rotation) {}
 
     public record ShipContent(
-            List<BatteriesData> batteriesData,
-            List<CrewData> crewData,
-            List<CargoData> cargoData
+            Set<BatteriesData> batteriesData,
+            Set<CrewData> crewData,
+            Set<CargoData> cargoData
     ) {}
     public ShipContent getShipContent() {
-        List<BatteriesData> batteries = new ArrayList<>();
-        List<CrewData> crew = new ArrayList<>();
-        List<CargoData> cargo = new ArrayList<>();
+        Set<BatteriesData> batteries = new HashSet<>();
+        Set<CrewData> crew = new HashSet<>();
+        Set<CargoData> cargo = new HashSet<>();
 
         for (int y = 0; y < tiles.length; y++) {
             for (int x = 0; x < tiles[0].length; x++) {
@@ -337,9 +367,9 @@ public class ShipBoard {
 
                 if (tile instanceof BatteriesTile batteryTile) {
                     batteries.add(new BatteriesData(x, y, batteryTile.getStoredBatteries(), batteryTile.getCapacity(), batteryTile.getRotation()));
-                } else if (tile instanceof CabinTile cabin && cabin.hasCrew()) {
+                } else if (tile instanceof CabinTile cabin) {
                     crew.add(new CrewData(x, y, cabin.getCrew()));
-                } else if (tile instanceof CargoTile cargoTile && cargoTile.getHoldsValue() > 0) {
+                } else if (tile instanceof CargoTile cargoTile) {
                     cargo.add(new CargoData(x, y, cargoTile.getContent(), cargoTile.getCapacity(), cargoTile.getRotation()));
                 }
             }
@@ -443,7 +473,6 @@ public class ShipBoard {
 
     private boolean hasValidConnections(int x, int y) {
         // Checks the connection in all 4 directions to see if its compatible.
-        boolean isConnected = false;
         Tile tile = getTile(x, y);
         int[][] offsets = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
         for(int side = 0; side < 4; side++) {
@@ -457,10 +486,8 @@ public class ShipBoard {
 
             int opposite_side = (side + 2) % 4;
             if(!areConnectorsCompatible(tile.getConnector(side), neighbor.getConnector(opposite_side))) return false;
-
-            if(tile.getConnector(side) != Connector.NONE) isConnected = true;
         }
-        return isConnected;
+        return true;
     }
 
     protected boolean isInsideShip(int x, int y) {
@@ -508,12 +535,12 @@ public class ShipBoard {
                         if(!isInsideShip(nx, ny)) continue;
 
                         if(tiles[ny][nx] instanceof AlienSupportTile support) {
-                            if(support.getAlienColor() == CrewType.BROWN_ALIEN) canHostBrown = true;
-                            if(support.getAlienColor() == CrewType.PURPLE_ALIEN) canHostPurple = true;
+                            if(support.getAlienColor() == BROWN_ALIEN) canHostBrown = true;
+                            if(support.getAlienColor() == PURPLE_ALIEN) canHostPurple = true;
                         }
                     }
-                    cabin.allowAlienType(CrewType.BROWN_ALIEN, canHostBrown);
-                    cabin.allowAlienType(CrewType.PURPLE_ALIEN, canHostPurple);
+                    cabin.allowAlienType(BROWN_ALIEN, canHostBrown);
+                    cabin.allowAlienType(PURPLE_ALIEN, canHostPurple);
                 }
             }
         }

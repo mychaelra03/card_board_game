@@ -20,6 +20,6 @@ public class UseReservedTileMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "useReservedTile";
+        return "use_reserved_tile";
     }
 }

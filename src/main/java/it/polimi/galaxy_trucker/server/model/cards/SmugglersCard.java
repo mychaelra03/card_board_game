@@ -13,7 +13,7 @@ import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class SmugglersCard extends AbstractEnemy {
+public class SmugglersCard extends AbstractEnemy implements CargoHandlerCard {
     // Combat encounter, win to gain goods, lose to lose goods.
 
     private final BlockType[] rewardCargo;
@@ -42,20 +42,21 @@ public class SmugglersCard extends AbstractEnemy {
         setInputState(CARGO_DECISION);
     }
 
+    @Override
     public void loadCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
         verifyCaller(caller, rewardedPlayer);
 
         caller.swapCargo(blockIndex, tileCoords, containerIndex);
     }
-
+    @Override
     public void unloadCargo(Player caller, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
         verifyCaller(caller, rewardedPlayer);
 
         caller.unloadCargo(tileCoords, containerIndex);
     }
-
+    @Override
     public void confirmDone(Player caller) {
         verifyInputState(CARGO_DECISION);
         verifyCaller(caller, rewardedPlayer);

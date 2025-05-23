@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.server.model.cards;
 
+import it.polimi.galaxy_trucker.server.events.flight.cards.CardDecisionEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.CannonTile;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
-public abstract class AbstractEnemy extends Card {
+public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, DecisionHandlerCard {
 
     private final int requiredCannonPower;
     private final int positionCost;
@@ -52,6 +53,7 @@ public abstract class AbstractEnemy extends Card {
         handlePlayer();
     }
 
+    @Override
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
@@ -60,6 +62,8 @@ public abstract class AbstractEnemy extends Card {
         caller.removeBatteries(batteryTiles);
         if(strength > requiredCannonPower) {
             setInputState(REWARD_DECISION);
+
+            dispatcher.fireEvent(new CardDecisionEvent(caller.getName()));
         } else if (strength < requiredCannonPower) {
             setInputState(NONE);
             applyPunishment(caller);
@@ -68,7 +72,8 @@ public abstract class AbstractEnemy extends Card {
         }
     }
 
-    public void acceptReward(Player caller) {
+    @Override
+    public void accept(Player caller) {
         verifyInputState(REWARD_DECISION);
         verifyPlayerTurn(caller, playerQueue);
         board.movePlayerBackward(caller, positionCost);
@@ -76,7 +81,8 @@ public abstract class AbstractEnemy extends Card {
         setInputState(NONE);
         giveReward(caller);
     }
-    public void refuseReward(Player caller) {
+    @Override
+    public void refuse(Player caller) {
         verifyInputState(REWARD_DECISION);
         verifyPlayerTurn(caller, playerQueue);
         playerQueue.clear();

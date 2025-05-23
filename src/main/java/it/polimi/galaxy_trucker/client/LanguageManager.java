@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.client;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -41,5 +42,9 @@ public class LanguageManager {
 
     public static String get(String key) {
         return bundle.getString(key);
+    }
+
+    public static String get(String key, String... args) {
+        return MessageFormat.format(LanguageManager.get(key), (Object[]) args);
     }
 }

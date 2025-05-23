@@ -20,6 +20,6 @@ public class GameStateMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "gameState";
+        return "game_state";
     }
 }

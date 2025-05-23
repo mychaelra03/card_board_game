@@ -10,6 +10,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -18,11 +19,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController.*;
-
 public class TileManager {
 
-    TileEffectManager tileEffectManager = new TileEffectManager();
+    private final AnchorPane mainContentPane;
+
+    private final TileEffectManager tileEffectManager = new TileEffectManager();
 
     public static final String TILES_PATH = "/textures/tiles/";
     private static final double TILE_SIZE = 83.5;
@@ -46,7 +47,8 @@ public class TileManager {
 
     private final VirtualServer virtualServer = VirtualServer.getInstance();
 
-    public TileManager(GridPane gridPane, Rectangle focusSlot, StackPane reservedSlot0, StackPane reservedSlot1) {
+    public TileManager(AnchorPane mainContentPane, GridPane gridPane, Rectangle focusSlot, StackPane reservedSlot0, StackPane reservedSlot1) {
+        this.mainContentPane = mainContentPane;
         this.gridPane = gridPane;
         this.focusSlot = focusSlot;
         this.reservedSlot0 = reservedSlot0;
@@ -147,7 +149,7 @@ public class TileManager {
         starterCabin.setTranslateX(-400);
         starterCabin.setTranslateY(100);
         starterCabin.setRotate(Math.random() * 360 - 180);
-        animationHandler.animateImageToPosition(starterCabin, starterCabin.getLayoutX(), starterCabin.getLayoutY(), 1, 0, 1200, 1200);
+        ShipAnim.animateImageToPosition(starterCabin, mainContentPane, starterCabin.getLayoutX(), starterCabin.getLayoutY(), 1, 0, 1200, 1200);
     }
 
     public void takeTile(ImageView tile) {
@@ -229,7 +231,7 @@ public class TileManager {
         showValidCells();
         focusSlot.setDisable(true);
         focusSlot.setCursor(Cursor.DEFAULT);
-        animationHandler.animateImageToPosition(selectedTile, focusSlot.getLayoutX(), focusSlot.getLayoutY(), 1.7, 0,500, 500);
+        ShipAnim.animateImageToPosition(selectedTile, mainContentPane, focusSlot.getLayoutX(), focusSlot.getLayoutY(), 1.7, 0,500, 500);
     }
 
     private boolean isCellValid(BoardType shipType, int x, int y) {
@@ -258,7 +260,7 @@ public class TileManager {
     }
 
     public void rotateSelectedTile(double angle) {
-        animationHandler.rotateTile(selectedTile, angle);
+        ShipAnim.rotateTile(selectedTile, angle);
     }
 
     public void updateValidCells(int x, int y) {
@@ -279,14 +281,14 @@ public class TileManager {
     }
 
     public void showValidCells() {
-        validCells.forEach(cell -> animationHandler.playShowSlot(cell));
-        animationHandler.playShowSlot(reservedSlot0);
-        animationHandler.playShowSlot(reservedSlot1);
+        validCells.forEach(cell -> ShipAnim.playShowSlot(cell));
+        ShipAnim.playShowSlot(reservedSlot0);
+        ShipAnim.playShowSlot(reservedSlot1);
     }
     public void hideValidCells() {
-        validCells.forEach(cell -> animationHandler.playHideSlot(cell));
-        animationHandler.playHideSlot(reservedSlot0);
-        animationHandler.playHideSlot(reservedSlot1);
+        validCells.forEach(cell -> ShipAnim.playHideSlot(cell));
+        ShipAnim.playHideSlot(reservedSlot0);
+        ShipAnim.playHideSlot(reservedSlot1);
     }
 
     private void removePaneFromGrid(int x, int y) {
@@ -348,7 +350,7 @@ public class TileManager {
         gridY = rowIndex;
 
         // moving tile from Focus spot to the reserved slot
-        animationHandler.animateImageToPosition(selectedTile, layoutX, layoutY, 1, selectedTile.getRotate(), 250, 400);
+        ShipAnim.animateImageToPosition(selectedTile, mainContentPane, layoutX, layoutY, 1, selectedTile.getRotate(), 250, 400);
 
         tileEffectManager.applySelectedEffect(selectedTile, isHoldingReservedTile());
 
@@ -371,7 +373,7 @@ public class TileManager {
             return;
         }
         virtualServer.sendMessage(new ReserveTileMessage(Integer.parseInt(slot.getId())));
-        animationHandler.animateImageToPosition(selectedTile, slot.getLayoutX(), slot.getLayoutY(), 1, selectedTile.getRotate(), 250, 400);
+        ShipAnim.animateImageToPosition(selectedTile, mainContentPane, slot.getLayoutX(), slot.getLayoutY(), 1, selectedTile.getRotate(), 250, 400);
     }
 
     private void removeTileFromReservedSlots() {

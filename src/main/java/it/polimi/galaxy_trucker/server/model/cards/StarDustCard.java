@@ -2,6 +2,7 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.PlayerPositionUpdateEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.util.List;

@@ -17,9 +17,10 @@ public class SettingsController implements PopupAware {
     private Popup popup;
     private static boolean isPopupVisible = false;
 
-    @FXML private Label languageLabel;
     @FXML private Button languageButton;
     @FXML private Label languageNoteLabel;
+
+    @FXML private Button debugButton;
 
     @FXML private Button mainMenuButton;
 
@@ -38,6 +39,12 @@ public class SettingsController implements PopupAware {
     @FXML
     public void onLanguageChange() {
         LanguageManager.cycleLanguages();
+        updateTexts();
+    }
+
+    @FXML
+    public void onDebugModeChange() {
+        Logger.setDebugMode(!Logger.isDebugEnabled());
         updateTexts();
     }
 
@@ -76,17 +83,20 @@ public class SettingsController implements PopupAware {
     }
 
     private void updateTexts() {
-        languageLabel.setText(LanguageManager.get("label.language") + ": ");
 
         String langKey = LanguageManager.getPendingLocale().toLanguageTag().toLowerCase();
         boolean isCurrent = LanguageManager.getLocale().equals(LanguageManager.getPendingLocale());
 
         languageButton.setText(LanguageManager.get("button.language_" + langKey));
-        languageButton.setStyle("-fx-background-color:" + (isCurrent ? "gold" : "orange"));
+        languageButton.setStyle("-fx-font-size: 14; -fx-background-color: " + (isCurrent ? "gold" : "orange"));
 
-        languageNoteLabel.setText(isCurrent ? "" : LanguageManager.get("label.language_note"));
+        languageNoteLabel.setVisible(!isCurrent);
 
         mainMenuButton.setDisable(isMainMenu);
+
+        boolean isDebug = Logger.isDebugEnabled();
+        debugButton.setText(LanguageManager.get(isDebug? "button.on" : "button.off"));
+        debugButton.setStyle("-fx-font-size: 14; -fx-background-color: " + (isDebug ? "gold" : "orange"));
     }
 
     @Override

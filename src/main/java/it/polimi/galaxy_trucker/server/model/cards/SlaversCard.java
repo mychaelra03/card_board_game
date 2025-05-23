@@ -10,7 +10,7 @@ import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class SlaversCard extends AbstractEnemy {
+public class SlaversCard extends AbstractEnemy implements CrewHandlerCard {
     // Combat encounter, win to gain credits, lose to lose crew members.
 
     private final int rewardCredits;
@@ -51,6 +51,7 @@ public class SlaversCard extends AbstractEnemy {
         else handleNextPlayer();
     }
 
+    @Override
     public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);
         verifyCaller(caller, punishedPlayer);

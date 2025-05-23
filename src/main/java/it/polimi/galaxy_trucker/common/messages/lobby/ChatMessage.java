@@ -35,6 +35,6 @@ public class ChatMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "chatMessage";
+        return "chat_message";
     }
 }

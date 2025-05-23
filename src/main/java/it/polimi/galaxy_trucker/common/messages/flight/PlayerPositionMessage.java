@@ -9,14 +9,12 @@ import java.util.List;
 public class PlayerPositionMessage implements GameMessage {
 
     private String playerName;
-    private int oldPosition;
     private int newPosition;
 
     public PlayerPositionMessage() {}
 
-    public PlayerPositionMessage(String playerName, int oldPosition, int newPosition) {
+    public PlayerPositionMessage(String playerName, int newPosition) {
         this.playerName = playerName;
-        this.oldPosition = oldPosition;
         this.newPosition = newPosition;
     }
 
@@ -24,15 +22,12 @@ public class PlayerPositionMessage implements GameMessage {
         return playerName;
     }
 
-    public int getOldPosition() {
-        return oldPosition;
-    }
     public int getNewPosition() {
         return newPosition;
     }
 
     @Override
     public String getType() {
-        return "playerPosition";
+        return "player_position";
     }
 }

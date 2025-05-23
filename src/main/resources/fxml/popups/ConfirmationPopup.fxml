@@ -15,12 +15,12 @@
       </VBox.margin>
    </Label>
     <HBox alignment="CENTER" spacing="30.0">
-        <Button cancelButton="true" defaultButton="true" onAction="#onClose" style="-fx-font-size: 14;" text="%button.cancel">
+        <Button cancelButton="true" onAction="#onClose" style="-fx-font-size: 14;" text="%button.cancel">
            <cursor>
                <Cursor fx:constant="HAND" />
            </cursor>
         </Button>
-        <Button onAction="#onConfirm" style="-fx-font-size: 14;" text="%button.confirm">
+        <Button defaultButton="true" onAction="#onConfirm" style="-fx-font-size: 14;" text="%button.confirm">
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>

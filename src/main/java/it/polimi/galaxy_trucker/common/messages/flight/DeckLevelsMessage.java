@@ -22,6 +22,6 @@ public class DeckLevelsMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "deckLevels";
+        return "deck_levels";
     }
 }

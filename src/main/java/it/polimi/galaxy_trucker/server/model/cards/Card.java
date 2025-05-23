@@ -1,5 +1,7 @@
 package it.polimi.galaxy_trucker.server.model.cards;
 
+import it.polimi.galaxy_trucker.server.events.EventDispatcher;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CardFinishedEvent;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.server.model.Player;
 
@@ -12,7 +14,7 @@ public abstract class Card {
     private final int level;
     protected GameModel board;
 
-    protected enum InputState {
+    public enum InputState {
         NONE,
         PLANET_SELECTION,
         CANNON_SELECTION,
@@ -24,6 +26,8 @@ public abstract class Card {
         FINISHED
     }
     private InputState inputState = InputState.NONE;
+
+    protected EventDispatcher dispatcher;
 
     public Card(int id, int level) {
         this.id = id;
@@ -42,12 +46,15 @@ public abstract class Card {
         if(board == null) throw new IllegalArgumentException("Invalid board.");
         if(this.board != null) throw new IllegalStateException("Card has already been activated.");
         this.board = board;
+        this.dispatcher = board.getEventDispatcher();
         onActivate();
     }
     protected abstract void onActivate();
 
     protected final void setInputState(InputState state) {
         this.inputState = state;
+
+        if(state == InputState.FINISHED) dispatcher.fireEvent(new CardFinishedEvent());
     }
 
     protected final void verifyPlayerTurn(Player caller, List<Player> playerQueue) {

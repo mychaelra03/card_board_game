@@ -13,7 +13,7 @@ import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class OpenSpaceCard extends Card {
+public class OpenSpaceCard extends Card implements EnginesHandlerCard {
     // Move forward based on engine strength.
 
     private List<Player> playerQueue;
@@ -28,6 +28,7 @@ public class OpenSpaceCard extends Card {
         setInputState(ENGINE_SELECTION);
     }
 
+    @Override
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);
         verifyPlayerTurn(caller, playerQueue);

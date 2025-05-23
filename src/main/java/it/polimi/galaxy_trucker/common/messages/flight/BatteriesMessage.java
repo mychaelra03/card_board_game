@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.polimi.galaxy_trucker.common.messages.GameMessage;
 import it.polimi.galaxy_trucker.server.model.ShipBoard;
 
-import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BatteriesMessage implements GameMessage {
 
     private String playerName;
-    private List<ShipBoard.BatteriesData> batteries;
+    private Set<ShipBoard.BatteriesData> batteries;
 
     public BatteriesMessage() {}
 
-    public BatteriesMessage(String playerName, List<ShipBoard.BatteriesData> batteries) {
+    public BatteriesMessage(String playerName, Set<ShipBoard.BatteriesData> batteries) {
         this.playerName = playerName;
         this.batteries = batteries;
     }
@@ -23,7 +23,7 @@ public class BatteriesMessage implements GameMessage {
         return playerName;
     }
 
-    public List<ShipBoard.BatteriesData> getBatteries() {
+    public Set<ShipBoard.BatteriesData> getBatteries() {
         return batteries;
     }
 

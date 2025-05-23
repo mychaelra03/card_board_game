@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.server.events.shipBuilding;
 import it.polimi.galaxy_trucker.server.events.EventModel;
 
 public class TimerStartEvent extends EventModel {
+
     private final int duration;
     private final int timesFlipped;
 

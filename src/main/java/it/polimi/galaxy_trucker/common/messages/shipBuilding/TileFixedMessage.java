@@ -31,6 +31,6 @@ public class TileFixedMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "tileFixed";
+        return "tile_fixed";
     }
 }

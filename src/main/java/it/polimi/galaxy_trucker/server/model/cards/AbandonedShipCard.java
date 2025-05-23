@@ -2,6 +2,8 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CardDecisionEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.PlanetSelectionEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.awt.*;
@@ -11,7 +13,7 @@ import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class AbandonedShipCard extends Card {
+public class AbandonedShipCard extends Card implements DecisionHandlerCard, CrewHandlerCard {
     // Exchange crew members for credits.
 
     private final int crewToGiveUp;
@@ -42,8 +44,11 @@ public class AbandonedShipCard extends Card {
         this.playerQueue = board.getSortedPlayers();
         setInputState(REWARD_DECISION);
         skipIneligiblePlayers();
+
+        if(!playerQueue.isEmpty()) dispatcher.fireEvent(new CardDecisionEvent(playerQueue.getFirst().getName()));
     }
 
+    @Override
     public void accept(Player caller) {
         verifyInputState(REWARD_DECISION);
         verifyPlayerTurn(caller, playerQueue);
@@ -59,6 +64,7 @@ public class AbandonedShipCard extends Card {
         else setInputState(FINISHED);
     }
 
+    @Override
     public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);
         verifyCaller(caller, rewardedPlayer);
@@ -70,11 +76,14 @@ public class AbandonedShipCard extends Card {
         }
     }
 
+    @Override
     public void refuse(Player caller) {
         verifyInputState(REWARD_DECISION);
         verifyPlayerTurn(caller, playerQueue);
         playerQueue.removeFirst();
         skipIneligiblePlayers();
+
+        if(!playerQueue.isEmpty()) dispatcher.fireEvent(new CardDecisionEvent(playerQueue.getFirst().getName()));
     }
 
     private void skipIneligiblePlayers() {

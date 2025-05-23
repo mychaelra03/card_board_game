@@ -11,16 +11,37 @@ import java.net.*;
 import java.util.Enumeration;
 
 public class ServerMain {
-    static Integer portNumber;
     static MainController controller = new MainController(new GameModel());
 
     public static void main(String[] args) {
-        if(args.length > 0) {
-            portNumber = Integer.parseInt(args[0]);
-        } else {
-            try {
-                InputStream config = ServerMain.class.getClassLoader().getResourceAsStream("public/config.json");
-                if(config == null) throw new IOException("Could not find config.json");
+        Integer portNumber = null;
+        boolean debugMode = false;
+
+        // Parse command-line arguments
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-p", "--port" -> {
+                    if (i + 1 < args.length) {
+                        try {
+                            portNumber = Integer.parseInt(args[++i]);
+                        } catch (NumberFormatException e) {
+                            Logger.logWarning("Invalid port number: " + args[i] + ". Falling back to config file.");
+                        }
+                    } else {
+                        Logger.logWarning("Missing port number after --port. Falling back to config file.");
+                    }
+                }
+
+                case "-d", "--debug" -> debugMode = true;
+
+                default -> Logger.logWarning("Unknown argument: " + args[i]);
+            }
+        }
+
+        // Load from config if no valid port provided
+        if (portNumber == null) {
+            try (InputStream config = ServerMain.class.getClassLoader().getResourceAsStream("public/config.json")) {
+                if (config == null) throw new IOException("Could not find config.json");
                 portNumber = new ObjectMapper().readTree(config).get("port").asInt();
             } catch (IOException e) {
                 Logger.logError("Could not read config.json: " + e.getMessage());
@@ -28,33 +49,38 @@ public class ServerMain {
         }
 
         Logger.logInfo("Server Started!");
+        Logger.setDebugMode(debugMode);
+
         try {
-            Logger.logInfo("Server running on IP: " + getLocalAddress() + " (LocalHostAddress:" + InetAddress.getLocalHost().getHostAddress() + ")");
+            Logger.logInfo("Server running on IP: " + getLocalAddress()
+                    + " (LocalHostAddress: " + InetAddress.getLocalHost().getHostAddress() + ")");
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-        ServerSocket serverSocket = null;
+
+        // Start server socket
+        ServerSocket serverSocket;
         try {
-            serverSocket = (portNumber == null)? new ServerSocket(0) : new ServerSocket(portNumber);
-        } catch (IOException e){
+            serverSocket = (portNumber == null) ? new ServerSocket(0) : new ServerSocket(portNumber);
+        } catch (IOException e) {
             Logger.logError("Could not listen on port: " + portNumber);
             System.exit(1);
+            return;
         }
 
         Logger.logInfo("Listening on port " + serverSocket.getLocalPort());
 
-        while(true) {
-            Socket clientSocket = null;
+        // Main server loop
+        while (true) {
             try {
-                clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
+                Logger.logInfo("New client accepted");
+                VirtualView virtualView = new VirtualView(clientSocket, controller);
+                virtualView.start();
             } catch (IOException e) {
-                Logger.logError("Accept failed");
+                Logger.logError("Accept failed: " + e.getMessage());
                 System.exit(1);
             }
-            Logger.logInfo("New client accepted");
-            VirtualView virtualView = new VirtualView(clientSocket, controller);
-            virtualView.start();
-
         }
     }
 

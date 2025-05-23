@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.polimi.galaxy_trucker.common.messages.GameMessage;
 import it.polimi.galaxy_trucker.server.model.ShipBoard;
 
-import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CargoMessage implements GameMessage {
 
     private String playerName;
-    private List<ShipBoard.CargoData> cargo;
+    private Set<ShipBoard.CargoData> cargo;
 
     public CargoMessage() {}
 
-    public CargoMessage(String playerName, List<ShipBoard.CargoData> cargo) {
+    public CargoMessage(String playerName, Set<ShipBoard.CargoData> cargo) {
         this.playerName = playerName;
         this.cargo = cargo;
     }
@@ -23,7 +23,7 @@ public class CargoMessage implements GameMessage {
         return playerName;
     }
 
-    public List<ShipBoard.CargoData> getCargo() {
+    public Set<ShipBoard.CargoData> getCargo() {
         return cargo;
     }
 

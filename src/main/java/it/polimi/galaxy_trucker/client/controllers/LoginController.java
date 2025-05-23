@@ -5,7 +5,7 @@ import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
+import it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import javafx.animation.PauseTransition;
@@ -15,7 +15,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -23,9 +22,6 @@ import java.util.Objects;
 import java.util.Random;
 
 public class LoginController implements VirtualServerAware {
-
-    @FXML private StackPane rootPane;
-    @FXML private AnchorPane mainContentPane;
 
     @FXML private TextField usernameTextField;
 
@@ -53,7 +49,7 @@ public class LoginController implements VirtualServerAware {
     @FXML
     public void initialize() {
         VirtualServer.getInstance().close();
-        Platform.runLater(() -> PendingPopup.tryShow(rootPane, mainContentPane));
+        Platform.runLater(PendingPopup::tryShow);
 
         if(ClientSession.getUsername() != null) {
             usernameTextField.setText(ClientSession.getUsername());
@@ -91,10 +87,11 @@ public class LoginController implements VirtualServerAware {
 
             ObjectMapper mapper = new ObjectMapper();
             String type = mapper.readTree(cmd).get("type").asText();
-            if (type.equals("lobbyJoinResponse")) {
-                LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
+            if (type.equals("join_response")) {
+                JoinResponseMessage joinResponse = mapper.readValue(cmd, JoinResponseMessage.class);
 
-                if (joinResponse.getJoinStatus() == LobbyJoinResponse.JoinStatus.SUCCESS) {
+                if (joinResponse.getJoinStatus() == JoinResponseMessage.JoinStatus.SUCCESS) {
+                    PendingPopup.clear();
                     VirtualServer.getInstance().setCallBack(null);
                     Platform.runLater(() -> SceneSwitch.switchScene("LobbyScene"));
                     return;
@@ -192,8 +189,8 @@ public class LoginController implements VirtualServerAware {
 
         String type = mapper.readTree(cmd).get("type").asText();
 
-        if (type.equals("lobbyJoinResponse")) {
-            LobbyJoinResponse joinResponse = mapper.readValue(cmd, LobbyJoinResponse.class);
+        if (type.equals("join_response")) {
+            JoinResponseMessage joinResponse = mapper.readValue(cmd, JoinResponseMessage.class);
 
             switch (joinResponse.getJoinStatus()) {
                 case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
@@ -204,7 +201,6 @@ public class LoginController implements VirtualServerAware {
                 }
                 case GAME_STARTED -> Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show();
             }
-            PendingPopup.clear();
         } else {
             Logger.logError("Unrecognized command: " + type);
         }

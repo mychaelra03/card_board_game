@@ -2,12 +2,13 @@ package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
-import it.polimi.galaxy_trucker.common.messages.login.LobbyJoinResponse;
+import it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
 import it.polimi.galaxy_trucker.server.events.*;
-import it.polimi.galaxy_trucker.server.events.flight.InvalidShipEvent;
-import it.polimi.galaxy_trucker.server.events.flight.PlayerPositionUpdateEvent;
-import it.polimi.galaxy_trucker.server.events.flight.ShipUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.flight.*;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CardPickedEvent;
+import it.polimi.galaxy_trucker.server.events.lobby.BoardTypeUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 
@@ -35,8 +36,11 @@ public class GameModel {
     private final Set<Integer> availablePositions;
 
     private final Set<Player> invalidShips = new HashSet<>();
+    private final Set<Player> choosingCrewType = new HashSet<>();
 
-    private final BuildingTimerHandler timerHandler = new BuildingTimerHandler(20, eventDispatcher, this::onTimerFinished);
+    private Card currentCard;
+
+    private final BuildingTimerHandler timerHandler = new BuildingTimerHandler(80, eventDispatcher, this::onTimerFinished);
     private Boolean timerFlipAvailable = false;
 
     public enum GameState {
@@ -114,23 +118,23 @@ public class GameModel {
         return cardPiles.get(pileId);
     }
 
-    public LobbyJoinResponse.JoinStatus canAddPlayer(Player player) {
-        if(gameState != LOBBY) return LobbyJoinResponse.JoinStatus.GAME_STARTED;
+    public JoinResponseMessage.JoinStatus canAddPlayer(Player player) {
+        if(gameState != LOBBY) return JoinResponseMessage.JoinStatus.GAME_STARTED;
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
-        if(players.size() >= 4) return LobbyJoinResponse.JoinStatus.LOBBY_FULL;
+        if(players.size() >= 4) return JoinResponseMessage.JoinStatus.LOBBY_FULL;
 
         boolean nameTaken = players.stream().anyMatch(p -> p.getName().equalsIgnoreCase(player.getName()));
-        if(nameTaken) return LobbyJoinResponse.JoinStatus.NAME_TAKEN;
+        if(nameTaken) return JoinResponseMessage.JoinStatus.NAME_TAKEN;
 
-        return LobbyJoinResponse.JoinStatus.SUCCESS;
+        return JoinResponseMessage.JoinStatus.SUCCESS;
     }
 
 
     public void addPlayer(Player player) {
         verifyGameState(LOBBY);
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
-        LobbyJoinResponse.JoinStatus canAddPlayer = canAddPlayer(player);
-        if(canAddPlayer != LobbyJoinResponse.JoinStatus.SUCCESS) throw new IllegalStateException("Can't add player :" + canAddPlayer);
+        JoinResponseMessage.JoinStatus canAddPlayer = canAddPlayer(player);
+        if(canAddPlayer != JoinResponseMessage.JoinStatus.SUCCESS) throw new IllegalStateException("Can't add player :" + canAddPlayer);
 
         players.add(player);
         assignFirstAvailableColor(player);
@@ -213,6 +217,9 @@ public class GameModel {
                 .sorted(Comparator.comparingInt(Player::getPosition).reversed())
                 .collect(Collectors.toList());
     }
+    public Player getFirstPlayer() {
+        return getSortedPlayers().getFirst();
+    }
 
     private int mod(int x, int m) {
         // Had to add this method to correctly compare negative numbers.
@@ -225,7 +232,7 @@ public class GameModel {
                 .anyMatch(p -> mod(p.getPosition(), flightTrackLength) == mod(position, flightTrackLength));
     }
     public Card getCurrentCard() {
-        return deck.getFirst();
+        return currentCard;
     }
     public List<Player> getPlayers() {
         return players;
@@ -240,6 +247,21 @@ public class GameModel {
             availableTiles.remove(id);
             eventDispatcher.fireEvent(new TileTakenEvent(player.getName(), id));
             return true;
+        }
+    }
+    public Integer TakeRandomTile(Player player) {
+        if(player.getState() != BUILDING_SHIP) return null;
+
+        synchronized (availableTiles) {
+            if (availableTiles.isEmpty()) return null;
+
+            List<Integer> tileList = new ArrayList<>(availableTiles);
+            int randomIndex = new Random().nextInt(tileList.size());
+            int id = tileList.get(randomIndex);
+
+            availableTiles.remove(id);
+            eventDispatcher.fireEvent(new TileTakenEvent(player.getName(), id));
+            return id;
         }
     }
     public void returnTile(int id) {
@@ -303,7 +325,6 @@ public class GameModel {
     }
 
     private void movePlayer(Player player, int steps, boolean forward) {
-        int oldPosition = player.getPosition();
         int newPosition = player.getPosition();
         while(steps > 0) {
             newPosition += forward? 1 : -1;
@@ -313,7 +334,7 @@ public class GameModel {
         }
         setPlayerPosition(player, newPosition);
 
-        eventDispatcher.fireEvent(new PlayerPositionUpdateEvent(player.getName(), oldPosition, newPosition));
+        eventDispatcher.fireEvent(new PlayerPositionUpdateEvent(player.getName(), newPosition));
     }
     public void movePlayerForward(Player player, int steps) {
         movePlayer(player, steps, true);
@@ -340,29 +361,49 @@ public class GameModel {
     private void setGameState(GameState state) {
         GameState previousGameState = gameState;
         this.gameState = state;
-        switch(state) {
+
+        eventDispatcher.fireEvent(new GameStateUpdateEvent(previousGameState, state));
+
+        handleNewGameState(state);
+    }
+
+    private void handleNewGameState(GameState gameState) {
+        switch(gameState) {
             case BUILDING_SHIPS -> {
                 timerFlipAvailable = true;
                 flipTimer(false);
             }
             case CORRECTING_SHIP -> {
-                ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-                scheduler.schedule(() -> {
-                    for(Player player : players) {
-                        player.updateConnectivity();
-                        eventDispatcher.fireEvent(new ShipUpdateEvent(player.getName(), player.getSimplifiedShipBoard()));
-                        Set<Point> invalidTiles = player.getInvalidTiles();
-                        if(!invalidTiles.isEmpty()) invalidShips.add(player);
-                        eventDispatcher.fireEvent(new InvalidShipEvent(player.getName(), invalidTiles));
-                    }
-                    if(invalidShips.isEmpty()) setGameState(ASSIGNING_CREW);
-                    scheduler.shutdown();
-                }, 5, TimeUnit.SECONDS);
+                for (Player player : players) {
+                    player.updateConnectivity();
+                    eventDispatcher.fireEvent(new ShipUpdateEvent(player.getName(), player.getSimplifiedShipBoard()));
+                    Set<Point> invalidTiles = player.getInvalidTiles();
+                    if (!invalidTiles.isEmpty()) invalidShips.add(player);
+                    eventDispatcher.fireEvent(new InvalidShipEvent(player.getName(), invalidTiles));
+                }
+                if (invalidShips.isEmpty()) setGameState(ASSIGNING_CREW);
             }
+            case ASSIGNING_CREW -> {
+                for(Player player : getSortedPlayers()) {
+                    eventDispatcher.fireEvent(new CrewUpdateEvent(player.getName(), player.getShipContent().crewData()));
+                    Set<Point> alienCabins = player.getCabinTilesThatCanHostAliens();
+                    if(!alienCabins.isEmpty()) choosingCrewType.add(player);
+                    eventDispatcher.fireEvent(new AlienCabinTilesEvent(player.getName(), alienCabins));
+                }
+                if(choosingCrewType.isEmpty()) setGameState(PICKING_CARDS);
+            }
+//            case PICKING_CARDS -> {
+//                for(Player player : getSortedPlayers()) {
+//                    eventDispatcher.fireEvent(new CrewUpdateEvent(player.getName(), player.getShipContent().crewData()));
+//                    Set<Point> alienCabins = player.getCabinTilesThatCanHostAliens();
+//                    if(!alienCabins.isEmpty()) choosingCrewType.add(player);
+//                    eventDispatcher.fireEvent(new AlienCabinTilesEvent(player.getName(), alienCabins));
+//                }
+//                if(choosingCrewType.isEmpty()) setGameState(PICKING_CARDS);
+//            }
         }
-
-        eventDispatcher.fireEvent(new GameStateUpdateEvent(previousGameState, gameState));
     }
+
     public GameState getGameState() {
         return gameState;
     }
@@ -452,11 +493,10 @@ public class GameModel {
 
     public void removeSelectedTile(Player player, int x, int y) {
         if(!invalidShips.contains(player)) {
-            Logger.logError("Player " + player.getName() + " doesn't have an invalid ship board.");
+            Logger.logWarning("Player " + player.getName() + " doesn't have an invalid ship board.");
             return;
         }
         player.removeTile(x, y);
-        eventDispatcher.fireEvent(new ShipUpdateEvent(player.getName(), player.getSimplifiedShipBoard()));
 
         Set<Point> invalidTiles = player.getInvalidTiles();
         eventDispatcher.fireEvent(new InvalidShipEvent(player.getName(), invalidTiles));
@@ -466,11 +506,47 @@ public class GameModel {
         if (invalidShips.isEmpty()) setGameState(ASSIGNING_CREW);
     }
 
+    public void cycleCrewTypeAt(Player player, int x, int y) {
+        if(!choosingCrewType.contains(player)) {
+            Logger.logWarning("Player " + player.getName() + " isn't choosing crew type.");
+            return;
+        }
+        player.cycleCrewTypeAt(x, y);
+        eventDispatcher.fireEvent(new CrewUpdateEvent(player.getName(), player.getShipContent().crewData()));
+    }
+    public void doneChoosingCrew(Player player) {
+        if(!choosingCrewType.contains(player)) {
+            Logger.logWarning("Player " + player.getName() + " isn't choosing crew type.");
+            return;
+        }
+        choosingCrewType.remove(player);
+        eventDispatcher.fireEvent(new AlienCabinTilesEvent(player.getName(), new HashSet<>()));
+        if (choosingCrewType.isEmpty()) setGameState(PICKING_CARDS);
+    }
+
+    public void pickNextCard(Player player) {
+        if(currentCard != null && !currentCard.isFinished()) {
+            Logger.logWarning("Cannot pick new card, previous card wasn't finished."); return;
+        }
+        if(!player.equals(getFirstPlayer())) {
+            Logger.logWarning("Player " + player.getName() + " cannot pick a card, they are not first."); return;
+        }
+        if(deck.isEmpty()) {
+            Logger.logWarning("There are no more cards in the deck."); return;
+        }
+        currentCard = deck.getFirst();
+        deck.removeFirst();
+        eventDispatcher.fireEvent(new CardPickedEvent(currentCard));
+
+        currentCard.activate(this);
+    }
+
     private void resetToLobby() {
         this.gameState = GameState.LOBBY;
         for (Player player : players) player.setState(IDLE);
         this.deck.clear();
         this.cardPiles = null;
+        currentCard = null;
         this.availableTiles.clear();
         for (int i = 0; i < 152; i++) availableTiles.add(i);
         this.availableCardPiles.clear();
@@ -494,6 +570,9 @@ public class GameModel {
         return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor().toString(),player.isAdmin(),player.isReady());
     }
 
+    public EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
+    }
     public <T extends EventModel> void addEventListener(Class<T> eventType, ModelEventListener<T> listener) {
         eventDispatcher.addListener(eventType, listener);
     }

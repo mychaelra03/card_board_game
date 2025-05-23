@@ -1,14 +1,21 @@
 package it.polimi.galaxy_trucker.server.model;
 
+import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.flight.BatteriesMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
+import it.polimi.galaxy_trucker.server.events.EventDispatcher;
+import it.polimi.galaxy_trucker.server.events.flight.BatteriesUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.flight.CreditsUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.flight.ShipUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CargoDoneEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CargoSwappedEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CargoUnloadedEvent;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.server.model.tiles.*;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 
@@ -39,6 +46,8 @@ public class Player {
 
     private List<BlockType> cargoPool;
 
+    protected EventDispatcher dispatcher = new EventDispatcher();
+
     public Player(String username, int[] profilePictureIds) {
         this.username = username;
         this.profilePictureIds = profilePictureIds;
@@ -51,6 +60,7 @@ public class Player {
         this.admin = false;
     }
     public Player(String username, int[] profilePictureIds, ShipBoard shipBoard) {
+        // used in tests to assign an already made shipboard
         this(username, profilePictureIds);
         this.shipBoard = shipBoard;
     }
@@ -76,6 +86,7 @@ public class Player {
     }
     public void giveCredits(int credits) {
         this.credits += credits;
+        dispatcher.fireEvent(new CreditsUpdateEvent(username, credits));
     }
     public int getCredits() {
         return credits;
@@ -98,6 +109,9 @@ public class Player {
     public void setCargoPool(List<BlockType> cargoPool) {
         this.cargoPool = cargoPool;
     }
+    public void assignEventDispatcher(EventDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
+    }
 
     // DELEGATE METHODS
 
@@ -106,6 +120,7 @@ public class Player {
     }
     public void removeTile(int x, int y) {
         shipBoard.removeTile(x, y);
+        dispatcher.fireEvent(new ShipUpdateEvent(username,getSimplifiedShipBoard()));
     }
     public int getTotalTileCount() {
         return shipBoard.getTotalTileCount();
@@ -139,9 +154,11 @@ public class Player {
     }
     public void removeBatteries(List<Point> coordinates) {
         shipBoard.removeBatteries(coordinates);
+        dispatcher.fireEvent(new BatteriesUpdateEvent(username, getShipContent().batteriesData()));
     }
-    public Point removeFirstTileInPath(Projectile.Source source, int index) {
-        return shipBoard.removeFirstTileInPath(source, index);
+    public void removeFirstTileInPath(Projectile.Source source, int index) {
+        shipBoard.removeFirstTileInPath(source, index);
+        dispatcher.fireEvent(new ShipUpdateEvent(username,getSimplifiedShipBoard()));
     }
     public ShipBoard.DefendingCannonType getDefendingCannonType(Projectile.Source source, int index) {
         return shipBoard.getDefendingCannonType(source, index);
@@ -167,8 +184,14 @@ public class Player {
     public ShipBoard.ShipContent getShipContent() {
         return shipBoard.getShipContent();
     }
+    public Set<Point> getCabinTilesThatCanHostAliens() {
+        return shipBoard.getCabinTilesThatCanHostAliens();
+    }
+    public void cycleCrewTypeAt(int x, int y) {
+        shipBoard.cycleCrewTypeAt(x, y);
+    }
 
-// NEW METHODS
+    // NEW METHODS
 
     public boolean isAdmin() {
         return admin;
@@ -219,10 +242,20 @@ public class Player {
         if(blockIndex < 0 || blockIndex >= cargoPool.size()) throw new IllegalArgumentException("Invalid block index.");
 
         BlockType selectedBlock = cargoPool.get(blockIndex);
+
+        if(getShipBoard().getTile(tileCoords.x, tileCoords.y) instanceof CargoTile cargo) {
+            if(cargo.getType() == CargoTile.CargoType.NORMAL && selectedBlock == BlockType.RED) {
+                Logger.logDebug("Trying to place Red block inside Normal container.");
+                return;
+            }
+        }
+
         BlockType replaced = shipBoard.loadCargoAt(tileCoords.x, tileCoords.y, containerIndex, selectedBlock);
 
         cargoPool.remove(blockIndex);
         if(replaced != null) cargoPool.add(replaced);
+
+        dispatcher.fireEvent(new CargoSwappedEvent(this, blockIndex, tileCoords,containerIndex));
     }
 
     public void unloadCargo(Point tileCoords, int containerIndex) {
@@ -231,15 +264,19 @@ public class Player {
         BlockType removed = shipBoard.unloadCargoAt(tileCoords.x, tileCoords.y, containerIndex);
 
         if(removed != null) cargoPool.add(removed);
+
+        dispatcher.fireEvent(new CargoUnloadedEvent(this, tileCoords,containerIndex));
     }
 
     public void clearCargoPool() {
         this.cargoPool = null;
+
+        dispatcher.fireEvent(new CargoDoneEvent(username));
     }
 
 
-    public List<TileInfo> getSimplifiedShipBoard() {
-        List<TileInfo> simplifiedShipBoard = new ArrayList<>();
+    public Set<TileInfo> getSimplifiedShipBoard() {
+        Set<TileInfo> simplifiedShipBoard = new HashSet<>();
         Tile[][] tiles = shipBoard.getTiles();
         for (int y = 0; y < 5; y++) {
             for (int x = 0; x < 7; x++) {

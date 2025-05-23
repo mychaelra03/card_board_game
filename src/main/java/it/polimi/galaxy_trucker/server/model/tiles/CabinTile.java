@@ -3,6 +3,9 @@ package it.polimi.galaxy_trucker.server.model.tiles;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static it.polimi.galaxy_trucker.server.model.tiles.CrewType.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -48,6 +51,9 @@ public class CabinTile extends Tile {
         if(!alienType.isAlien()) throw new IllegalArgumentException(alienType + " is not an alien type.");
         return (alienType == BROWN_ALIEN)? canHostBrownAlien : canHostPurpleAlien;
     }
+    public boolean canHostAnAlienType() {
+        return canHostAlienType(CrewType.BROWN_ALIEN) || canHostAlienType(CrewType.PURPLE_ALIEN);
+    }
 
     public boolean hasCrew() {
         return crew != CrewType.NONE;
@@ -64,6 +70,14 @@ public class CabinTile extends Tile {
         else crew = NONE;
 
         return removed;
+    }
+
+    public List<CrewType> getValidCrewTypesForCycle() {
+        List<CrewType> options = new ArrayList<>();
+        options.add(CrewType.DOUBLE_HUMAN);
+        if (canHostAlienType(CrewType.BROWN_ALIEN)) options.add(CrewType.BROWN_ALIEN);
+        if (canHostAlienType(CrewType.PURPLE_ALIEN)) options.add(CrewType.PURPLE_ALIEN);
+        return options;
     }
 
     @Override

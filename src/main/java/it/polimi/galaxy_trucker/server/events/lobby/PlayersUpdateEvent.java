@@ -1,10 +1,12 @@
-package it.polimi.galaxy_trucker.server.events;
+package it.polimi.galaxy_trucker.server.events.lobby;
 
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
+import it.polimi.galaxy_trucker.server.events.EventModel;
 
 import java.util.List;
 
 public class PlayersUpdateEvent extends EventModel {
+
     public final List<PlayerInfo> playerInfoList;
     public final String username;
 

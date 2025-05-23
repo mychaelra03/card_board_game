@@ -20,6 +20,6 @@ public class TimerFinishedMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "timerFinished";
+        return "timer_finished";
     }
 }

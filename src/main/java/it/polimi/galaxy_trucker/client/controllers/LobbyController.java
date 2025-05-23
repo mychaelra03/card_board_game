@@ -13,7 +13,6 @@ import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
 import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
 import it.polimi.galaxy_trucker.common.messages.lobby.ChatMessage;
-import it.polimi.galaxy_trucker.common.messages.lobby.ReadyToggleMessage;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -46,9 +45,6 @@ import java.util.Objects;
 
 public class LobbyController implements VirtualServerAware {
 
-    @FXML private StackPane rootPane;
-    @FXML private AnchorPane mainContentPane;
-
     @FXML private Label playerCounter;
     @FXML private Label readyCounter;
 
@@ -75,7 +71,7 @@ public class LobbyController implements VirtualServerAware {
     @FXML
     public void initialize() {
 
-        Platform.runLater(() -> PendingPopup.tryShow(rootPane, mainContentPane));
+        Platform.runLater(PendingPopup::tryShow);
 
         chatVbox.setPadding(new Insets(10, 5, 10, 5));
         chatScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -97,7 +93,7 @@ public class LobbyController implements VirtualServerAware {
         });
         readyButton.setOnAction(_ -> {
             cooldownButton(readyButton, .2);
-            this.virtualServer.sendMessage(new ReadyToggleMessage());
+            this.virtualServer.sendMessage(new SimpleMessage("ready_toggle"));
         });
     }
 
@@ -112,7 +108,7 @@ public class LobbyController implements VirtualServerAware {
                     virtualServer.close();
                     return;
                 }
-                case "gameState" -> {
+                case "game_state" -> {
                     GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
 
                     if (message.getGameState() != GameModel.GameState.WAITING) {
@@ -153,9 +149,9 @@ public class LobbyController implements VirtualServerAware {
         String type = node.get("type").asText();
 
         switch (type) {
-            case "playersInfo" -> handlePlayersInfo(cmd);
-            case "boardType"   -> handleBoardType(cmd);
-            case "chatMessage" -> handleChatMessage(cmd);
+            case "players_info" -> handlePlayersInfo(cmd);
+            case "board_type"   -> handleBoardType(cmd);
+            case "chat_message" -> handleChatMessage(cmd);
             default            -> Logger.logError("Unrecognized command: " + type);
         }
     }
@@ -224,11 +220,11 @@ public class LobbyController implements VirtualServerAware {
             msg.setStyle("-fx-font-weight: bold; -fx-background-radius: 5; -fx-font-size: 14px;");
 
             if (playersInfo.size() > currentCount) {
-                msg.setText(MessageFormat.format(LanguageManager.get("label.player_join"), playersInfoMessage.getUsername()));
+                msg.setText(LanguageManager.get("label.player_join", playersInfoMessage.getUsername()));
                 msg.setTextFill(Color.GREEN);
                 msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(0,128,0,0.1);");
             } else {
-                msg.setText(MessageFormat.format(LanguageManager.get("label.player_left"), playersInfoMessage.getUsername()));
+                msg.setText(LanguageManager.get("label.player_left", playersInfoMessage.getUsername()));
                 msg.setTextFill(Color.RED);
                 msg.setStyle(msg.getStyle() + "-fx-background-color: rgba(255,0,0,0.1);");
             }
@@ -340,11 +336,11 @@ public class LobbyController implements VirtualServerAware {
             promote.setStyle("-fx-text-fill: white; -fx-background-color: transparent;");
 
             promote.setOnAction(_ -> {
-                playerInfo.setType("promotePlayer");
+                playerInfo.setType("promote_player");
                 this.virtualServer.sendMessage(playerInfo);
             });
             kick.setOnAction(_ -> {
-                playerInfo.setType("kickPlayer");
+                playerInfo.setType("kick_player");
                 this.virtualServer.sendMessage(playerInfo);
             });
 

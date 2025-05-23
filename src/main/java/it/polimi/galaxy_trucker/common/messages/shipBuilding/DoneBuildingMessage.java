@@ -26,6 +26,6 @@ public class DoneBuildingMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "doneBuilding";
+        return "done_building";
     }
 }

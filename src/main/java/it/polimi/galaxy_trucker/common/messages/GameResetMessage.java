@@ -19,6 +19,6 @@ public class GameResetMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "gameReset";
+        return "game_reset";
     }
 }

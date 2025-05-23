@@ -4,16 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.polimi.galaxy_trucker.common.messages.GameMessage;
 
 import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShipBoardMessage implements GameMessage {
 
     private String playerName;
-    private List<TileInfo> tiles;
+    private Set<TileInfo> tiles;
 
     public ShipBoardMessage() {}
 
-    public ShipBoardMessage(String playerName, List<TileInfo> tiles) {
+    public ShipBoardMessage(String playerName, Set<TileInfo> tiles) {
         this.playerName = playerName;
         this.tiles = tiles;
     }
@@ -22,12 +23,12 @@ public class ShipBoardMessage implements GameMessage {
         return playerName;
     }
 
-    public List<TileInfo> getTiles() {
+    public Set<TileInfo> getTiles() {
         return tiles;
     }
 
     @Override
     public String getType() {
-        return "shipBoard";
+        return "ship_board";
     }
 }

@@ -21,13 +21,13 @@ import java.util.Objects;
 
 public class CardsPopupController implements PopupAware {
 
+    private Popup popup;
+    private static boolean isPopupVisible = false;
+
     @FXML private HBox cardBox;
     @FXML private Button closeButton;
 
     private boolean isClosing = false;
-
-    private Popup popup;
-    private static boolean isPopupVisible = false;
 
     @Override
     public void bindPopup(Popup popup) {
@@ -137,6 +137,10 @@ public class CardsPopupController implements PopupAware {
     @Override
     public void setPopupVisible(boolean visible) {
         isPopupVisible = visible;
+    }
+
+    public static void setPopupVisible() {
+        isPopupVisible = false;
     }
 
     @Override

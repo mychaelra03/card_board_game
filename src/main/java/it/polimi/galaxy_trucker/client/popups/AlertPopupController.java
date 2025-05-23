@@ -37,7 +37,7 @@ public class AlertPopupController implements PopupAware {
         }
         if(args.length > 1 && args[1] instanceof String descriptionText) {
             if(args.length > 2 && args[2] instanceof String descriptionArgs) {
-                description.setText(MessageFormat.format(LanguageManager.get(descriptionText), descriptionArgs));
+                description.setText(LanguageManager.get(descriptionText, descriptionArgs));
             } else {
                 description.setText(LanguageManager.get(descriptionText.trim()));
             }

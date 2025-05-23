@@ -36,4 +36,12 @@ module it.polimi.galaxy_trucker {
     exports it.polimi.galaxy_trucker.server.model;
     opens it.polimi.galaxy_trucker.server.model to javafx.fxml;
     exports it.polimi.galaxy_trucker.server.events.flight to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.server.events;
+    exports it.polimi.galaxy_trucker.client.controllers.flight;
+    opens it.polimi.galaxy_trucker.client.controllers.flight to javafx.fxml;
+    exports it.polimi.galaxy_trucker.server.events.flight.cards to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.common.messages.flight.cardActions;
+    opens it.polimi.galaxy_trucker.common.messages.flight.cardActions to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.client.popups.cards;
+    opens it.polimi.galaxy_trucker.client.popups.cards to javafx.fxml;
 }

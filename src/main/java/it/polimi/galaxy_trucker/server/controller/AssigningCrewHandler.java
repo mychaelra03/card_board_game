@@ -23,15 +23,22 @@ public class AssigningCrewHandler extends CommandHandler {
         String type = cmd.get("type").asText();
         switch (type) {
 
-            case "selectedTile" -> {
+            case "selected_tile" -> handleSelectedTile(senderView, mapper.convertValue(cmd, SelectedTileMessage.class));
+            case "done"          -> handleDone(senderView);
 
-                SelectedTileMessage message = mapper.convertValue(cmd, SelectedTileMessage.class);
-                Player player = playerMap.get(senderView);
-
-                gameModel.removeSelectedTile(player, message.getX(), message.getY());
-            }
-
-            default -> Logger.logError("Unrecognized command: " + type);
+            default              -> Logger.logError("Unrecognized command: " + type);
         }
+    }
+
+    private void handleSelectedTile(VirtualView senderView, SelectedTileMessage message) {
+        Player player = playerMap.get(senderView);
+
+        gameModel.cycleCrewTypeAt(player, message.getX(), message.getY());
+    }
+
+    private void handleDone(VirtualView senderView) {
+        Player player = playerMap.get(senderView);
+
+        gameModel.doneChoosingCrew(player);
     }
 }

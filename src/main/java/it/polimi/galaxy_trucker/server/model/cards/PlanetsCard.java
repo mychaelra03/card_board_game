@@ -2,18 +2,25 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.flight.CargoDecisionMessage;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CargoDecisionEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.PlanetChosenEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.PlanetRefusedEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.PlanetSelectionEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.BlockType;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class PlanetsCard extends Card {
+public class PlanetsCard extends Card implements CargoHandlerCard {
     // Players can land to collect goods.
 
     private final BlockType[][] planets;
@@ -21,8 +28,7 @@ public class PlanetsCard extends Card {
 
     private List<Player> playerQueue;
 
-    private boolean[] planetTaken;
-    private List<Player> acceptedPlayers;
+    private Player[] planetChosenBy;
 
     public PlanetsCard(
             @JsonProperty("id") int id,
@@ -39,21 +45,29 @@ public class PlanetsCard extends Card {
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
-        this.planetTaken = new boolean[planets.length];
-        this.acceptedPlayers = new ArrayList<>();
+        this.planetChosenBy = new Player[planets.length];
         setInputState(PLANET_SELECTION);
+
+        dispatcher.fireEvent(new PlanetSelectionEvent(playerQueue.getFirst().getName(), planetChosenBy));
     }
 
     public void choosePlanet(Player caller, int index) {
         verifyInputState(PLANET_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
         if(index < 0 || index >= planets.length) throw new IllegalArgumentException("Planet index out of bounds.");
-        if(planetTaken[index]) throw new IllegalArgumentException("Planet " + index + " is already taken.");
-        planetTaken[index] = true;
+        if (planetChosenBy[index] != null) {
+            Logger.logWarning("Planet " + index + " is already taken.");
+            return;
+        }
+        planetChosenBy[index] = caller;
         caller.setCargoPool(new ArrayList<>(Arrays.asList(planets[index])));
-        acceptedPlayers.add(caller);
         playerQueue.removeFirst();
-        if(playerQueue.isEmpty()) {
+
+        dispatcher.fireEvent(new PlanetChosenEvent(caller.getName(), index));
+
+        if(!playerQueue.isEmpty()) {
+            dispatcher.fireEvent(new PlanetSelectionEvent(playerQueue.getFirst().getName(), planetChosenBy));
+        } else {
             setInputState(NONE);
             giveRewards();
         }
@@ -63,7 +77,12 @@ public class PlanetsCard extends Card {
         verifyInputState(PLANET_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
         playerQueue.removeFirst();
-        if(playerQueue.isEmpty()) {
+
+        dispatcher.fireEvent(new PlanetRefusedEvent(caller.getName()));
+
+        if(!playerQueue.isEmpty()) {
+            dispatcher.fireEvent(new PlanetSelectionEvent(playerQueue.getFirst().getName(), planetChosenBy));
+        } else {
             setInputState(NONE);
             giveRewards();
         }
@@ -71,38 +90,52 @@ public class PlanetsCard extends Card {
 
     private void giveRewards() {
         verifyInputState(NONE);
-        if(acceptedPlayers.isEmpty()) {
+
+        boolean anyAccepted = Arrays.stream(planetChosenBy).anyMatch(Objects::nonNull);
+        if (!anyAccepted) {
             setInputState(FINISHED);
             return;
         }
-        for(Player player : board.getSortedPlayers().reversed()) {
-            if(acceptedPlayers.contains(player)) {
+        for (Player player : board.getSortedPlayers().reversed()) {
+            if (Arrays.asList(planetChosenBy).contains(player)) {
                 board.movePlayerBackward(player, positionCost);
             }
         }
         setInputState(CARGO_DECISION);
+        Set<Player> accepted = Arrays.stream(planetChosenBy).filter(Objects::nonNull).collect(Collectors.toSet());
+        dispatcher.fireEvent(new CargoDecisionEvent(accepted));
     }
 
-    public void placeCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
+    @Override
+    public void loadCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
-        verifyPlayerInList(caller, acceptedPlayers, "Player " + caller.getName() + " has no active cargo session.");
+        verifyPlayerInList(caller, Arrays.asList(planetChosenBy), "Player " + caller.getName() + " has no active cargo session.");
 
         caller.swapCargo(blockIndex, tileCoords, containerIndex);
     }
 
+    @Override
     public void unloadCargo(Player caller, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
-        verifyPlayerInList(caller, acceptedPlayers, "Player " + caller.getName() + " has no active cargo session.");
+        verifyPlayerInList(caller, Arrays.asList(planetChosenBy), "Player " + caller.getName() + " has no active cargo session.");
 
         caller.unloadCargo(tileCoords, containerIndex);
     }
 
+    @Override
     public void confirmDone(Player caller) {
         verifyInputState(CARGO_DECISION);
-        verifyPlayerInList(caller, acceptedPlayers, "Player " + caller.getName() + " has no active cargo session.");
-        acceptedPlayers.remove(caller);
+        verifyPlayerInList(caller, Arrays.asList(planetChosenBy), "Player " + caller.getName() + " has no active cargo session.");
+
+        for (int i = 0; i < planetChosenBy.length; i++) {
+            if (planetChosenBy[i] == caller) {
+                planetChosenBy[i] = null;
+            }
+        }
         caller.clearCargoPool();
-        if(acceptedPlayers.isEmpty()) {
+
+        boolean anyRemaining = Arrays.stream(planetChosenBy).anyMatch(Objects::nonNull);
+        if (!anyRemaining) {
             setInputState(FINISHED);
         }
     }

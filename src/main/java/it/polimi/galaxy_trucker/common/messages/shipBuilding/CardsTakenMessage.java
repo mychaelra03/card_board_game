@@ -26,6 +26,6 @@ public class CardsTakenMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "cardsTaken";
+        return "cards_taken";
     }
 }

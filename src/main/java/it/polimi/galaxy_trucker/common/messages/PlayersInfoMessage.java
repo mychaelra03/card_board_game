@@ -9,7 +9,7 @@ public class PlayersInfoMessage implements GameMessage {
 
     private List<PlayerInfo> players;
     private String username;
-    private String type = "playersInfo";
+    private String type = "players_info";
 
 
     public PlayersInfoMessage() {}

@@ -20,6 +20,6 @@ public class BoardTypeMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "boardType";
+        return "board_type";
     }
 }

@@ -62,8 +62,6 @@ public class ShipBuildingController implements VirtualServerAware {
     @FXML private Button done_3;
     @FXML private Button done_4;
 
-    public static AnimationHandler animationHandler;
-
     private final Map<Integer, ImageView> tileMap = new HashMap<>();
     private final Map<Integer, ImageView> cardsMap = new HashMap<>();
     private final Map<Integer, Button> doneButtonsMap = new HashMap<>();
@@ -75,9 +73,8 @@ public class ShipBuildingController implements VirtualServerAware {
     private boolean lastTimerWasFinal = false;
 
     public void initialize() {
-
-        animationHandler = new AnimationHandler(mainContentPane);
-        tileManager = new TileManager(gridPane, focusSlot, reservedSlot0, reservedSlot1);
+        
+        tileManager = new TileManager(mainContentPane, gridPane, focusSlot, reservedSlot0, reservedSlot1);
 
         cardsMap.put(0, cardPile0);
         cardsMap.put(1, cardPile1);
@@ -100,7 +97,7 @@ public class ShipBuildingController implements VirtualServerAware {
 
         for(int i = 0; i < tileList.size(); i++) {
             ImageView tile = tileList.get(i);
-            animationHandler.playTileReturn(tile, i * 15);
+            ShipAnim.playTileReturn(tile, i * 15);
         }
 
         rightButton.setOnAction(this::onClickTurnTileRight);
@@ -140,7 +137,7 @@ public class ShipBuildingController implements VirtualServerAware {
             String type = mapper.readTree(cmd).get("type").asText();
             switch (type) {
 
-                case "gameState" -> {
+                case "game_state" -> {
                     GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
 
                     if (message.getGameState() == GameModel.GameState.CORRECTING_SHIP) {
@@ -150,7 +147,7 @@ public class ShipBuildingController implements VirtualServerAware {
                     }
                 }
 
-                case "gameReset" -> {
+                case "game_reset" -> {
                     GameResetMessage message = mapper.readValue(cmd, GameResetMessage.class);
 
                     virtualServer.setCallBack(null);
@@ -181,16 +178,17 @@ public class ShipBuildingController implements VirtualServerAware {
         String type = node.get("type").asText();
 
         switch (type) {
-            case "gameState"     -> handleGameState(mapper.readValue(cmd, GameStateMessage.class));
-            case "boardType"     -> handleBoardType(mapper.readValue(cmd, BoardTypeMessage.class));
-            case "tileTaken"     -> handleTileTaken(mapper.readValue(cmd, TileTakenMessage.class));
-            case "tileReturned"  -> handleTileReturned(mapper.readValue(cmd, TileReturnedMessage.class));
-            case "cardsTaken"    -> handleCardsTaken(mapper.readValue(cmd, CardsTakenMessage.class));
-            case "cardsReturned" -> handleCardsReturned(mapper.readValue(cmd, CardsReturnedMessage.class));
+            case "game_state"     -> handleGameState(mapper.readValue(cmd, GameStateMessage.class));
+            case "board_type"     -> handleBoardType(mapper.readValue(cmd, BoardTypeMessage.class));
+            case "tile_taken"     -> handleTileTaken(mapper.readValue(cmd, TileTakenMessage.class));
+            case "tile_returned"  -> handleTileReturned(mapper.readValue(cmd, TileReturnedMessage.class));
+            case "cards_taken"    -> handleCardsTaken(mapper.readValue(cmd, CardsTakenMessage.class));
+            case "cards_returned" -> handleCardsReturned(mapper.readValue(cmd, CardsReturnedMessage.class));
             case "cards"         -> handleCards(mapper.readValue(cmd, CardsMessage.class));
-            case "timerStart"    -> handleTimerStart(mapper.readValue(cmd, TimerStartMessage.class));
-            case "timerFinished" -> handleTimerFinished(mapper.readValue(cmd, TimerFinishedMessage.class));
-            case "doneBuilding"  -> handleDoneBuilding(mapper.readValue(cmd, DoneBuildingMessage.class));
+            case "timer_start"    -> handleTimerStart(mapper.readValue(cmd, TimerStartMessage.class));
+            case "timer_finished" -> handleTimerFinished(mapper.readValue(cmd, TimerFinishedMessage.class));
+            case "done_building"  -> handleDoneBuilding(mapper.readValue(cmd, DoneBuildingMessage.class));
+
             default              -> Logger.logError("Unrecognized command: " + type);
         }
     }
@@ -232,7 +230,7 @@ public class ShipBuildingController implements VirtualServerAware {
         if (isSelf) {
             tileManager.takeTile(tile);
         } else {
-            animationHandler.playTileTaken(tile);
+            ShipAnim.playTileTaken(tile);
         }
     }
 
@@ -243,17 +241,17 @@ public class ShipBuildingController implements VirtualServerAware {
 
         tile.setImage(new Image(Objects.requireNonNull(getClass().getResource("/textures/tiles/tile_" + tileId + ".png")).toExternalForm()));
 
-        animationHandler.playTileReturn(tile, 0);
+        ShipAnim.playTileReturn(tile, 0);
     }
 
     private void handleCardsTaken(CardsTakenMessage message) {
 
-        animationHandler.playCardsTaken(cardsMap.get(message.getPileId()), message.getPlayerName());
+        ShipAnim.playCardsTaken(cardsMap.get(message.getPileId()), message.getPlayerName());
     }
 
     private void handleCardsReturned(CardsReturnedMessage message) {
 
-        animationHandler.playCardsReturn(cardsMap.get(message.getPileId()), 200);
+        ShipAnim.playCardsReturn(cardsMap.get(message.getPileId()), 200);
     }
 
     private void handleCards(CardsMessage message) {
@@ -340,7 +338,7 @@ public class ShipBuildingController implements VirtualServerAware {
         Image pile = new Image(Objects.requireNonNull(getClass().getResourceAsStream(pilePath)));
         cardsMap.forEach((id, card) -> {
             card.setImage(pile);
-            animationHandler.playCardsReturn(card, 500 + id * 150);
+            ShipAnim.playCardsReturn(card, 500 + id * 150);
         });
     }
 

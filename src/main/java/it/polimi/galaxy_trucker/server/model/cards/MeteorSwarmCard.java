@@ -13,7 +13,7 @@ import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class MeteorSwarmCard extends Card {
+public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
     // Rolling dice determines if meteors hit your ship.
 
     private final Meteor[] meteors;
@@ -57,6 +57,7 @@ public class MeteorSwarmCard extends Card {
         handleNextMeteorIfReady();
     }
 
+    @Override
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
         verifyPlayerInList(caller, playersAtRisk, "Player " + caller.getName() + " is not currently at risk.");
@@ -66,6 +67,7 @@ public class MeteorSwarmCard extends Card {
 
         handleNextMeteorIfReady();
     }
+    @Override
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);
         verifyPlayerInList(caller, playersAtRisk, "Player " + caller.getName() + " is not currently at risk.");

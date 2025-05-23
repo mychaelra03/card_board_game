@@ -20,6 +20,6 @@ public class TileReturnedMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "tileReturned";
+        return "tile_returned";
     }
 }

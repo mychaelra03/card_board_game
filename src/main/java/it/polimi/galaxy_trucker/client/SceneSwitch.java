@@ -1,5 +1,6 @@
 package it.polimi.galaxy_trucker.client;
 
+import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,6 +23,7 @@ public class SceneSwitch {
     public static void switchScene(String fxmlFile) {
         if (fxmlFile.equals(currentFxml)) return;
 
+        Popup.closeAllPopups();
         URL resource = SceneSwitch.class.getResource("/fxml/scenes/" + fxmlFile + ".fxml");
 
         Parent root;

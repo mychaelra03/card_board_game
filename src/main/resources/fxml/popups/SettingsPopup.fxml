@@ -11,7 +11,7 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="450.0" spacing="15.0" styleClass="popup-root" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.popups.SettingsController">
     <HBox>
-        <Label style="-fx-font-size: 20; -fx-font-weight: bold;" text="%label.settings">
+        <Label style="-fx-font-size: 22; -fx-font-weight: bold;" text="%label.settings">
             <HBox.margin>
                 <Insets left="10.0" />
             </HBox.margin>
@@ -26,29 +26,42 @@
          </cursor>
         </Button>
     </HBox>
-    <VBox prefHeight="1000.0" style="-fx-border-color: black; -fx-border-radius: 5;">
+    <VBox prefHeight="1000.0" spacing="3.0" style="-fx-border-color: black; -fx-border-radius: 5;">
         <VBox.margin>
             <Insets />
         </VBox.margin>
         <padding>
             <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
         </padding>
-        <HBox alignment="CENTER_LEFT">
-            <Label fx:id="languageLabel" style="-fx-font-size: 14;" text="LANGUAGE: " />
-            <Button fx:id="languageButton" mnemonicParsing="false" onAction="#onLanguageChange" style="-fx-font-size: 14;" text="%language.name">
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor></Button>
-        </HBox>
-        <Label fx:id="languageNoteLabel" style="-fx-font-style: italic; -fx-text-fill: gray;" />
-      <Region VBox.vgrow="ALWAYS" />
-        <HBox alignment="CENTER" spacing="30.0">
-            <Button fx:id="mainMenuButton" mnemonicParsing="false" onAction="#onMainMenuPressed" style="-fx-font-size: 14;" text="%button.main_menu">
+      <VBox>
+         <children>
+              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label style="-fx-font-size: 16;" text="%label.language" />
+                  <Button fx:id="languageButton" mnemonicParsing="false" onAction="#onLanguageChange" style="-fx-font-size: 14;" text="%language.name">
+                  <cursor>
+                     <Cursor fx:constant="HAND" />
+                  </cursor>
+               </Button>
+              </HBox>
+              <Label fx:id="languageNoteLabel" style="-fx-font-style: italic; -fx-text-fill: gray; -fx-font-size: 13;" text="%label.language_note" />
+         </children>
+      </VBox>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label style="-fx-font-size: 16;" text="%label.debug" />
+            <Button fx:id="debugButton" mnemonicParsing="false" onAction="#onDebugModeChange" style="-fx-font-size: 14;" text="%button.off">
                 <cursor>
                     <Cursor fx:constant="HAND" />
                 </cursor>
             </Button>
-            <Button fx:id="closeGameButton" mnemonicParsing="false" onAction="#onCloseGamePressed" style="-fx-font-size: 14;" text="%button.close_game">
+        </HBox>
+      <Region VBox.vgrow="ALWAYS" />
+        <HBox alignment="CENTER" spacing="30.0">
+            <Button fx:id="mainMenuButton" mnemonicParsing="false" onAction="#onMainMenuPressed" style="-fx-font-size: 16;" text="%button.main_menu">
+                <cursor>
+                    <Cursor fx:constant="HAND" />
+                </cursor>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#onCloseGamePressed" style="-fx-font-size: 16;" text="%button.close_game">
                 <cursor>
                     <Cursor fx:constant="HAND" />
                 </cursor>

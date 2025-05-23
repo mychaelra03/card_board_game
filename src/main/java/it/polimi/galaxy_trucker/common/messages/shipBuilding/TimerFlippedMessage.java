@@ -10,6 +10,6 @@ public class TimerFlippedMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "timerFlipped";
+        return "timer_flipped";
     }
 }

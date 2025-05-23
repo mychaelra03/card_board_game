@@ -505,10 +505,10 @@ public class ShipBoardTest {
         ship.setTile(5, 4, new StructuralTile(0, FULL_SINGLE_CONNECTORS), 0);                           // has non compatible connectors
         ship.setTile(2, 3, new StructuralTile(0, new Connector[]{DOUBLE, UNIVERSAL, NONE, SINGLE}), 0);
         ship.setTile(1, 3, new StructuralTile(0, new Connector[]{NONE, SINGLE, NONE, NONE}), 0);
-        ship.setTile(1, 4, new StructuralTile(0, new Connector[]{NONE, NONE, UNIVERSAL, NONE}), 0);     // not connected
+        ship.setTile(1, 4, new StructuralTile(0, new Connector[]{NONE, NONE, UNIVERSAL, NONE}), 0);     // not connected, but valid
 
         Set<Point> invalidPoints = Set.of(new Point(2,1), new Point(2,2), new Point(3,2), new Point(5,2),
-                new Point(3,3), new Point(4,3), new Point(4,4), new Point(5,4), new Point(1,4));
+                new Point(3,3), new Point(4,3), new Point(4,4), new Point(5,4));
         assertEquals(invalidPoints, ship.getInvalidTiles(), "Invalid tiles should match.");
     }
 }

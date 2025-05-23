@@ -26,6 +26,6 @@ public class TileTakenMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "tileTaken";
+        return "tile_taken";
     }
 }

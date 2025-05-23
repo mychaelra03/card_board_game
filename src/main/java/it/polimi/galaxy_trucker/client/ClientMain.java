@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class ClientMain extends Application {
@@ -40,7 +41,45 @@ public class ClientMain extends Application {
     }
 
     public static void main(String[] args) {
+
         Logger.logInfo("Starting Galaxy Trucker...");
+
+        Locale selectedLocale = Locale.ENGLISH;
+        boolean tui = false;
+        boolean debugMode = false;
+
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-l", "--lang" -> {
+                    if (i + 1 < args.length) {
+                        String langCode = args[++i].toLowerCase();
+                        switch (langCode) {
+                            case "en":
+                                selectedLocale = Locale.ENGLISH;
+                                break;
+                            case "it":
+                                selectedLocale = Locale.ITALIAN;
+                                break;
+                            default:
+                                Logger.logWarning("Unsupported language: " + langCode + ". Defaulting to English.");
+                        }
+                    } else {
+                        Logger.logWarning("Missing language code after --lang. Defaulting to English.");
+                    }
+                }
+
+                case "-t", "-tui" -> tui = true;
+
+                case "-d", "--debug" -> debugMode = true;
+
+                default -> Logger.logWarning("Unknown argument: " + args[i]);
+            }
+        }
+        // Apply selected settings
+        LanguageManager.setPendingLocale(selectedLocale);
+        if(tui) Logger.logWarning("TUI is still WIP.");
+        Logger.setDebugMode(debugMode);
+
         launch();
     }
 }

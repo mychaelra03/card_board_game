@@ -17,7 +17,7 @@ import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class CombatZoneCard extends Card {
+public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsHandlerCard, BatteryHandlerCard, CrewHandlerCard {
     // Compare crew, engine strength, and cannons to avoid penalties.
 
     public static class CombatRule {
@@ -123,6 +123,7 @@ public class CombatZoneCard extends Card {
         applyRule();
     }
 
+    @Override
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
@@ -137,6 +138,7 @@ public class CombatZoneCard extends Card {
             applyPunishment();
         }
     }
+    @Override
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
@@ -180,6 +182,7 @@ public class CombatZoneCard extends Card {
         }
     }
 
+    @Override
     public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);
         verifyCaller(caller, punishedPlayer);
@@ -214,6 +217,7 @@ public class CombatZoneCard extends Card {
         applyShot();
     }
 
+    @Override
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);
@@ -223,6 +227,7 @@ public class CombatZoneCard extends Card {
         setInputState(NONE);
         handleNextShot();
     }
+    @Override
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);

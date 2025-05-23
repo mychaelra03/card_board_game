@@ -13,7 +13,7 @@ import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class PiratesCard extends AbstractEnemy {
+public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
     // Combat encounter, win to gain credits, lose to get shot.
 
     private final int rewardCredits;
@@ -73,6 +73,7 @@ public class PiratesCard extends AbstractEnemy {
         applyShot();
     }
 
+    @Override
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);
@@ -82,6 +83,7 @@ public class PiratesCard extends AbstractEnemy {
         setInputState(NONE);
         handleNextShot();
     }
+    @Override
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);

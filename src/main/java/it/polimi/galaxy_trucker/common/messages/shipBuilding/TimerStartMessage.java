@@ -26,6 +26,6 @@ public class TimerStartMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "timerStart";
+        return "timer_start";
     }
 }

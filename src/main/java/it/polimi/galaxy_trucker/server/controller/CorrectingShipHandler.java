@@ -21,17 +21,17 @@ public class CorrectingShipHandler extends CommandHandler {
 
         ObjectMapper mapper = new ObjectMapper();
         String type = cmd.get("type").asText();
-        switch (type) {
 
-            case "selectedTile" -> {
-
-                SelectedTileMessage message = mapper.convertValue(cmd, SelectedTileMessage.class);
-                Player player = playerMap.get(senderView);
-
-                gameModel.removeSelectedTile(player, message.getX(), message.getY());
-            }
-
-            default -> Logger.logError("Unrecognized command: " + type);
+        if (type.equals("selected_tile")) {
+            handleSelectedTile(senderView, mapper.convertValue(cmd, SelectedTileMessage.class));
+        } else {
+            Logger.logError("Unrecognized command: " + type);
         }
+    }
+
+    private void handleSelectedTile(VirtualView senderView, SelectedTileMessage message) {
+        Player player = playerMap.get(senderView);
+
+        gameModel.removeSelectedTile(player, message.getX(), message.getY());
     }
 }
