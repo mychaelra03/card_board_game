@@ -2,6 +2,10 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.cards.BatteryDecisionEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.DecisionEndEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.DiceThrowEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.ProjectileEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.CannonShot;
 
@@ -58,12 +62,15 @@ public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
             return;
         }
         this.currentShot = shotQueue.getFirst();
-        currentShot.randomizePathIndex();
+
+        int[] dice = currentShot.randomizePathIndex();
+        dispatcher.fireEvent(new DiceThrowEvent(punishedPlayer.getName(), dice));
 
         boolean isPlayerAtRisk = currentShot.evaluateDefense(punishedPlayer);
 
         if(isPlayerAtRisk) {
             setInputState(BATTERY_DECISION);
+            dispatcher.fireEvent(new BatteryDecisionEvent(punishedPlayer, currentShot));
         }
         else handleNextShot();
     }
@@ -78,7 +85,11 @@ public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);
 
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
+
         caller.ensureBatteryRemovedFrom(batteryCoords);
+
+        dispatcher.fireEvent(new ProjectileEvent(caller, currentShot, null, true));
 
         setInputState(NONE);
         handleNextShot();
@@ -88,7 +99,9 @@ public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);
 
-        caller.removeFirstTileInPath(currentShot.getSource(), currentShot.getPathIndex());
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
+
+        caller.applyProjectile(currentShot);
 
         setInputState(NONE);
         handleNextShot();

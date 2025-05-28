@@ -19,11 +19,11 @@ public class CannonShot extends Projectile {
         // Returns true if the player have to use a battery to block the projectile.
         // It damages ship if not blocked.
 
-        if(player.isPathEmpty(getSource(), getPathIndex())) return false;
+        if(player.isPathEmpty(this)) return false;
 
         if(getSize() == SMALL && player.isSideShielded(getSource().toInt())) return true;
 
-        player.removeFirstTileInPath(getSource(), getPathIndex());
+        player.applyProjectile(this);
         return false;
     }
 }

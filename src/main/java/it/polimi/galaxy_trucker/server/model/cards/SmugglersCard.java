@@ -2,12 +2,14 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CargoDecisionEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.BlockType;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
@@ -40,6 +42,8 @@ public class SmugglersCard extends AbstractEnemy implements CargoHandlerCard {
         this.rewardedPlayer = player;
         player.setCargoPool(new ArrayList<>(Arrays.asList(rewardCargo)));
         setInputState(CARGO_DECISION);
+
+        dispatcher.fireEvent(new CargoDecisionEvent(Set.of(player)));
     }
 
     @Override

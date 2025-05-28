@@ -11,17 +11,7 @@ import java.awt.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BatteryRefuseMessage implements CardActionMessage {
 
-    private String playerName;
-
     public BatteryRefuseMessage() {}
-
-    public BatteryRefuseMessage(String playerName) {
-        this.playerName = playerName;
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
 
     @Override
     public String getType() {

@@ -45,7 +45,6 @@ public class ClientMain extends Application {
         Logger.logInfo("Starting Galaxy Trucker...");
 
         Locale selectedLocale = Locale.ENGLISH;
-        boolean tui = false;
         boolean debugMode = false;
 
         for (int i = 0; i < args.length; i++) {
@@ -68,8 +67,6 @@ public class ClientMain extends Application {
                     }
                 }
 
-                case "-t", "-tui" -> tui = true;
-
                 case "-d", "--debug" -> debugMode = true;
 
                 default -> Logger.logWarning("Unknown argument: " + args[i]);
@@ -77,7 +74,6 @@ public class ClientMain extends Application {
         }
         // Apply selected settings
         LanguageManager.setPendingLocale(selectedLocale);
-        if(tui) Logger.logWarning("TUI is still WIP.");
         Logger.setDebugMode(debugMode);
 
         launch();

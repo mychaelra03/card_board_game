@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.client.controllers.shipBuilding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage;
 import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.client.*;
@@ -11,6 +12,7 @@ import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
+import it.polimi.galaxy_trucker.server.model.ShipBoard;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -62,6 +64,8 @@ public class ShipBuildingController implements VirtualServerAware {
     @FXML private Button done_3;
     @FXML private Button done_4;
 
+    @FXML private HBox otherShipButtonsBox;
+
     private final Map<Integer, ImageView> tileMap = new HashMap<>();
     private final Map<Integer, ImageView> cardsMap = new HashMap<>();
     private final Map<Integer, Button> doneButtonsMap = new HashMap<>();
@@ -80,7 +84,7 @@ public class ShipBuildingController implements VirtualServerAware {
         cardsMap.put(1, cardPile1);
         cardsMap.put(2, cardPile2);
 
-        Image backTexture = new Image(Objects.requireNonNull(getClass().getResource(TILES_PATH + "tile_back.png")).toExternalForm());
+        Image backTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream(TILES_PATH + "tile_back.png")));
 
         // initialize covered tiles
         List<ImageView> tileList = new ArrayList<>();
@@ -97,13 +101,13 @@ public class ShipBuildingController implements VirtualServerAware {
 
         for(int i = 0; i < tileList.size(); i++) {
             ImageView tile = tileList.get(i);
-            ShipAnim.playTileReturn(tile, i * 15);
+            ShipAnim.playTileReturn(tile, false, i * 15);
         }
 
         rightButton.setOnAction(this::onClickTurnTileRight);
         leftButton.setOnAction(this::onClickTurnTileLeft);
 
-        focusSlot.setOnMouseClicked(_ -> tileManager.moveSelectedToFocusSlot());
+        focusSlot.setOnMouseClicked(_ -> tileManager.moveSelectedToFocusSlot(false));
 
         settingsButton.setOnAction(_ -> Popup.newSettingsPopup().show());
 
@@ -180,14 +184,16 @@ public class ShipBuildingController implements VirtualServerAware {
         switch (type) {
             case "game_state"     -> handleGameState(mapper.readValue(cmd, GameStateMessage.class));
             case "board_type"     -> handleBoardType(mapper.readValue(cmd, BoardTypeMessage.class));
+            case "players_info"   -> handlePlayersInfo(mapper.readValue(cmd, PlayersInfoMessage.class));
             case "tile_taken"     -> handleTileTaken(mapper.readValue(cmd, TileTakenMessage.class));
             case "tile_returned"  -> handleTileReturned(mapper.readValue(cmd, TileReturnedMessage.class));
             case "cards_taken"    -> handleCardsTaken(mapper.readValue(cmd, CardsTakenMessage.class));
             case "cards_returned" -> handleCardsReturned(mapper.readValue(cmd, CardsReturnedMessage.class));
-            case "cards"         -> handleCards(mapper.readValue(cmd, CardsMessage.class));
+            case "cards"          -> handleCards(mapper.readValue(cmd, CardsMessage.class));
             case "timer_start"    -> handleTimerStart(mapper.readValue(cmd, TimerStartMessage.class));
             case "timer_finished" -> handleTimerFinished(mapper.readValue(cmd, TimerFinishedMessage.class));
             case "done_building"  -> handleDoneBuilding(mapper.readValue(cmd, DoneBuildingMessage.class));
+            case "ship_board"     -> handleShipBoard(mapper.readValue(cmd, ShipBoardMessage.class));
 
             default              -> Logger.logError("Unrecognized command: " + type);
         }
@@ -222,6 +228,21 @@ public class ShipBuildingController implements VirtualServerAware {
         tileManager.initializeGridPane(shipType);
     }
 
+    private void handlePlayersInfo(PlayersInfoMessage message) {
+        for(PlayerInfo player : message.getPlayers()) {
+            if(ClientSession.isSelf(player.getUsername())) continue;
+
+            Button shipButton = new Button();
+            shipButton.setPrefSize(40, 40);
+            shipButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            shipButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            shipButton.setGraphic(ClientSession.getPlayerProfilePicture(player.getUsername(), 35));
+
+            shipButton.setOnAction(_ -> virtualServer.sendMessage(new ShipBoardMessage(player.getUsername(), null)));
+            otherShipButtonsBox.getChildren().add(shipButton);
+        }
+    }
+
     private void handleTileTaken(TileTakenMessage message) {
 
         boolean isSelf = ClientSession.isSelf(message.getPlayerName());
@@ -239,9 +260,9 @@ public class ShipBuildingController implements VirtualServerAware {
         int tileId = message.getTileId();
         ImageView tile = tileMap.get(tileId);
 
-        tile.setImage(new Image(Objects.requireNonNull(getClass().getResource("/textures/tiles/tile_" + tileId + ".png")).toExternalForm()));
+        tile.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/textures/tiles/tile_" + tileId + ".png"))));
 
-        ShipAnim.playTileReturn(tile, 0);
+        ShipAnim.playTileReturn(tile, true, 0);
     }
 
     private void handleCardsTaken(CardsTakenMessage message) {
@@ -310,6 +331,10 @@ public class ShipBuildingController implements VirtualServerAware {
             StackPane profilePic = ClientSession.getPlayerProfilePicture(message.getPlayerName(), 40);
             pane.getChildren().add(profilePic);
         }
+    }
+
+    private void handleShipBoard(ShipBoardMessage message) {
+        Popup.newShipPreviewPopup(message.getPlayerName(), shipBoardImage.getImage(), message.getTiles()).show();
     }
 
     private void updateShipBoard(BoardType shipType) {

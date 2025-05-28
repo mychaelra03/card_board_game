@@ -28,16 +28,16 @@ The implementation features both a command-line interface (CLI) and a JavaFX gra
 
 ## Status of the work
 
-| Functionality     | Status                  | 
-|-------------------|-------------------------|
-| Basic rules       | :construction:          |
-| Complete rules    | :construction:          |
-| Socket connection | :white_check_mark:      |
-| CLI               | :construction:          |
-| GUI               | :construction:          |
-| Multiple games    | :x:                     |
-| Resilience        | :construction:          |
-| Chat              | :white_check_mark:      |
+| Functionality     | Status             | 
+|-------------------|--------------------|
+| Basic rules       | :white_check_mark: |
+| Complete rules    | :white_check_mark: |
+| Socket connection | :white_check_mark: |
+| CLI               | :x:                |
+| GUI               | :white_check_mark: |
+| Multiple games    | :x:                |
+| Resilience        | :construction:     |
+| Chat              | :white_check_mark: |
 
 (*) *For testing purposes.*
 
@@ -104,7 +104,6 @@ To run the client, use the following command:
 | Argument        | Description                              | Accepted Values | Default Value |
 |-----------------|------------------------------------------|-----------------|---------------|
 | `--lang`, `-l`  | Sets the client UI language.             | `en`, `it`      | `en`          |
-| `--tui`, `-t`   | Launches the client in text-based mode.  | (flag only)     | GUI           |
 | `--debug`, `-d` | Enables debug mode with verbose logging. | (flag only)     | Off           |
 
 

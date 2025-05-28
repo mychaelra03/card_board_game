@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.server.model.cards;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.server.events.flight.CrewUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.util.List;
@@ -20,10 +21,10 @@ public class EpidemicCard extends Card {
 
     @Override
     protected void onActivate() {
+        dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.EPIDEMIC));
         List<Player> players = board.getSortedPlayers();
         for(Player player : players) {
             player.applyEpidemicCard();
-            dispatcher.fireEvent(new CrewUpdateEvent(player.getName(), player.getShipContent().crewData()));
         }
         setInputState(FINISHED);
     }

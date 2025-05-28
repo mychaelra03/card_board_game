@@ -1,12 +1,15 @@
 package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.endGame.PlayerScores;
+import it.polimi.galaxy_trucker.common.messages.flight.PickAvailableMessage;
 import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
 import it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
 import it.polimi.galaxy_trucker.server.events.*;
 import it.polimi.galaxy_trucker.server.events.flight.*;
 import it.polimi.galaxy_trucker.server.events.flight.cards.CardPickedEvent;
+import it.polimi.galaxy_trucker.server.events.gameOver.GameOverEvent;
 import it.polimi.galaxy_trucker.server.events.lobby.BoardTypeUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
@@ -49,8 +52,7 @@ public class GameModel {
         CORRECTING_SHIP,
         ASSIGNING_CREW,
         PICKING_CARDS,
-        WAITING,
-        GAME_OVER
+        WAITING
     }
     private GameState gameState = LOBBY;
 
@@ -131,7 +133,6 @@ public class GameModel {
 
 
     public void addPlayer(Player player) {
-        verifyGameState(LOBBY);
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
         JoinResponseMessage.JoinStatus canAddPlayer = canAddPlayer(player);
         if(canAddPlayer != JoinResponseMessage.JoinStatus.SUCCESS) throw new IllegalStateException("Can't add player :" + canAddPlayer);
@@ -204,7 +205,7 @@ public class GameModel {
         if(players.size() > 1 && playersReady == players.size()) {
             setGameStateAfterWait(5, BUILDING_SHIPS);
         } else {
-            eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), ""));
+            eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), null));
         }
     }
 
@@ -227,15 +228,12 @@ public class GameModel {
     }
     private boolean isPositionOccupied(Player movingPlayer, int position) {
         int flightTrackLength = boardType.getFlightTrackLength();
-        return players.stream()
+        return getSortedPlayers().stream()
                 .filter(p -> p != movingPlayer)
                 .anyMatch(p -> mod(p.getPosition(), flightTrackLength) == mod(position, flightTrackLength));
     }
     public Card getCurrentCard() {
         return currentCard;
-    }
-    public List<Player> getPlayers() {
-        return players;
     }
 
 
@@ -343,18 +341,52 @@ public class GameModel {
         movePlayer(player, steps, false);
     }
 
+    public PlayerScores getPlayerScores(Player player, Set<Player> bestShipPlayers) {
+        boolean isEliminated = player.getState() == ELIMINATED;
+        boolean hasBestShip = bestShipPlayers.contains(player);
+
+        int positionScore = isEliminated? 0 : boardType.getPositionReward(getSortedPlayers().indexOf(player) + 1);
+        int bestShipScore = (isEliminated || !hasBestShip) ? 0 : boardType.getBestShipReward();
+        int cargoScore = isEliminated? (player.getTotalHoldsValue() + 1) / 2 : player.getTotalHoldsValue();
+        int lostTilesScore = -player.getRemovedTilesCount();
+
+        int totaleScore = positionScore + bestShipScore + cargoScore + lostTilesScore;
+
+        return new PlayerScores(player.getName(), positionScore, bestShipScore, cargoScore, lostTilesScore, totaleScore);
+    }
+
+    public Set<Player> getPlayersWithBestShip() {
+        Set<Player> playersWithBestShip = new HashSet<>();
+        int minExposed = Integer.MAX_VALUE;
+
+        for (Player player : players) {
+            if(player.getState() == ELIMINATED) continue;
+            int exposed = player.getExposedConnectorsCount();
+
+            if (exposed < minExposed) {
+                minExposed = exposed;
+                playersWithBestShip.clear();
+                playersWithBestShip.add(player);
+            } else if (exposed == minExposed) {
+                playersWithBestShip.add(player);
+            }
+        }
+
+        return playersWithBestShip;
+    }
+
     public void updatePlayersStatus() {
-        if(players.isEmpty()) return;
+        if(getSortedPlayers().isEmpty()) return;
 
         int highestPosition = getSortedPlayers().getFirst().getPosition();
         for(Player player : players) {
             if(player.getState() == ELIMINATED) continue;
 
+            boolean givingUp = player.getState() == GIVING_UP;
             boolean noCrew = player.getHumanCount() == 0;
             boolean lapped = player.getPosition() < highestPosition - boardType.getFlightTrackLength();
-            // TODO: other conditions?
 
-            if(noCrew || lapped) player.setState(ELIMINATED);
+            if(givingUp || noCrew || lapped) player.setState(ELIMINATED);
         }
     }
 
@@ -374,9 +406,13 @@ public class GameModel {
                 flipTimer(false);
             }
             case CORRECTING_SHIP -> {
+                players.forEach(Player::applyReservedTilePenalty);
+
+                invalidShips.clear();
                 for (Player player : players) {
                     player.updateConnectivity();
                     eventDispatcher.fireEvent(new ShipUpdateEvent(player.getName(), player.getSimplifiedShipBoard()));
+
                     Set<Point> invalidTiles = player.getInvalidTiles();
                     if (!invalidTiles.isEmpty()) invalidShips.add(player);
                     eventDispatcher.fireEvent(new InvalidShipEvent(player.getName(), invalidTiles));
@@ -384,6 +420,8 @@ public class GameModel {
                 if (invalidShips.isEmpty()) setGameState(ASSIGNING_CREW);
             }
             case ASSIGNING_CREW -> {
+                updatePlayersStatus();
+                choosingCrewType.clear();
                 for(Player player : getSortedPlayers()) {
                     eventDispatcher.fireEvent(new CrewUpdateEvent(player.getName(), player.getShipContent().crewData()));
                     Set<Point> alienCabins = player.getCabinTilesThatCanHostAliens();
@@ -392,25 +430,11 @@ public class GameModel {
                 }
                 if(choosingCrewType.isEmpty()) setGameState(PICKING_CARDS);
             }
-//            case PICKING_CARDS -> {
-//                for(Player player : getSortedPlayers()) {
-//                    eventDispatcher.fireEvent(new CrewUpdateEvent(player.getName(), player.getShipContent().crewData()));
-//                    Set<Point> alienCabins = player.getCabinTilesThatCanHostAliens();
-//                    if(!alienCabins.isEmpty()) choosingCrewType.add(player);
-//                    eventDispatcher.fireEvent(new AlienCabinTilesEvent(player.getName(), alienCabins));
-//                }
-//                if(choosingCrewType.isEmpty()) setGameState(PICKING_CARDS);
-//            }
         }
     }
 
     public GameState getGameState() {
         return gameState;
-    }
-    private void verifyGameState(GameState expectedState) {
-        if(gameState != expectedState) {
-            throw new IllegalStateException("Expected state: " + expectedState + ". Current state: " + gameState + ".");
-        }
     }
 
     private void setGameStateAfterWait(int seconds, GameState nextState) {
@@ -512,7 +536,6 @@ public class GameModel {
             return;
         }
         player.cycleCrewTypeAt(x, y);
-        eventDispatcher.fireEvent(new CrewUpdateEvent(player.getName(), player.getShipContent().crewData()));
     }
     public void doneChoosingCrew(Player player) {
         if(!choosingCrewType.contains(player)) {
@@ -532,7 +555,8 @@ public class GameModel {
             Logger.logWarning("Player " + player.getName() + " cannot pick a card, they are not first."); return;
         }
         if(deck.isEmpty()) {
-            Logger.logWarning("There are no more cards in the deck."); return;
+            handleGameOver();
+            return;
         }
         currentCard = deck.getFirst();
         deck.removeFirst();
@@ -541,7 +565,17 @@ public class GameModel {
         currentCard.activate(this);
     }
 
-    private void resetToLobby() {
+    public void handleGameOver() {
+        Set<Player> bestShipPlayers = getPlayersWithBestShip();
+        List<PlayerScores> playersScores = players.stream()
+                .map(p -> getPlayerScores(p, bestShipPlayers))
+                .sorted(Comparator.comparingInt(PlayerScores::getFinalScore).reversed())
+                .toList();
+        resetToLobby();
+        eventDispatcher.fireEvent(new GameOverEvent(playersScores));
+    }
+
+    public void resetToLobby() {
         this.gameState = GameState.LOBBY;
         for (Player player : players) player.setState(IDLE);
         this.deck.clear();
@@ -561,7 +595,7 @@ public class GameModel {
         this.boardType = BoardType.LEVEL_TWO;
     }
 
-    private List<PlayerInfo> getPlayersInfo(){
+    public List<PlayerInfo> getPlayersInfo(){
         return players.stream()
                 .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor().toString(),p.isAdmin(),p.isReady()))
                 .collect(Collectors.toList());

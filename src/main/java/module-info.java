@@ -15,12 +15,16 @@ module it.polimi.galaxy_trucker {
     opens it.polimi.galaxy_trucker.server.model.cards.projectile to com.fasterxml.jackson.databind;
     exports it.polimi.galaxy_trucker.client;
     opens it.polimi.galaxy_trucker.client to javafx.fxml;
-    exports it.polimi.galaxy_trucker.client.controllers.shipBuilding;
-    opens it.polimi.galaxy_trucker.client.controllers.shipBuilding to javafx.fxml;
     exports it.polimi.galaxy_trucker.common;
     opens it.polimi.galaxy_trucker.common to com.fasterxml.jackson.databind;
-    opens it.polimi.galaxy_trucker.client.controllers to javafx.fxml;
-    exports it.polimi.galaxy_trucker.client.controllers;
+    opens it.polimi.galaxy_trucker.client.controllers.flight to javafx.fxml;
+    exports it.polimi.galaxy_trucker.client.controllers.flight;
+    opens it.polimi.galaxy_trucker.client.controllers.lobby to javafx.fxml;
+    exports it.polimi.galaxy_trucker.client.controllers.lobby;
+    opens it.polimi.galaxy_trucker.client.controllers.login to javafx.fxml;
+    exports it.polimi.galaxy_trucker.client.controllers.login;
+    opens it.polimi.galaxy_trucker.client.controllers.shipBuilding to javafx.fxml;
+    exports it.polimi.galaxy_trucker.client.controllers.shipBuilding;
     exports it.polimi.galaxy_trucker.client.popups;
     opens it.polimi.galaxy_trucker.client.popups to javafx.fxml;
     exports it.polimi.galaxy_trucker.common.messages;
@@ -37,11 +41,11 @@ module it.polimi.galaxy_trucker {
     opens it.polimi.galaxy_trucker.server.model to javafx.fxml;
     exports it.polimi.galaxy_trucker.server.events.flight to com.fasterxml.jackson.databind;
     exports it.polimi.galaxy_trucker.server.events;
-    exports it.polimi.galaxy_trucker.client.controllers.flight;
-    opens it.polimi.galaxy_trucker.client.controllers.flight to javafx.fxml;
     exports it.polimi.galaxy_trucker.server.events.flight.cards to com.fasterxml.jackson.databind;
     exports it.polimi.galaxy_trucker.common.messages.flight.cardActions;
     opens it.polimi.galaxy_trucker.common.messages.flight.cardActions to com.fasterxml.jackson.databind;
     exports it.polimi.galaxy_trucker.client.popups.cards;
     opens it.polimi.galaxy_trucker.client.popups.cards to javafx.fxml;
+    exports it.polimi.galaxy_trucker.common.messages.endGame;
+    opens it.polimi.galaxy_trucker.common.messages.endGame to com.fasterxml.jackson.databind;
 }

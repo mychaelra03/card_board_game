@@ -48,9 +48,10 @@ public abstract class Projectile {
         return 1 + (int)(Math.random() * 6);
     }
 
-    public void randomizePathIndex() {
-        // If the value has been coded in (like in tests), it doesn't override it.
-        if(pathIndex != null) return;
+    public int[] randomizePathIndex() {
+        // If the value was passed in the constructor (for test purposes), it doesn't override it.
+        if(pathIndex != null) return null;
+
         int firstDie = rollDie();
         int secondDie = rollDie();
         int diceSum = firstDie + secondDie;
@@ -60,7 +61,7 @@ public abstract class Projectile {
             case LEFT, RIGHT -> diceSum - 5;
         };
 
-        // if(diceRollListener != null) diceRollListener.onDiceRolled(firstDie, secondDie);
-        // TODO: dice listener
+        // Return the die values in an array
+        return new int[] { firstDie, secondDie };
     }
 }

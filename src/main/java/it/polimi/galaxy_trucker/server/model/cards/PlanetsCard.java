@@ -63,8 +63,6 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         caller.setCargoPool(new ArrayList<>(Arrays.asList(planets[index])));
         playerQueue.removeFirst();
 
-        dispatcher.fireEvent(new PlanetChosenEvent(caller.getName(), index));
-
         if(!playerQueue.isEmpty()) {
             dispatcher.fireEvent(new PlanetSelectionEvent(playerQueue.getFirst().getName(), planetChosenBy));
         } else {
@@ -77,8 +75,6 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         verifyInputState(PLANET_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
         playerQueue.removeFirst();
-
-        dispatcher.fireEvent(new PlanetRefusedEvent(caller.getName()));
 
         if(!playerQueue.isEmpty()) {
             dispatcher.fireEvent(new PlanetSelectionEvent(playerQueue.getFirst().getName(), planetChosenBy));

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.VirtualServer;
-import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.SimplePlayerMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.*;
 import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardDecisionMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoDoneMessage;
@@ -20,7 +20,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -37,13 +36,10 @@ public class CardsHandler {
 
     private final VirtualServer virtualServer = VirtualServer.getInstance();
 
-    private final Label statusLabel;
-
     private final VBox blockPool = new VBox();
 
     private final GridPane cargoGridP1;
     private final StackPane shipboardP1;
-    private final VBox P1Box;
     private final StackPane deckPane;
     private final Region currentCardRegion;
     private final Button pickCardButton;
@@ -54,14 +50,18 @@ public class CardsHandler {
 
     private final List<ImageView> faceDownCardPile = new LinkedList<>();
 
-    public CardsHandler(Label statusLabel, GridPane cargoGridP1, StackPane shipboardP1, VBox P1Box, StackPane deckPane, Region currentCardRegion, Button pickCardButton) {
-        this.statusLabel = statusLabel;
+    private final Map<String, GridPane> tilesGridMap;
+
+    private final Map<GridPane, Integer> gridCellsSize;
+
+    public CardsHandler(GridPane cargoGridP1, StackPane shipboardP1, StackPane deckPane, Region currentCardRegion, Button pickCardButton, Map<String, GridPane> tilesGridMap, Map<GridPane, Integer> gridCellsSize) {
         this.cargoGridP1 = cargoGridP1;
         this.shipboardP1 = shipboardP1;
-        this.P1Box = P1Box;
         this.deckPane = deckPane;
         this.currentCardRegion = currentCardRegion;
         this.pickCardButton = pickCardButton;
+        this.tilesGridMap = tilesGridMap;
+        this.gridCellsSize = gridCellsSize;
 
         blockPool.setPadding(new Insets(30));
         blockPool.setSpacing(30);
@@ -75,13 +75,26 @@ public class CardsHandler {
             case "deck_levels"       -> handleDeckLevels(mapper.readValue(cmd, DeckLevelsMessage.class));
             case "card_picked"       -> handleCardPicked(mapper.readValue(cmd, CardPickedMessage.class));
 
+            case "player_status"     -> handlePlayerStatus(mapper.readValue(cmd, StatusUpdateMessage.class));
+            case "card_status"       -> handleCardStatus(mapper.readValue(cmd, StatusUpdateMessage.class));
+
             case "planet_selection"  -> handlePlanetSelection(mapper.readValue(cmd, PlanetSelectionMessage.class));
             case "cargo_decision"    -> handleCargoDecision(mapper.readValue(cmd, CargoDecisionMessage.class));
             case "swap_cargo"        -> handleCargoSwap(mapper.readValue(cmd, CargoSwapMessage.class));
             case "unload_cargo"      -> handleCargoUnload(mapper.readValue(cmd, CargoUnloadMessage.class));
-            case "done"              -> handleCargoDone(mapper.readValue(cmd, CargoDoneMessage.class));
+
+            case "dice_throw"        -> handleDiceThrow(mapper.readValue(cmd, DiceThrowMessage.class));
+            case "projectile"        -> handleProjectile(mapper.readValue(cmd, ProjectileMessage.class));
+            case "battery_decision"  -> handleBatteryDecision(mapper.readValue(cmd, BatteryDecisionMessage.class));
 
             case "card_decision"     -> handleCardDecision(mapper.readValue(cmd, CardDecisionMessage.class));
+
+            case "crew_decision"     -> handleCrewDecision(mapper.readValue(cmd, CrewMessage.class));
+
+            case "cannon_selection"  -> handleCannonSelection(mapper.readValue(cmd, TileSelectionMessage.class));
+            case "engine_selection"  -> handleEngineSelection(mapper.readValue(cmd, TileSelectionMessage.class));
+
+            case "decision_end"      -> FlightAnim.closeCurrentPopup();
 
             default                  -> Logger.logError("Unrecognized command: " + type);
         }
@@ -133,7 +146,7 @@ public class CardsHandler {
         if(isSelf) {
             FlightAnim.queuePlanetsPopup(currentCard, planetChosenBy);
         } else {
-            FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.player_choosing_planet", message.getPlayerName()), 500);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_choosing_planet", message.getPlayerName()), 500);
         }
     }
 
@@ -147,8 +160,9 @@ public class CardsHandler {
                 if (tileData.cargo()[i] != null) {
                     ImageView block = getDisplayBlock(tileData.cargo()[i], gridSize / 3);
                     Point offset = getOffsetForSlot(tileData.capacity(), i);
-                    block.setTranslateX(offset.x);
-                    block.setTranslateY(offset.y);
+                    block.setTranslateX(offset.x * gridSize / gridCellsSize.get(cargoGridP1));
+                    block.setTranslateY(offset.y * gridSize / gridCellsSize.get(cargoGridP1));
+                    block.setRotate(-tileData.rotation() * 90);
                     block.setMouseTransparent(true);
                     tile.getChildren().add(block);
                 }
@@ -164,17 +178,19 @@ public class CardsHandler {
         boolean isSelf = ClientSession.isSelf(message.getPlayerName());
 
         if (!isSelf) {
-            FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.player_deciding_cargo", message.getPlayerName()), 500);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_deciding_cargo", message.getPlayerName()), 0);
             return;
         }
         updateCargoPool(message);
         cargoGridP1.getChildren().clear();
         renderInteractableCargoContent(message);
         cargoGridP1.setMouseTransparent(false);
-        Popup.newCargoDecisionPopup(shipboardP1, P1Box, blockPool).show();
+        FlightAnim.queueCargoDecisionPopup(shipboardP1, blockPool);
     }
 
     private void renderInteractableCargoContent(CargoDecisionMessage message) {
+        cargoGridP1.getChildren().clear();
+
         for (ShipBoard.CargoData tileData : message.getCargoTiles()) {
             StackPane tileSlot = new StackPane();
 
@@ -234,7 +250,6 @@ public class CardsHandler {
     }
 
     private void selectBlock(ImageView block) {
-        System.out.println("SELECTED BLOCK");
         if(block == selectedBlock) {
             unselectBlock();
             return;
@@ -247,7 +262,6 @@ public class CardsHandler {
     }
 
     private void clickedSlot(StackPane slot) {
-        System.out.println("CLICKED SLOT");
 
         StackPane tileSlot = (StackPane) slot.getParent();
         int colIndex = GridPane.getColumnIndex(tileSlot) != null ? GridPane.getColumnIndex(tileSlot) : 0;
@@ -269,10 +283,10 @@ public class CardsHandler {
         DropShadow dropShadow = new DropShadow();
         dropShadow.setBlurType(BlurType.THREE_PASS_BOX);
         dropShadow.setColor(new Color(1, 1, 1, .8));
-        dropShadow.setWidth(2);
-        dropShadow.setHeight(2);
+        dropShadow.setWidth(1);
+        dropShadow.setHeight(1);
         dropShadow.setRadius(10);
-        dropShadow.setSpread(1);
+        dropShadow.setSpread(.8);
         block.setEffect(dropShadow);
 
         ScaleTransition scale = new ScaleTransition(Duration.millis(200), block);
@@ -337,12 +351,33 @@ public class CardsHandler {
         moveBlockToPool(slot);
     }
 
-    private void handleCargoDone(CargoDoneMessage message) {
-        if(!ClientSession.isSelf(message.getPlayerName())) {
-            Logger.logWarning("Only the player loading the cargo should receive this message: " + message.getPlayerName());
-            return;
-        }
-        cargoGridP1.setMouseTransparent(true);
+    private void handleDiceThrow(DiceThrowMessage message) {
+        FlightAnim.queueDiceThrowPopup(message.getPlayerName(), message.getDice());
+    }
+
+    private void handleProjectile(ProjectileMessage m) {
+        GridPane shipGrid = tilesGridMap.get(m.getPlayerName());
+        StackPane shipPane = (StackPane) shipGrid.getParent();
+        int cellSize = gridCellsSize.get(shipGrid);
+        String color = ClientSession.getPlayerInfo(m.getPlayerName()).getColor();
+
+        ImageView projectile = getProjectileImageView(m, cellSize, shipPane);
+
+        FlightAnim.queueProjectile(projectile, m.getSource(), m.getPathIndex(), m.getHitPoint(), m.isDefended(), m.getTiles(), shipGrid, color, cellSize);
+    }
+
+    private ImageView getProjectileImageView(ProjectileMessage message, int cellSize, StackPane shipPane) {
+        String projectileType = message.getProjectileType().toString().toLowerCase();
+        String size = message.getSize().toString().toLowerCase();
+        String path = "/textures/sprites/" + projectileType + "_" + size + ".png";
+
+        ImageView projectile = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+        projectile.setOpacity(0);
+        projectile.setFitHeight(cellSize);
+        projectile.setFitWidth(cellSize);
+        projectile.setRotate(message.getSource().toInt() * 90);
+        shipPane.getChildren().add(projectile);
+        return projectile;
     }
 
     private void moveBlockToPool(StackPane slot) {
@@ -376,14 +411,64 @@ public class CardsHandler {
         return (StackPane) tileSlot.getChildren().get(containerIndex);
     }
 
-    private void handleCardDecision(CardDecisionMessage message) {
+    private void handleBatteryDecision(BatteryDecisionMessage message) {
 
-        boolean isSelf = ClientSession.isSelf(message.getPlayerName());
-
-        if(isSelf) {
-            FlightAnim.queueCardDecisionPopup(currentCard);
+        if (ClientSession.isSelf(message.getPlayerName())) {
+            FlightAnim.queueBatteryDecisionPopup(message.getBatteries(), message.getHitPoint());
         } else {
-            FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.player_deciding", message.getPlayerName()), 500);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_deciding_battery", message.getPlayerName()), 500);
         }
     }
+
+    private void handleCardDecision(CardDecisionMessage message) {
+
+        if(ClientSession.isSelf(message.getPlayerName())) {
+            FlightAnim.queueCardDecisionPopup(currentCard);
+        } else {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_deciding", message.getPlayerName()), 500);
+        }
+    }
+
+    private void handlePlayerStatus(StatusUpdateMessage message) {
+        String status = message.getStatus().toLowerCase();
+        if(ClientSession.isSelf(message.getPlayerName())) {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status." + status), 1500);
+        } else {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_" + status, message.getPlayerName()), 1500);
+        }
+    }
+    private void handleCardStatus(StatusUpdateMessage message) {
+        String status = message.getStatus().toLowerCase();
+        FlightAnim.queueUpdateStatus(LanguageManager.get("status." + status), 1500);
+    }
+
+    private void handleCrewDecision(CrewMessage message) {
+
+        if (ClientSession.isSelf(message.getPlayerName())) {
+            FlightAnim.queueCrewDecisionPopup(message.getCrew());
+        } else {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_deciding_crew", message.getPlayerName()), 500);
+        }
+    }
+
+    private void handleCannonSelection(TileSelectionMessage m) {
+
+        if(m.getOpenSpace()) Logger.logWarning("Open space card shouldn't send cannon messages.");
+
+        if (ClientSession.isSelf(m.getPlayerName())) {
+            FlightAnim.queueTileSelectionPopup("cannons", m.getMinPower(), m.getBatteries(), m.getVerticalTiles(), m.getRotatedTiles(), m.getOpenSpace(), m.getHasAlien());
+        } else {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_deciding_cannons", m.getPlayerName()), 500);
+        }
+    }
+
+    private void handleEngineSelection(TileSelectionMessage message) {
+
+        if (ClientSession.isSelf(message.getPlayerName())) {
+            FlightAnim.queueTileSelectionPopup("engines", message.getMinPower(), message.getBatteries(), message.getVerticalTiles(), null, message.getOpenSpace(), message.getHasAlien());
+        } else {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_deciding_engines", message.getPlayerName()), 500);
+        }
+    }
+
 }

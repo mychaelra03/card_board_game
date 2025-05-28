@@ -23,21 +23,20 @@ public class Meteor extends Projectile {
         // Returns true if the player have to use a battery to block the projectile.
         // It damages ship if not blocked.
 
-        if(player.isPathEmpty(getSource(), getPathIndex())) return false;
+        if(player.isPathEmpty(this)) return false;
 
         if(getSize() == SMALL) {
-            if(!player.hasExposedConnectorInPath(getSource(), getPathIndex())) return false;
+            if(!player.hasExposedConnectorInPath(this)) return false;
 
-            if(player.isSideShielded(getSource().toInt())) {
-                return true;
-            }
+            if(player.isSideShielded(getSource().toInt())) return true;
+
         } else if(getSize() == LARGE) {
-            ShipBoard.DefendingCannonType cannonType = player.getDefendingCannonType(getSource(), getPathIndex());
+            ShipBoard.DefendingCannonType cannonType = player.getDefendingCannonType(this);
             if(cannonType == SINGLE) return false;
             if(cannonType == DOUBLE) return true;
         }
 
-        player.removeFirstTileInPath(getSource(), getPathIndex());
+        player.applyProjectile(this);
         return false;
     }
 }

@@ -2,6 +2,8 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.cards.DecisionEndEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CrewDecisionEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.awt.*;
@@ -47,6 +49,8 @@ public class SlaversCard extends AbstractEnemy implements CrewHandlerCard {
             this.punishedPlayer = player;
             this.remainingCrewToGiveUp = crewLossOnDefeat;
             setInputState(CREW_DECISION);
+
+            dispatcher.fireEvent(new CrewDecisionEvent(player.getName(), player.getShipContent().crewData()));
         }
         else handleNextPlayer();
     }
@@ -59,6 +63,7 @@ public class SlaversCard extends AbstractEnemy implements CrewHandlerCard {
         caller.ensureCrewRemovedAt(cabinCoords);
         remainingCrewToGiveUp--;
         if(remainingCrewToGiveUp == 0 || punishedPlayer.getCrewCount() == 0) {
+            dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
             setInputState(NONE);
             handleNextPlayer();
         }

@@ -1,14 +1,17 @@
 package it.polimi.galaxy_trucker.client.popups;
 
+import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import it.polimi.galaxy_trucker.client.VirtualServer;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.SimpleMessage;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -21,10 +24,13 @@ public class SettingsController implements PopupAware {
     @FXML private Label languageNoteLabel;
 
     @FXML private Button debugButton;
-
     @FXML private Button mainMenuButton;
 
-    private boolean isMainMenu = false;
+    @FXML private VBox giveUpBox;
+    @FXML private Button giveUpButton;
+    @FXML private Label giveUpNoteLabel;
+
+    VirtualServer virtualServer = VirtualServer.getInstance();
 
     @Override
     public void bindPopup(Popup popup) {
@@ -66,17 +72,31 @@ public class SettingsController implements PopupAware {
         }).show();
     }
 
+    private void onGivUpPressed() {
+        if(ClientSession.isGivingUp()) return;
+        virtualServer.sendMessage(new SimpleMessage("give_up"));
+        ClientSession.setGivingUp(true);
+        updateTexts();
+    }
+
     @FXML
     public void onClose() {
-        if (popup != null) popup.playClosingAnimation();
+        popup.playClosingAnimation();
     }
 
     @Override
     public void initialize(Object... args) {
         if(args == null || args.length == 0) return;
 
-        if(args[0] instanceof Boolean arg) {
-            isMainMenu = arg;
+        if(args[0] instanceof Boolean isMainMenu) {
+            mainMenuButton.setDisable(isMainMenu);
+        }
+
+        if(args.length > 1 && args[1] instanceof Boolean isFlight) {
+            if(isFlight) {
+                giveUpButton.setOnAction(_ -> onGivUpPressed());
+                giveUpBox.setVisible(true);
+            }
         }
 
         updateTexts();
@@ -86,17 +106,17 @@ public class SettingsController implements PopupAware {
 
         String langKey = LanguageManager.getPendingLocale().toLanguageTag().toLowerCase();
         boolean isCurrent = LanguageManager.getLocale().equals(LanguageManager.getPendingLocale());
-
         languageButton.setText(LanguageManager.get("button.language_" + langKey));
         languageButton.setStyle("-fx-font-size: 14; -fx-background-color: " + (isCurrent ? "gold" : "orange"));
-
         languageNoteLabel.setVisible(!isCurrent);
-
-        mainMenuButton.setDisable(isMainMenu);
 
         boolean isDebug = Logger.isDebugEnabled();
         debugButton.setText(LanguageManager.get(isDebug? "button.on" : "button.off"));
         debugButton.setStyle("-fx-font-size: 14; -fx-background-color: " + (isDebug ? "gold" : "orange"));
+
+        boolean givingUp = ClientSession.isGivingUp();
+        giveUpButton.setDisable(givingUp);
+        giveUpNoteLabel.setVisible(givingUp);
     }
 
     @Override

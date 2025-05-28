@@ -9,19 +9,14 @@ import it.polimi.galaxy_trucker.server.model.cards.PlanetsCard;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanetChosenMessage implements CardActionMessage {
 
-    private String playerName;
     private int chosenPlanet;
 
     public PlanetChosenMessage() {}
 
-    public PlanetChosenMessage(String playerName, int chosenPlanet) {
-        this.playerName = playerName;
+    public PlanetChosenMessage(int chosenPlanet) {
         this.chosenPlanet = chosenPlanet;
     }
 
-    public String getPlayerName() {
-        return playerName;
-    }
     public int getChosenPlanet() {
         return chosenPlanet;
     }

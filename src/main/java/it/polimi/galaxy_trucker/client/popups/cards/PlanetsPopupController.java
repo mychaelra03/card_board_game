@@ -57,7 +57,7 @@ public class PlanetsPopupController implements PopupAware {
                     button.setDisable(false);
                     final int chosenPlanet = i;
                     button.setOnAction(_ -> {
-                        virtualServer.sendMessage(new PlanetChosenMessage(null, chosenPlanet));
+                        virtualServer.sendMessage(new PlanetChosenMessage(chosenPlanet));
                         popup.playClosingAnimation();
                     });
                 } else {

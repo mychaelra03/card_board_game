@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.server.model.cards;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.cards.*;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.CannonShot;
 import it.polimi.galaxy_trucker.server.model.tiles.CannonTile;
@@ -12,7 +13,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule.*;
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,6 +30,7 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         private final int punishmentValue;
         private final CannonShot[] cannonShots;
 
+        @JsonCreator
         public CombatRule(
                 @JsonProperty("condition") Condition condition,
                 @JsonProperty("punishment") Punishment punishment,
@@ -72,11 +73,10 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
     private Player punishedPlayer;
     private CannonShot currentShot;
 
-    @JsonCreator
     public CombatZoneCard(
             @JsonProperty("id") int id,
             @JsonProperty("level") int level,
-            @JsonProperty("combatRule") CombatRule[] combatRules) {
+            @JsonProperty("combatRules") CombatRule[] combatRules) {
         super(id, level);
         this.combatRules = combatRules;
     }
@@ -95,25 +95,37 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
             return;
         }
         this.currentRule = ruleQueue.getFirst();
-        List<Player> players = board.getSortedPlayers();
-        if(players.size() < 2) return;
+        List<Player> alivePlayers = board.getSortedPlayers();
+
+        if(alivePlayers.size() < 2) {
+            dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.COMBAT_SKIPPED));
+            setInputState(FINISHED);
+            return;
+        }
 
         this.playerScores = new HashMap<>();
 
         switch(currentRule.getCondition()) {
             case CREW_SIZE -> {
-                for(Player player : players) {
+                dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.RULE_CREW));
+                for(Player player : alivePlayers) {
                     playerScores.put(player, (double)player.getCrewCount());
                 }
                 applyPunishment();
             }
             case ENGINE_POWER -> {
-                this.playerQueue = board.getSortedPlayers();
+                dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.RULE_ENGINE));
+                this.playerQueue = alivePlayers;
+
                 setInputState(ENGINE_SELECTION);
+                dispatcher.fireEvent(new EngineSelectionEvent(playerQueue.getFirst(), false));
             }
             case CANNON_POWER -> {
-                this.playerQueue = board.getSortedPlayers();
+                dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.RULE_CANNON));
+                this.playerQueue = alivePlayers;
+
                 setInputState(CANNON_SELECTION);
+                dispatcher.fireEvent(new CannonSelectionEvent(playerQueue.getFirst()));
             }
         }
     }
@@ -127,13 +139,16 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
         if(activatedEngines != batteryTiles.size()) throw new IllegalArgumentException("The number of activated engines does not match the number of batteries used.");
         double strength = caller.getStrength(EngineTile.class, activatedEngines);
         caller.removeBatteries(batteryTiles);
         playerScores.put(caller, strength);
         playerQueue.removeFirst();
 
-        if(playerQueue.isEmpty()) {
+        if (!playerQueue.isEmpty()) {
+            dispatcher.fireEvent(new EngineSelectionEvent(playerQueue.getFirst(), false));
+        } else {
             setInputState(NONE);
             applyPunishment();
         }
@@ -142,13 +157,16 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
         if(verticalCannons + rotatedCannons != batteryTiles.size()) throw new IllegalArgumentException("The number of activated cannons does not match the number of batteries used.");
         double strength = caller.getStrength(CannonTile.class, verticalCannons, rotatedCannons);
         caller.removeBatteries(batteryTiles);
         playerScores.put(caller, strength);
         playerQueue.removeFirst();
 
-        if(playerQueue.isEmpty()) {
+        if (!playerQueue.isEmpty()) {
+            dispatcher.fireEvent(new CannonSelectionEvent(playerQueue.getFirst()));
+        } else {
             setInputState(NONE);
             applyPunishment();
         }
@@ -157,7 +175,8 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
     private void applyPunishment() {
         verifyInputState(NONE);
 
-        Player worstPlayer = getWorstPlayer(board.getSortedPlayers(), currentRule.getCondition());
+        Player worstPlayer = getWorstPlayer(board.getSortedPlayers());
+        dispatcher.fireEvent(new PlayerStatusEvent(worstPlayer.getName(), PlayerStatusEvent.Status.WORST_PLAYER));
 
         switch(currentRule.getPunishment()) {
             case FLIGHT_DAYS -> {
@@ -169,6 +188,7 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
                 this.punishedPlayer = worstPlayer;
                 this.remainingCrewToGiveUp = currentRule.getPunishmentValue();
                 setInputState(CREW_DECISION);
+                dispatcher.fireEvent(new CrewDecisionEvent(worstPlayer.getName(), worstPlayer.getShipContent().crewData()));
             }
             case CARGO_LOSS -> {
                 worstPlayer.removeMostValuableCargo(currentRule.getPunishmentValue());
@@ -190,6 +210,7 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         caller.ensureCrewRemovedAt(cabinCoords);
         remainingCrewToGiveUp--;
         if(remainingCrewToGiveUp == 0 || punishedPlayer.getCrewCount() == 0) {
+            dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
             setInputState(NONE);
             handleNextRule();
         }
@@ -202,14 +223,18 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
             return;
         }
         this.currentShot = shotQueue.getFirst();
-        currentShot.randomizePathIndex();
+
+        int[] dice = currentShot.randomizePathIndex();
+        dispatcher.fireEvent(new DiceThrowEvent(punishedPlayer.getName(), dice));
 
         boolean isPlayerAtRisk = currentShot.evaluateDefense(punishedPlayer);
 
         if(isPlayerAtRisk) {
             setInputState(BATTERY_DECISION);
+            dispatcher.fireEvent(new BatteryDecisionEvent(punishedPlayer, currentShot));
+        } else {
+            handleNextShot();
         }
-        else handleNextShot();
     }
 
     private void handleNextShot() {
@@ -222,7 +247,11 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);
 
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
+
         caller.ensureBatteryRemovedFrom(batteryCoords);
+
+        dispatcher.fireEvent(new ProjectileEvent(caller, currentShot, null, true));
 
         setInputState(NONE);
         handleNextShot();
@@ -232,13 +261,15 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         verifyInputState(BATTERY_DECISION);
         verifyCaller(caller, punishedPlayer);
 
-        caller.removeFirstTileInPath(currentShot.getSource(), currentShot.getPathIndex());
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
+
+        caller.applyProjectile(currentShot);
 
         setInputState(NONE);
         handleNextShot();
     }
 
-    private Player getWorstPlayer(List<Player> players, Condition condition) {
+    private Player getWorstPlayer(List<Player> players) {
 
         if(players.isEmpty()) throw new IllegalArgumentException("Players list cannot be empty.");
 

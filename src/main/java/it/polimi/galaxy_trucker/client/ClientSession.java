@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.client;
 
-import it.polimi.galaxy_trucker.client.controllers.LobbyController;
+import it.polimi.galaxy_trucker.client.controllers.lobby.LobbyController;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,6 +16,7 @@ public class ClientSession {
     private static String username = null;
     private static int[] profilePicture = null;
     private static Map<String, PlayerInfo> players = new HashMap<>();
+    private static boolean givingUp = false;
 
     public static String getUsername() {
         return username;
@@ -45,14 +46,15 @@ public class ClientSession {
         return username.equals(ClientSession.getUsername());
     }
 
-    public static Set<String> getPlayerNames() {
-        return players.keySet();
+    public static boolean isGivingUp() {
+        return givingUp;
+    }
+    public static void setGivingUp(boolean givingUp) {
+        ClientSession.givingUp = givingUp;
     }
 
-    public static void resetData() {
-        username = null;
-        profilePicture = null;
-        players.clear();
+    public static Set<String> getPlayerNames() {
+        return players.keySet();
     }
 
     public static int getPlayerCount() {

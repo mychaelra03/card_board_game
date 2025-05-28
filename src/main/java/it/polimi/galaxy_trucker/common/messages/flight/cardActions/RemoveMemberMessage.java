@@ -11,18 +11,12 @@ import java.awt.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RemoveMemberMessage implements CardActionMessage {
 
-    private String playerName;
     private Point cabinCoords;
 
     public RemoveMemberMessage() {}
 
-    public RemoveMemberMessage(String playerName, Point cabinCoords) {
-        this.playerName = playerName;
+    public RemoveMemberMessage(Point cabinCoords) {
         this.cabinCoords = cabinCoords;
-    }
-
-    public String getPlayerName() {
-        return playerName;
     }
     public Point getCabinCoords() {
         return cabinCoords;

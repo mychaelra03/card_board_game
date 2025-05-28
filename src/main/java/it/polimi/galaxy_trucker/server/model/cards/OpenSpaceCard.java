@@ -2,6 +2,8 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.cards.DecisionEndEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.EngineSelectionEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.EngineTile;
 
@@ -25,24 +27,35 @@ public class OpenSpaceCard extends Card implements EnginesHandlerCard {
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
-        setInputState(ENGINE_SELECTION);
+
+        if (!playerQueue.isEmpty()) {
+            setInputState(ENGINE_SELECTION);
+
+            dispatcher.fireEvent(new EngineSelectionEvent(playerQueue.getFirst(), true));
+        } else {
+            setInputState(FINISHED);
+        }
     }
 
     @Override
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
         if(activatedEngines != batteryTiles.size()) throw new IllegalArgumentException("The number of activated engines does not match the number of batteries used.");
         int strength = (int)caller.getStrength(EngineTile.class, activatedEngines);
-        if(strength == 0) {
+
+        if (strength != 0) {
+            caller.removeBatteries(batteryTiles);
+            board.movePlayerForward(caller, strength);
+        } else {
             caller.setState(ELIMINATED);
-            return;
         }
-        caller.removeBatteries(batteryTiles);
-        board.movePlayerForward(caller, strength);
         playerQueue.removeFirst();
 
-        if(playerQueue.isEmpty()) {
+        if (!playerQueue.isEmpty()) {
+            dispatcher.fireEvent(new EngineSelectionEvent(playerQueue.getFirst(), true));
+        } else {
             setInputState(FINISHED);
         }
     }

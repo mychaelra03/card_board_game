@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.LobbyController">
+<StackPane style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.lobby.LobbyController">
    <AnchorPane fx:id="mainContentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../../css/lobby-scene.css">
       <stylesheets>
          <URL value="@../../css/default.css" />
@@ -37,7 +37,7 @@
                <Insets right="15.0" />
             </StackPane.margin>
          </Button>
-         <Label fx:id="boardName" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-background-color: rgba(255,255,255,.2); -fx-background-radius: 5;" styleClass="white-label" text="Default">
+         <Label fx:id="boardName" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-background-color: rgba(255,255,255,.2); -fx-background-radius: 5;" styleClass="white-label">
             <StackPane.margin>
                <Insets bottom="100.0" />
             </StackPane.margin>

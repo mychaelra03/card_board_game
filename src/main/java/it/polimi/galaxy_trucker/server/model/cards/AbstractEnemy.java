@@ -1,6 +1,9 @@
 package it.polimi.galaxy_trucker.server.model.cards;
 
+import it.polimi.galaxy_trucker.server.events.flight.cards.CannonSelectionEvent;
 import it.polimi.galaxy_trucker.server.events.flight.cards.CardDecisionEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.DecisionEndEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.PlayerStatusEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.CannonTile;
 
@@ -41,10 +44,19 @@ public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, 
         }
         Player currentPlayer = playerQueue.getFirst();
 
-        if(currentPlayer.getMaxStrength(CannonTile.class) < requiredCannonPower) applyPunishment(currentPlayer);
-        else if(currentPlayer.getMinStrength(CannonTile.class) > requiredCannonPower) setInputState(REWARD_DECISION);
-
-        else setInputState(CANNON_SELECTION);
+        if(currentPlayer.getMaxStrength(CannonTile.class) < requiredCannonPower) {
+            dispatcher.fireEvent(new PlayerStatusEvent(currentPlayer.getName(), PlayerStatusEvent.Status.PUNISHED));
+            applyPunishment(currentPlayer);
+        }
+        else if(currentPlayer.getMinStrength(CannonTile.class) > requiredCannonPower) {
+            setInputState(REWARD_DECISION);
+            dispatcher.fireEvent(new PlayerStatusEvent(currentPlayer.getName(), PlayerStatusEvent.Status.REWARDED));
+            dispatcher.fireEvent(new CardDecisionEvent(currentPlayer.getName()));
+        }
+        else {
+            setInputState(CANNON_SELECTION);
+            dispatcher.fireEvent(new CannonSelectionEvent(currentPlayer));
+        }
     }
 
     protected void handleNextPlayer() {
@@ -57,17 +69,21 @@ public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, 
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
         if(verticalCannons + rotatedCannons != batteryTiles.size()) throw new IllegalArgumentException("The number of activated cannons does not match the number of batteries used.");
         double strength = caller.getStrength(CannonTile.class, verticalCannons, rotatedCannons);
         caller.removeBatteries(batteryTiles);
         if(strength > requiredCannonPower) {
             setInputState(REWARD_DECISION);
 
+            dispatcher.fireEvent(new PlayerStatusEvent(caller.getName(), PlayerStatusEvent.Status.REWARDED));
             dispatcher.fireEvent(new CardDecisionEvent(caller.getName()));
         } else if (strength < requiredCannonPower) {
             setInputState(NONE);
+            dispatcher.fireEvent(new PlayerStatusEvent(caller.getName(), PlayerStatusEvent.Status.PUNISHED));
             applyPunishment(caller);
         } else {
+            dispatcher.fireEvent(new PlayerStatusEvent(caller.getName(), PlayerStatusEvent.Status.SKIPPED_ENEMY));
             handleNextPlayer();
         }
     }

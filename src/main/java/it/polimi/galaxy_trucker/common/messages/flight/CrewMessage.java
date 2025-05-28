@@ -9,12 +9,15 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CrewMessage implements GameMessage {
 
+    private String type;
+
     private String playerName;
     private Set<ShipBoard.CrewData> crew;
 
     public CrewMessage() {}
 
-    public CrewMessage(String playerName, Set<ShipBoard.CrewData> crew) {
+    public CrewMessage(String type, String playerName, Set<ShipBoard.CrewData> crew) {
+        this.type = type;
         this.playerName = playerName;
         this.crew = crew;
     }
@@ -29,6 +32,6 @@ public class CrewMessage implements GameMessage {
 
     @Override
     public String getType() {
-        return "crew";
+        return type;
     }
 }

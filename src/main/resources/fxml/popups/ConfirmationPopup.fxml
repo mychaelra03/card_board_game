@@ -8,8 +8,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0" spacing="40.0" styleClass="popup-root" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.popups.ConfirmationPopupController">
-     <Label fx:id="prompt" style="-fx-font-size: 18; -fx-font-weight: bold;" text="Text" textAlignment="CENTER" wrapText="true">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="200.0" minWidth="400.0" spacing="40.0" styleClass="popup-root" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.popups.ConfirmationPopupController">
+     <Label fx:id="prompt" style="-fx-font-size: 18; -fx-font-weight: bold;" textAlignment="CENTER" wrapText="true">
       <VBox.margin>
          <Insets top="20.0" />
       </VBox.margin>
@@ -30,4 +30,7 @@
       <URL value="@../../css/default.css" />
       <URL value="@../../css/popup.css" />
    </stylesheets>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
  </VBox>

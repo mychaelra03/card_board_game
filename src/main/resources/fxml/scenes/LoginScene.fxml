@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane prefHeight="648.0" prefWidth="764.0" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.LoginController">
+<StackPane prefHeight="648.0" prefWidth="764.0" style="-fx-background-color: #2d1564;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.galaxy_trucker.client.controllers.login.LoginController">
    <AnchorPane fx:id="mainContentPane">
       <Label layoutX="19.0" layoutY="224.0" style="-fx-font-size: 14;" text="%label.username" textFill="WHITE" AnchorPane.bottomAnchor="400.0" AnchorPane.leftAnchor="25.0" />
 

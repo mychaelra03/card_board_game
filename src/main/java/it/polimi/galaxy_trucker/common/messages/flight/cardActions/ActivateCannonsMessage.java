@@ -12,23 +12,18 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivateCannonsMessage implements CardActionMessage {
 
-    private String playerName;
     private int verticalCannons;
     private int rotatedCannons;
     private List<Point> batteryTiles;
 
     public ActivateCannonsMessage() {}
 
-    public ActivateCannonsMessage(String playerName, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
-        this.playerName = playerName;
+    public ActivateCannonsMessage(int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         this.verticalCannons = verticalCannons;
         this.rotatedCannons = rotatedCannons;
         this.batteryTiles = batteryTiles;
     }
 
-    public String getPlayerName() {
-        return playerName;
-    }
     public int getVerticalCannons() {
         return verticalCannons;
     }

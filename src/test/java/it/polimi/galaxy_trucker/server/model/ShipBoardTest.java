@@ -408,6 +408,7 @@ public class ShipBoardTest {
         ship.setTile(4, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, true), 1);
         ship.setTile(4, 4, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 1);
         ship.setTile(3, 3, new CannonTile(0, FULL_UNIVERSAL_CONNECTORS, false), 2);
+        ship.setTile(2, 4, new BatteriesTile(0, FULL_UNIVERSAL_CONNECTORS, 3), 0);
         assertEquals(DefendingCannonType.NO_CANNON, ship.getDefendingCannonType(Source.UP, -1), "Row should not be defended.");
         assertEquals(DefendingCannonType.NO_CANNON, ship.getDefendingCannonType(Source.UP, 1), "Row should not be defended.");
         assertEquals(DefendingCannonType.SINGLE, ship.getDefendingCannonType(Source.UP, 2), "Row should be defended by a cannon (single)");

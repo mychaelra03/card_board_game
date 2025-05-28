@@ -2,6 +2,10 @@ package it.polimi.galaxy_trucker.client.popups;
 
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
+import it.polimi.galaxy_trucker.common.messages.endGame.PlayerScores;
+import it.polimi.galaxy_trucker.common.messages.endGame.PlayersScoresMessage;
+import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
+import it.polimi.galaxy_trucker.server.model.ShipBoard;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,18 +15,14 @@ import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.animation.*;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class Popup {
 
@@ -127,6 +127,9 @@ public class Popup {
         closingAnimation.play();
     }
 
+    public static Popup newSettingsPopup(boolean isMainMenu, boolean isFlight) {
+        return new Popup("SettingsPopup", isMainMenu, isFlight);
+    }
     public static Popup newSettingsPopup(boolean isMainMenu) {
         return new Popup("SettingsPopup", isMainMenu);
     }
@@ -145,6 +148,10 @@ public class Popup {
         return new Popup("CardsPopup", levelOneCards, levelTwoCards);
     }
 
+    public static Popup newShipPreviewPopup(String playerName, Image board, Set<TileInfo> tiles) {
+        return new Popup("ShipPreviewPopup", playerName, board, tiles);
+    }
+
     public static Popup newCountdownPopup(String text, int duration) {
         return new Popup("CountdownPopup", text, duration);
     }
@@ -157,12 +164,32 @@ public class Popup {
         return new Popup("cards/PlanetsCardPopup", cardImage, planetChosenBy);
     }
 
-    public static Popup newCargoDecisionPopup(StackPane ship, VBox originalShipPane, VBox blockPool) {
-        return new Popup("cards/CargoDecisionPopup", ship, originalShipPane, blockPool);
+    public static Popup newCargoDecisionPopup(StackPane ship, VBox blockPool) {
+        return new Popup("cards/CargoDecisionPopup", ship, blockPool);
     }
 
     public static Popup newCardDecisionPopup(Image cardImage) {
         return new Popup("cards/CardDecisionPopup", cardImage);
+    }
+
+    public static Popup newDiceThrowPopup(String playerName, int die1, int die2) {
+        return new Popup("cards/DiceThrowPopup", playerName, die1, die2);
+    }
+
+    public static Popup newCrewDecisionPopup(StackPane ship) {
+        return new Popup("cards/CrewDecisionPopup", ship);
+    }
+
+    public static Popup newBatteryDecisionPopup(StackPane ship) {
+        return new Popup("cards/BatteryDecisionPopup", ship);
+    }
+
+    public static Popup newTileSelectionPopup(StackPane ship, String tileType, double minPower, Set<ShipBoard.BatteriesData> batteries, Set<Point> verticalTiles, Set<Point> rotatedTiles, boolean isOpenSpace, boolean hasAlien) {
+        return new Popup("cards/TileSelectionPopup", ship, tileType, minPower, batteries, verticalTiles, rotatedTiles, isOpenSpace, hasAlien);
+    }
+
+    public static Popup newFinalScoresPopup(List<PlayerScores> playersScores) {
+        return new Popup("FinalScoresPopup", playersScores);
     }
 
     public static void closeAllPopups() {

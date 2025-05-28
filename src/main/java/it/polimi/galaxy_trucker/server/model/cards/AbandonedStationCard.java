@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.server.events.flight.cards.CardDecisionEvent;
 import it.polimi.galaxy_trucker.server.events.flight.cards.CargoDecisionEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.PlayerStatusEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.tiles.BlockType;
 
@@ -76,6 +77,7 @@ public class AbandonedStationCard extends Card implements DecisionHandlerCard, C
     private void skipIneligiblePlayers() {
         verifyInputState(REWARD_DECISION);
         while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() < requiredCrew) {
+            dispatcher.fireEvent(new PlayerStatusEvent(playerQueue.getFirst().getName(), PlayerStatusEvent.Status.SKIPPED_CREW));
             playerQueue.removeFirst();
         }
         if(playerQueue.isEmpty()) {

@@ -2,6 +2,10 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.galaxy_trucker.server.events.flight.cards.BatteryDecisionEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.DecisionEndEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.DiceThrowEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.ProjectileEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Meteor;
 
@@ -44,13 +48,21 @@ public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
         }
         List<Player> players = board.getSortedPlayers();
         this.currentMeteor = meteorQueue.getFirst();
-        currentMeteor.randomizePathIndex();
+
+        int[] dice = currentMeteor.randomizePathIndex();
+        dispatcher.fireEvent(new DiceThrowEvent(players.getFirst().getName(), dice));
 
         this.playersAtRisk = new HashSet<>();
         for(Player player : players) {
             if(currentMeteor.evaluateDefense(player)) {
                 playersAtRisk.add(player);
-                setInputState(BATTERY_DECISION);
+            }
+        }
+        if(!playersAtRisk.isEmpty()) {
+            setInputState(BATTERY_DECISION);
+
+            for(Player player : playersAtRisk) {
+                dispatcher.fireEvent(new BatteryDecisionEvent(player, currentMeteor));
             }
         }
 
@@ -62,7 +74,11 @@ public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
         verifyInputState(BATTERY_DECISION);
         verifyPlayerInList(caller, playersAtRisk, "Player " + caller.getName() + " is not currently at risk.");
 
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
+
         caller.ensureBatteryRemovedFrom(batteryCoords);
+
+        dispatcher.fireEvent(new ProjectileEvent(caller, currentMeteor, null, true));
         playersAtRisk.remove(caller);
 
         handleNextMeteorIfReady();
@@ -72,7 +88,9 @@ public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
         verifyInputState(BATTERY_DECISION);
         verifyPlayerInList(caller, playersAtRisk, "Player " + caller.getName() + " is not currently at risk.");
 
-        caller.removeFirstTileInPath(currentMeteor.getSource(), currentMeteor.getPathIndex());
+        dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
+
+        caller.applyProjectile(currentMeteor);
         playersAtRisk.remove(caller);
 
         handleNextMeteorIfReady();

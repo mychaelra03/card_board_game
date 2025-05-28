@@ -9,17 +9,7 @@ import it.polimi.galaxy_trucker.server.model.cards.PlanetsCard;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanetRefusedMessage implements CardActionMessage {
 
-    private String playerName;
-
     public PlanetRefusedMessage() {}
-
-    public PlanetRefusedMessage(String playerName) {
-        this.playerName = playerName;
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
 
     @Override
     public String getType() {

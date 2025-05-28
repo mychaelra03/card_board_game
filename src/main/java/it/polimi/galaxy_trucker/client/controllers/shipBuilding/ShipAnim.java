@@ -2,39 +2,66 @@ package it.polimi.galaxy_trucker.client.controllers.shipBuilding;
 
 import it.polimi.galaxy_trucker.client.ClientSession;
 import javafx.animation.*;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import static it.polimi.galaxy_trucker.client.controllers.shipBuilding.TileManager.TILES_PATH;
+
 public class ShipAnim {
 
-    public static void animateImageToPosition(ImageView image, AnchorPane mainContentPane, double targetX, double targetY, double scaling, double rotation, int duration, int scaleDuration) {
+    private static final Set<ImageView> flippedTiles = new HashSet<>();
 
-        image.toFront();
+    public static void animateTileToPosition(ImageView tile, AnchorPane mainContentPane, Point2D target, double scaling, double rotation, int duration, int scaleDuration, boolean flipTile) {
+
+        tile.toFront();
         mainContentPane.setDisable(true);
+        Point2D currentCenter = TileManager.getNodeCenterIn(tile, mainContentPane);
 
-        TranslateTransition translate = new TranslateTransition(Duration.millis(duration), image);
-        translate.setToX(targetX - image.getLayoutX());
-        translate.setToY(targetY - image.getLayoutY());
+        TranslateTransition translate = new TranslateTransition(Duration.millis(duration), tile);
+        translate.setByX(target.getX() - currentCenter.getX());
+        translate.setByY(target.getY() - currentCenter.getY());
 
-        RotateTransition rotate = new RotateTransition(Duration.millis(duration), image);
+        RotateTransition rotate = new RotateTransition(Duration.millis(duration), tile);
         rotate.setToAngle(rotation);
 
-        ScaleTransition scale = new ScaleTransition(Duration.millis(scaleDuration), image);
+        ScaleTransition scale = new ScaleTransition(Duration.millis(scaleDuration), tile);
         scale.setToX(scaling);
-        scale.setToY(scaling);
+        if(flipTile && !flippedTiles.contains(tile)) {
+            playTileFlip(tile, scaling);
+            flippedTiles.add(tile);
+        } else {
+            scale.setToY(scaling);
+        }
 
         ParallelTransition animation = new ParallelTransition(translate, rotate, scale);
 
         // Re-enable interaction after animation completes
         animation.setOnFinished(_ -> mainContentPane.setDisable(false));
         animation.play();
-
     }
 
+    private static void playTileFlip(ImageView tile, double finalScale) {
+        String tilePath = TILES_PATH + "tile_" + tile.getId() + ".png";
+
+        ScaleTransition scaleIn = new ScaleTransition(Duration.millis(250), tile);
+        scaleIn.setToY(0);
+        scaleIn.setOnFinished(_ -> tile.setImage(new Image(Objects.requireNonNull(ShipAnim.class.getResourceAsStream(tilePath)))));
+
+        ScaleTransition scaleOut = new ScaleTransition(Duration.millis(250), tile);
+        scaleOut.setToY(finalScale);
+
+        new SequentialTransition(scaleIn, scaleOut).play();
+    }
 
     public static void rotateTile(ImageView tile, double angle) {
 
@@ -70,7 +97,13 @@ public class ShipAnim {
         animation.play();
     }
 
-    public static void playTileReturn(ImageView tile, double delay) {
+    public static void playTileReturn(ImageView tile, boolean flipped, double delay) {
+
+        if(flipped && !flippedTiles.contains(tile)) {
+            tile.setImage(new Image(Objects.requireNonNull(ShipAnim.class.getResourceAsStream("/textures/tiles/tile_" + tile.getId() + ".png"))));
+            flippedTiles.add(tile);
+        }
+
         tile.setVisible(true);
         tile.toFront();
         final double duration = 600;
@@ -168,5 +201,18 @@ public class ShipAnim {
         FadeTransition fade = new FadeTransition(Duration.millis(100), cell);
         fade.setToValue(0);
         fade.play();
+    }
+
+    public static void playStarterCabinAnimation(ImageView starterCabin, int duration) {
+        starterCabin.toFront();
+
+        TranslateTransition translate = new TranslateTransition(Duration.millis(duration), starterCabin);
+        translate.setToX(0);
+        translate.setToY(0);
+
+        RotateTransition rotate = new RotateTransition(Duration.millis(duration), starterCabin);
+        rotate.setToAngle(0);
+
+        new ParallelTransition(translate, rotate).play();
     }
 }

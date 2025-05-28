@@ -2,8 +2,7 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.server.events.flight.cards.CardDecisionEvent;
-import it.polimi.galaxy_trucker.server.events.flight.cards.PlanetSelectionEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.*;
 import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.awt.*;
@@ -60,6 +59,8 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
             this.rewardedPlayer = caller;
             this.remainingCrewToGiveUp = crewToGiveUp;
             setInputState(CREW_DECISION);
+
+            dispatcher.fireEvent(new CrewDecisionEvent(caller.getName(), caller.getShipContent().crewData()));
         }
         else setInputState(FINISHED);
     }
@@ -72,6 +73,7 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
         caller.ensureCrewRemovedAt(cabinCoords);
         remainingCrewToGiveUp--;
         if(remainingCrewToGiveUp == 0) {
+            dispatcher.fireEvent(new DecisionEndEvent(caller.getName()));
             setInputState(FINISHED);
         }
     }
@@ -89,6 +91,7 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
     private void skipIneligiblePlayers() {
         verifyInputState(REWARD_DECISION);
         while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() <= crewToGiveUp) {
+            dispatcher.fireEvent(new PlayerStatusEvent(playerQueue.getFirst().getName(), PlayerStatusEvent.Status.SKIPPED_CREW));
             playerQueue.removeFirst();
         }
         if(playerQueue.isEmpty()) {

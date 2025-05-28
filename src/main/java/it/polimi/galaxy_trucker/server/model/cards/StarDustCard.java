@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.server.model.cards;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.galaxy_trucker.server.events.flight.PlayerPositionUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class StarDustCard extends Card {
 
     @Override
     protected void onActivate() {
+        dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.STARDUST));
         List<Player> playersReversed = board.getSortedPlayers().reversed();
         for(Player player : playersReversed) {
             int exposedConnectors = player.getExposedConnectorsCount();

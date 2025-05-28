@@ -23,7 +23,7 @@ public class CargoDoneMessage implements CardActionMessage {
 
     @Override
     public String getType() {
-        return "done";
+        return "cargo_done";
     }
 
 

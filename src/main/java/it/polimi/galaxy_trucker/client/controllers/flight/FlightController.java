@@ -6,26 +6,19 @@ import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.common.messages.BoardTypeMessage;
-import it.polimi.galaxy_trucker.common.messages.GameResetMessage;
-import it.polimi.galaxy_trucker.common.messages.GameStateMessage;
-import it.polimi.galaxy_trucker.common.messages.SimpleMessage;
+import it.polimi.galaxy_trucker.common.messages.*;
+import it.polimi.galaxy_trucker.common.messages.endGame.PlayersScoresMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.*;
-import it.polimi.galaxy_trucker.common.messages.flight.CardPickedMessage;
-import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoDoneMessage;
-import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoSwapMessage;
-import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoUnloadMessage;
 import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.server.model.ShipBoard;
-import it.polimi.galaxy_trucker.server.model.tiles.BlockType;
-import it.polimi.galaxy_trucker.server.model.tiles.CrewType;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -40,8 +33,6 @@ import java.util.List;
 public class FlightController implements VirtualServerAware {
 
     private final VirtualServer virtualServer = VirtualServer.getInstance();
-
-    @FXML private AnchorPane mainContentPane;
 
     @FXML private Label statusLabel;
 
@@ -75,26 +66,30 @@ public class FlightController implements VirtualServerAware {
 
     CardsHandler cardsHandler;
 
-    private final Map<String, GridPane> playerGridMap = new HashMap<>();
+    private final Map<String, GridPane> tilesGridMap = new HashMap<>();
     private final Map<String, GridPane> batteriesGridMap = new HashMap<>();
     private final Map<String, GridPane> crewGridMap = new HashMap<>();
     private final Map<String, GridPane> cargoGridMap = new HashMap<>();
+    private final Map<String, VBox> shipBoxMap = new HashMap<>();
     private final Map<String, Label> creditsLabelMap = new HashMap<>();
 
     private final Map<GridPane, Integer> gridCellsSize = new HashMap<>();
 
     public void initialize() {
-        cardsHandler = new CardsHandler(statusLabel, cargoGridP1, shipboardP1, P1Box, deckPane, currentCardRegion, pickCardButton);
-        FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.validating_ship"), 4000);
-
+        cardsHandler = new CardsHandler(batteriesGridP1, shipboardP1, deckPane, currentCardRegion, pickCardButton, tilesGridMap, gridCellsSize);
+        ClientSession.setGivingUp(false);
         assignPlayerGrids(ClientSession.getPlayerNames());
         FlightAnim.generatePlayerPawns(ClientSession.getPlayerNames(), gameBoardPane);
         setGridSize(71, shipGridP1, batteriesGridP1, crewGridP1, cargoGridP1);
         setGridSize(28, shipGridP2, batteriesGridP2, crewGridP2, cargoGridP2,
-                             shipGridP3, batteriesGridP3, crewGridP3, cargoGridP3,
-                             shipGridP4, batteriesGridP4, crewGridP4, cargoGridP4);
+                shipGridP3, batteriesGridP3, crewGridP3, cargoGridP3,
+                shipGridP4, batteriesGridP4, crewGridP4, cargoGridP4);
 
-        settingsButton.setOnAction(_ -> Popup.newSettingsPopup().show());
+
+        FlightAnim.initialize(this);
+        FlightAnim.queueUpdateStatus(LanguageManager.get("status.validating_ship"), 3000);
+
+        settingsButton.setOnAction(_ -> Popup.newSettingsPopup(false, true).show());
         doneButton.setOnAction(_ -> virtualServer.sendMessage(new SimpleMessage("done")));
         pickCardButton.setOnAction(_ -> virtualServer.sendMessage(new SimpleMessage("pick_card")));
     }
@@ -106,14 +101,9 @@ public class FlightController implements VirtualServerAware {
             String type = mapper.readTree(cmd).get("type").asText();
             switch (type) {
 
-                case "game_state" -> {
-                    GameStateMessage message = mapper.readValue(cmd, GameStateMessage.class);
-
-                    if (message.getGameState() == GameModel.GameState.GAME_OVER) {
-                        virtualServer.setCallBack(null);
-                        Platform.runLater(() -> SceneSwitch.switchScene("LobbyScene"));
-                        return;
-                    }
+                case "players_scores" -> {
+                    PlayersScoresMessage message = mapper.readValue(cmd, PlayersScoresMessage.class);
+                    virtualServer.setCallBack(null);
                 }
 
                 case "game_reset" -> {
@@ -156,6 +146,9 @@ public class FlightController implements VirtualServerAware {
             case "invalid_tiles"     -> handleInvalidTiles(mapper.readValue(cmd, TilesMessage.class));
             case "alien_cabin_tiles" -> handleAlienCabinTiles(mapper.readValue(cmd, TilesMessage.class));
             case "pick_available"    -> handlePickAvailable(mapper.readValue(cmd, PickAvailableMessage.class));
+            case "player_eliminated" -> handlePlayerEliminated(mapper.readValue(cmd, SimplePlayerMessage.class));
+
+            case "players_scores"    -> handlePlayersScores(mapper.readValue(cmd, PlayersScoresMessage.class));
 
             default                  -> cardsHandler.handleCardCommand(type, cmd);
         }
@@ -220,10 +213,11 @@ public class FlightController implements VirtualServerAware {
         String playerName = message.getPlayerName();
         String color = ClientSession.getPlayerInfo(playerName).getColor();
 
-        GridPane grid = playerGridMap.get(playerName);
+        GridPane grid = tilesGridMap.get(playerName);
 
         if (grid != null) {
-            updateShipPane(grid, tiles, color);
+            if(grid == shipGridP1) FlightAnim.unmarkTiles(grid);
+            ShipHandler.updateShipPane(grid, tiles, color, gridCellsSize.get(grid));
         } else {
             Logger.logError("No grid assigned for player: " + playerName);
         }
@@ -240,7 +234,7 @@ public class FlightController implements VirtualServerAware {
         GridPane grid = batteriesGridMap.get(playerName);
 
         if (grid != null) {
-            updateBatteriesPane(grid, batteriesData);
+            ShipHandler.updateBatteriesPane(grid, batteriesData, gridCellsSize.get(grid));
         } else {
             Logger.logError("No batteries grid assigned for player: " + playerName);
         }
@@ -253,7 +247,8 @@ public class FlightController implements VirtualServerAware {
         GridPane grid = crewGridMap.get(playerName);
 
         if (grid != null) {
-            updateCrewPane(grid, crewData);
+            ShipHandler.updateCrewPane(grid, crewData, gridCellsSize.get(grid));
+            //FlightAnim.queueCrewPaneUpdate(grid, crewData);
         } else {
             Logger.logError("No crew grid assigned for player: " + playerName);
         }
@@ -292,10 +287,10 @@ public class FlightController implements VirtualServerAware {
             return;
         }
         if(message.getTiles().isEmpty()) {
-            FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.valid_ship"), 800);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.valid_ship"), 800);
             return;
         }
-        FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.invalid_ship"), 800);
+        FlightAnim.queueUpdateStatus(LanguageManager.get("status.invalid_ship"), 800);
         for(Node node : shipGridP1.getChildren()) {
             if(!(node instanceof ImageView tile)) continue;
             int x = GridPane.getColumnIndex(node);
@@ -314,12 +309,12 @@ public class FlightController implements VirtualServerAware {
             return;
         }
         if(message.getTiles().isEmpty()) {
-            FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.no_alien_cabin"), 800);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.no_alien_cabin"), 800);
             if(doneButton.isVisible()) doneButton.setDisable(true);
             FlightAnim.unmarkTiles(shipGridP1);
             return;
         }
-        FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.choose_cabin"), 800);
+        FlightAnim.queueUpdateStatus(LanguageManager.get("status.choose_cabin"), 800);
         doneButton.setVisible(true);
         for(Node node : shipGridP1.getChildren()) {
             if(!(node instanceof ImageView tile)) continue;
@@ -338,11 +333,23 @@ public class FlightController implements VirtualServerAware {
         boolean isSelf = ClientSession.isSelf(pickerName);
 
         if(isSelf) {
-            pickCardButton.setDisable(false);
-            FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.pick_card"), 800);
+            FlightAnim.queueEnablePickButton(pickCardButton);
         } else {
-            FlightAnim.queueUpdateStatus(statusLabel, LanguageManager.get("status.waiting_pick", pickerName), 800);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.waiting_pick", pickerName), 800);
         }
+    }
+
+    private void handlePlayerEliminated(SimplePlayerMessage message) {
+
+        String playerName = message.getPlayerName();
+        VBox playerBox = shipBoxMap.get(playerName);
+
+        FlightAnim.queuePlayerEliminated(playerName, playerBox);
+    }
+
+    private void handlePlayersScores(PlayersScoresMessage message) {
+
+        FlightAnim.queueGameOver(message.getPlayersScores());
     }
 
     private boolean setContainsPoint(int x, int y, Set<Point> points) {
@@ -352,141 +359,18 @@ public class FlightController implements VirtualServerAware {
         return false;
     }
 
-    private void updateShipPane(GridPane shipGrid, Set<TileInfo> tiles, String color) {
-        double cellSize = gridCellsSize.get(shipGrid);
-
-        if(shipGrid == shipGridP1) FlightAnim.unmarkTiles(shipGrid);
-
-        Map<Point, Node> existingTiles = getCurrentTileMap(shipGrid);
-        Set<Point> newTilePositions = placeNewTiles(shipGrid, tiles, color, cellSize, existingTiles);
-        animateAndRemoveOldTiles(shipGrid, existingTiles, newTilePositions);
-    }
-
-    private Map<Point, Node> getCurrentTileMap(GridPane shipGrid) {
-        Map<Point, Node> map = new HashMap<>();
-        for (Node node : shipGrid.getChildren()) {
-            Integer x = GridPane.getColumnIndex(node);
-            Integer y = GridPane.getRowIndex(node);
-            if (x != null && y != null) {
-                map.put(new Point(x, y), node);
-            }
-        }
-        return map;
-    }
-
-    private Set<Point> placeNewTiles(GridPane shipGrid, Set<TileInfo> tiles, String color, double cellSize, Map<Point, Node> existingTiles) {
-        Set<Point> positions = new HashSet<>();
-
-        for (TileInfo tileInfo : tiles) {
-            Point pos = new Point(tileInfo.getX(), tileInfo.getY());
-            positions.add(pos);
-
-            if (existingTiles.containsKey(pos)) continue;
-
-            Image image = loadTileImage(tileInfo.getId(), color);
-            ImageView tile = createTileImageView(image, tileInfo.getRotation(), cellSize);
-            shipGrid.add(tile, tileInfo.getX(), tileInfo.getY());
-        }
-
-        return positions;
-    }
-
-    private Image loadTileImage(int id, String color) {
-        String path = (id < 0 || id > 151)
-                ? "/textures/tiles/tile_starter_cabin_" + color.toLowerCase() + ".png"
-                : "/textures/tiles/tile_" + id + ".png";
-        return new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
-    }
-
-    private ImageView createTileImageView(Image image, int rotation, double cellSize) {
-        ImageView tile = new ImageView(image);
-        tile.setPreserveRatio(true);
-        tile.setCache(true);
-        tile.setFitWidth(cellSize);
-        tile.setFitHeight(cellSize);
-        tile.setRotate(rotation * 90);
-        return tile;
-    }
-
-    private void animateAndRemoveOldTiles(GridPane shipGrid, Map<Point, Node> existingTiles, Set<Point> newTilePositions) {
-        for (Map.Entry<Point, Node> entry : existingTiles.entrySet()) {
-            if (!newTilePositions.contains(entry.getKey())) {
-                Node node = entry.getValue();
-
-                int col = GridPane.getColumnIndex(node);
-                int row = GridPane.getRowIndex(node);
-
-                // Center point of the grid
-                double dx = col - 3;
-                double dy = row - 2;
-
-                ParallelTransition animation = FlightAnim.getTileRemovalAnimation(dx, dy, node);
-                animation.setOnFinished(_ -> shipGrid.getChildren().remove(node));
-                animation.play();
-            }
-        }
-    }
-
-    private void updateBatteriesPane(GridPane batteriesGrid, Set<ShipBoard.BatteriesData> batteries) {
-        batteriesGrid.getChildren().clear();
-
-        for (ShipBoard.BatteriesData batteriesData : batteries) {
-
-            if(batteriesData.batteries() == batteriesData.capacity()) return;
-
-            String imagePath = "/textures/sprites/batteries_" + batteriesData.capacity() + "_" + batteriesData.batteries() + ".png";
-
-            ImageView overlay = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
-
-            overlay.setPreserveRatio(true);
-            overlay.setCache(true);
-            overlay.setRotate(batteriesData.rotation() * 90);
-
-            double cellSize = gridCellsSize.get(batteriesGrid);
-            overlay.setFitWidth(cellSize);
-            overlay.setFitHeight(cellSize);
-
-            batteriesGrid.add(overlay, batteriesData.x(), batteriesData.y());
-        }
-    }
-
-    private void updateCrewPane(GridPane crewGrid, Set<ShipBoard.CrewData> crewData) {
-        crewGrid.getChildren().clear();
-
-        for (ShipBoard.CrewData cabinData : crewData) {
-            if(cabinData.crew() == CrewType.NONE) continue;
-            String imagePath = switch (cabinData.crew()) {
-                case SINGLE_HUMAN -> "/textures/sprites/crew_human_1.png";
-                case DOUBLE_HUMAN -> "/textures/sprites/crew_human_2.png";
-                case PURPLE_ALIEN -> "/textures/sprites/crew_purple_alien.png";
-                case BROWN_ALIEN -> "/textures/sprites/crew_brown_alien.png";
-
-                default -> throw new IllegalStateException("Unexpected value: " + cabinData.crew());
-            };
-
-            ImageView overlay = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
-
-            overlay.setPreserveRatio(true);
-            overlay.setCache(true);
-
-            double cellSize = gridCellsSize.get(crewGrid);
-            overlay.setFitWidth(cellSize);
-            overlay.setFitHeight(cellSize);
-
-            crewGrid.add(overlay, cabinData.x(), cabinData.y());
-        }
-    }
 
     private void assignPlayerGrids(Set<String> playerNames) {
-        playerGridMap.clear();
+        tilesGridMap.clear();
 
         // Always assign self to shipGridP1
         String self = ClientSession.getUsername();
-        playerGridMap.put(self, shipGridP1);
+        tilesGridMap.put(self, shipGridP1);
         batteriesGridMap.put(self, batteriesGridP1);
         crewGridMap.put(self, crewGridP1);
         cargoGridMap.put(self, cargoGridP1);
         creditsLabelMap.put(self, creditsLabelP1);
+        shipBoxMap.put(self, P1Box);
 
         // Assign other players to P2, P3, P4
         List<GridPane> otherGrids = List.of(shipGridP2, shipGridP3, shipGridP4);
@@ -504,11 +388,12 @@ public class FlightController implements VirtualServerAware {
                     Logger.logWarning("Too many players for available grids");
                     return;
                 }
-                playerGridMap.put(name, otherGrids.get(i));
+                tilesGridMap.put(name, otherGrids.get(i));
                 batteriesGridMap.put(name, otherBatteriesGrids.get(i));
                 crewGridMap.put(name, otherCrewGrids.get(i));
                 cargoGridMap.put(name, otherCargoGrids.get(i));
                 creditsLabelMap.put(name, otherCreditsLabels.get(i));
+                shipBoxMap.put(name, shipBoxes.get(i));
                 updateNameBox(nameBoxes.get(i), name);
                 shipBoxes.get(i).setVisible(true);
                 i++;
@@ -530,5 +415,197 @@ public class FlightController implements VirtualServerAware {
         for (GridPane pane : panes) {
             gridCellsSize.put(pane, size);
         }
+    }
+
+    public Label getStatusLabel() {
+        return statusLabel;
+    }
+
+    public StackPane getGameBoardPane() {
+        return gameBoardPane;
+    }
+
+    public ImageView getGameBoardImage() {
+        return gameBoardImage;
+    }
+
+    public Button getSettingsButton() {
+        return settingsButton;
+    }
+
+    public Button getPickCardButton() {
+        return pickCardButton;
+    }
+
+    public StackPane getDeckPane() {
+        return deckPane;
+    }
+
+    public Region getCurrentCardRegion() {
+        return currentCardRegion;
+    }
+
+    public StackPane getShipboardP1() {
+        return shipboardP1;
+    }
+
+    public ImageView getShipImageP1() {
+        return shipImageP1;
+    }
+
+    public ImageView getShipImageP2() {
+        return shipImageP2;
+    }
+
+    public ImageView getShipImageP3() {
+        return shipImageP3;
+    }
+
+    public ImageView getShipImageP4() {
+        return shipImageP4;
+    }
+
+    public GridPane getShipGridP1() {
+        return shipGridP1;
+    }
+
+    public GridPane getShipGridP2() {
+        return shipGridP2;
+    }
+
+    public GridPane getShipGridP3() {
+        return shipGridP3;
+    }
+
+    public GridPane getShipGridP4() {
+        return shipGridP4;
+    }
+
+    public GridPane getBatteriesGridP1() {
+        return batteriesGridP1;
+    }
+
+    public GridPane getBatteriesGridP2() {
+        return batteriesGridP2;
+    }
+
+    public GridPane getBatteriesGridP3() {
+        return batteriesGridP3;
+    }
+
+    public GridPane getBatteriesGridP4() {
+        return batteriesGridP4;
+    }
+
+    public GridPane getCrewGridP1() {
+        return crewGridP1;
+    }
+
+    public GridPane getCrewGridP2() {
+        return crewGridP2;
+    }
+
+    public GridPane getCrewGridP3() {
+        return crewGridP3;
+    }
+
+    public GridPane getCrewGridP4() {
+        return crewGridP4;
+    }
+
+    public GridPane getCargoGridP1() {
+        return cargoGridP1;
+    }
+
+    public GridPane getCargoGridP2() {
+        return cargoGridP2;
+    }
+
+    public GridPane getCargoGridP3() {
+        return cargoGridP3;
+    }
+
+    public GridPane getCargoGridP4() {
+        return cargoGridP4;
+    }
+
+    public Label getCreditsLabelP1() {
+        return creditsLabelP1;
+    }
+
+    public Label getCreditsLabelP2() {
+        return creditsLabelP2;
+    }
+
+    public Label getCreditsLabelP3() {
+        return creditsLabelP3;
+    }
+
+    public Label getCreditsLabelP4() {
+        return creditsLabelP4;
+    }
+
+    public HBox getNameBoxP2() {
+        return nameBoxP2;
+    }
+
+    public HBox getNameBoxP3() {
+        return nameBoxP3;
+    }
+
+    public HBox getNameBoxP4() {
+        return nameBoxP4;
+    }
+
+    public VBox getP1Box() {
+        return P1Box;
+    }
+
+    public VBox getP2Box() {
+        return P2Box;
+    }
+
+    public VBox getP3Box() {
+        return P3Box;
+    }
+
+    public VBox getP4Box() {
+        return P4Box;
+    }
+
+    public Button getDoneButton() {
+        return doneButton;
+    }
+
+    public CardsHandler getCardsHandler() {
+        return cardsHandler;
+    }
+
+    public Map<String, GridPane> getTilesGridMap() {
+        return tilesGridMap;
+    }
+
+    public Map<String, GridPane> getBatteriesGridMap() {
+        return batteriesGridMap;
+    }
+
+    public Map<String, GridPane> getCrewGridMap() {
+        return crewGridMap;
+    }
+
+    public Map<String, GridPane> getCargoGridMap() {
+        return cargoGridMap;
+    }
+
+    public Map<String, VBox> getShipBoxMap() {
+        return shipBoxMap;
+    }
+
+    public Map<String, Label> getCreditsLabelMap() {
+        return creditsLabelMap;
+    }
+
+    public Integer getGridCellsSize(GridPane gridPane) {
+        return gridCellsSize.get(gridPane);
     }
 }

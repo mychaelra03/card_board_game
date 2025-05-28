@@ -346,6 +346,12 @@ public class ShipBoard {
     public Set<Point> getCabinTilesThatCanHostAliens() {
         return getTilesPositions(CabinTile.class, tile -> ((CabinTile)tile).canHostAnAlienType());
     }
+    public Set<Point> getDoubleCannonsPositions(boolean vertical) {
+        return getTilesPositions(CannonTile.class, tile -> ((CannonTile)tile).isDouble() && vertical == (tile.getRotation() == 0));
+    }
+    public Set<Point> getDoubleEnginesPositions() {
+        return getTilesPositions(EngineTile.class, tile -> ((EngineTile)tile).isDouble());
+    }
 
     public record BatteriesData(int x, int y, int batteries, int capacity, int rotation) {}
     public record CrewData(int x, int y, CrewType crew) {}
@@ -415,7 +421,8 @@ public class ShipBoard {
     public DefendingCannonType getDefendingCannonType(Projectile.Source source, int index) {
         if(source == Projectile.Source.UP) {
             if(hasTileOnPath(source, index, CannonTile.class, tile -> tile.getRotation() == source.toInt() && !((CannonTile)tile).isDouble())) return DefendingCannonType.SINGLE;
-            if(hasTileOnPath(source, index, CannonTile.class, tile -> tile.getRotation() == source.toInt() && ((CannonTile)tile).isDouble())) return DefendingCannonType.DOUBLE;
+            if(getTotalBatteriesCount() > 0 &&
+                    hasTileOnPath(source, index, CannonTile.class, tile -> tile.getRotation() == source.toInt() && ((CannonTile)tile).isDouble())) return DefendingCannonType.DOUBLE;
         }
         else {
             for(int i = -1; i <= 1; i++) {
@@ -423,14 +430,15 @@ public class ShipBoard {
                     return DefendingCannonType.SINGLE;
             }
             for(int i = -1; i <= 1; i++) {
-                if(hasTileOnPath(source, index + i, CannonTile.class, tile -> tile.getRotation() == source.toInt() && ((CannonTile)tile).isDouble()))
+                if(getTotalBatteriesCount() > 0 &&
+                        hasTileOnPath(source, index + i, CannonTile.class, tile -> tile.getRotation() == source.toInt() && ((CannonTile)tile).isDouble()))
                     return DefendingCannonType.DOUBLE;
             }
         }
         return DefendingCannonType.NO_CANNON;
     }
 
-    private Point getFirstNonEmptyTilePosition(Projectile.Source source, int index) {
+    public Point getFirstNonEmptyTilePosition(Projectile.Source source, int index) {
         if(isPathEmpty(source, index)) return null;
 
         if(source == Projectile.Source.UP) {
@@ -493,6 +501,10 @@ public class ShipBoard {
     protected boolean isInsideShip(int x, int y) {
         // Returns true if(x,y) is inside the usable space of the spaceship.
         if(y < 0 || x < 0 || y >= tiles.length || x >= tiles[0].length) return false;
+        return isCellValid(x, y, shipType);
+    }
+
+    public static boolean isCellValid(int x, int y, BoardType shipType) {
         if(shipType == BoardType.LEARNING || shipType == BoardType.LEVEL_ONE) {
             int[][] type1 = {
                     {0, 0, 0, 1, 0, 0, 0},

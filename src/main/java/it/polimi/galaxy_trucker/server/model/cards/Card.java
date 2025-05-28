@@ -54,7 +54,10 @@ public abstract class Card {
     protected final void setInputState(InputState state) {
         this.inputState = state;
 
-        if(state == InputState.FINISHED) dispatcher.fireEvent(new CardFinishedEvent());
+        if(state == InputState.FINISHED) {
+            board.updatePlayersStatus();
+            dispatcher.fireEvent(new CardFinishedEvent());
+        }
     }
 
     protected final void verifyPlayerTurn(Player caller, List<Player> playerQueue) {

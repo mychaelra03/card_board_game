@@ -1,15 +1,10 @@
 package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.common.messages.flight.BatteriesMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
 import it.polimi.galaxy_trucker.server.events.EventDispatcher;
-import it.polimi.galaxy_trucker.server.events.flight.BatteriesUpdateEvent;
-import it.polimi.galaxy_trucker.server.events.flight.CreditsUpdateEvent;
-import it.polimi.galaxy_trucker.server.events.flight.ShipUpdateEvent;
-import it.polimi.galaxy_trucker.server.events.flight.cards.CargoDoneEvent;
-import it.polimi.galaxy_trucker.server.events.flight.cards.CargoSwappedEvent;
-import it.polimi.galaxy_trucker.server.events.flight.cards.CargoUnloadedEvent;
+import it.polimi.galaxy_trucker.server.events.flight.*;
+import it.polimi.galaxy_trucker.server.events.flight.cards.*;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
 import it.polimi.galaxy_trucker.server.model.tiles.*;
 
@@ -29,7 +24,7 @@ public class Player {
         READY_TO_PLAY,
         BUILDING_SHIP,
         DONE_BUILDING,
-        RESOLVING_CARD,
+        GIVING_UP,
         ELIMINATED
     }
 
@@ -102,6 +97,9 @@ public class Player {
     }
     public void setState(PlayerState state) {
         this.playerState = state;
+        if(state == ELIMINATED) {
+            dispatcher.fireEvent(new PlayerEliminatedEvent(username));
+        }
     }
     public List<BlockType> getCargoPool() {
         return cargoPool;
@@ -111,6 +109,12 @@ public class Player {
     }
     public void assignEventDispatcher(EventDispatcher dispatcher) {
         this.dispatcher = dispatcher;
+    }
+    public boolean isAdmin() {
+        return admin;
+    }
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     // DELEGATE METHODS
@@ -136,9 +140,12 @@ public class Player {
     }
     public void applyEpidemicCard() {
         shipBoard.applyEpidemicCard();
+        dispatcher.fireEvent(new CrewUpdateEvent(username, getShipContent().crewData()));
     }
     public void removeMostValuableCargo(int quantity) {
         shipBoard.removeMostValuableCargo(quantity);
+        dispatcher.fireEvent(new CargoUpdateEvent(username, getShipContent().cargoData()));
+        dispatcher.fireEvent(new BatteriesUpdateEvent(username, getShipContent().batteriesData()));
     }
     public double getMaxStrength(Class<? extends ActivatableTile> tileClass) {
         return shipBoard.getMaxStrength(tileClass);
@@ -156,21 +163,39 @@ public class Player {
         shipBoard.removeBatteries(coordinates);
         dispatcher.fireEvent(new BatteriesUpdateEvent(username, getShipContent().batteriesData()));
     }
-    public void removeFirstTileInPath(Projectile.Source source, int index) {
-        shipBoard.removeFirstTileInPath(source, index);
-        dispatcher.fireEvent(new ShipUpdateEvent(username,getSimplifiedShipBoard()));
+    public void applyProjectile(Projectile projectile) {
+        Point hitPoint = shipBoard.removeFirstTileInPath(projectile.getSource(), projectile.getPathIndex());
+
+        dispatcher.fireEvent(new ProjectileEvent(this, projectile, hitPoint, false));
+
+        if(hitPoint != null) {
+            dispatcher.fireEvent(new CrewUpdateEvent(username, getShipContent().crewData()));
+            dispatcher.fireEvent(new CargoUpdateEvent(username, getShipContent().cargoData()));
+            dispatcher.fireEvent(new BatteriesUpdateEvent(username, getShipContent().batteriesData()));
+        }
     }
-    public ShipBoard.DefendingCannonType getDefendingCannonType(Projectile.Source source, int index) {
-        return shipBoard.getDefendingCannonType(source, index);
+    public ShipBoard.DefendingCannonType getDefendingCannonType(Projectile projectile) {
+        ShipBoard.DefendingCannonType cannonType = shipBoard.getDefendingCannonType(projectile.getSource(), projectile.getPathIndex());
+        if(cannonType == ShipBoard.DefendingCannonType.SINGLE) {
+            dispatcher.fireEvent(new ProjectileEvent(this, projectile, null, true));
+        }
+        return cannonType;
     }
-    public boolean isPathEmpty(Projectile.Source source, int index) {
-        return shipBoard.isPathEmpty(source, index);
+    public boolean isPathEmpty(Projectile projectile) {
+        if(shipBoard.isPathEmpty(projectile.getSource(), projectile.getPathIndex())) {
+            dispatcher.fireEvent(new ProjectileEvent(this, projectile, null, false));
+            return true;
+        }
+        return false;
     }
     public boolean isSideShielded(int side) {
         return shipBoard.isSideShielded(side);
     }
-    public boolean hasExposedConnectorInPath(Projectile.Source source, int index) {
-        return shipBoard.hasExposedConnectorInPath(source, index);
+    public boolean hasExposedConnectorInPath(Projectile projectile) {
+        if(shipBoard.hasExposedConnectorInPath(projectile.getSource(), projectile.getPathIndex())) return true;
+        Point tilePoint = getFirstNonEmptyTilePosition(projectile.getSource(), projectile.getPathIndex());
+        dispatcher.fireEvent(new ProjectileEvent(this, projectile, tilePoint, true));
+        return false;
     }
     public int getCargoHoldsValue() {
         return shipBoard.getTotalHoldsValue();
@@ -189,13 +214,29 @@ public class Player {
     }
     public void cycleCrewTypeAt(int x, int y) {
         shipBoard.cycleCrewTypeAt(x, y);
+        dispatcher.fireEvent(new CrewUpdateEvent(username, getShipContent().crewData()));
+    }
+    public Point getFirstNonEmptyTilePosition(Projectile.Source source, int index) {
+        return shipBoard.getFirstNonEmptyTilePosition(source, index);
+    }
+    public int getRemovedTilesCount() {
+        return shipBoard.getRemovedTilesCount();
+    }
+    public int getTotalHoldsValue() {
+        return shipBoard.getTotalHoldsValue();
+    }
+    public Set<Point> getDoubleCannonsPositions(boolean vertical) {
+        return shipBoard.getDoubleCannonsPositions(vertical);
+    }
+    public Set<Point> getDoubleEnginesPositions() {
+        return shipBoard.getDoubleEnginesPositions();
+    }
+    public boolean hasAlien(CrewType alienType) {
+        return shipBoard.hasAlien(alienType);
     }
 
     // NEW METHODS
 
-    public boolean isAdmin() {
-        return admin;
-    }
     public boolean isReady() {
         return playerState == READY_TO_PLAY;
     }
@@ -205,9 +246,6 @@ public class Player {
             case READY_TO_PLAY -> setState(IDLE);
             default -> throw new IllegalStateException("Cannot toggle ready state from " + playerState);
         }
-    }
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
     }
 
     public void reserveTile(int tileId, int index) {
@@ -222,19 +260,30 @@ public class Player {
         reservedTiles[index] = null;
         return tile;
     }
-    public Integer getPrivateTile(int index) {
-        if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: " + index + ".");
-        return reservedTiles[index];
+    private int getReservedTileCount() {
+        int count = 0;
+        for (Integer reservedTile : reservedTiles) {
+            if (reservedTile != null) count++;
+        }
+        return count;
+    }
+    public void applyReservedTilePenalty() {;
+        shipBoard.addToRemovedTiles(getReservedTileCount());
+        Arrays.fill(reservedTiles, null);
     }
 
     public void ensureCrewRemovedAt(Point cabinCoords) {
         CrewType removedMember = shipBoard.removeCrewMemberAt(cabinCoords.x, cabinCoords.y);
         if(removedMember == null) throw new IllegalArgumentException("Cabin tile does not have any crew members.");
+
+        dispatcher.fireEvent(new CrewUpdateEvent(username, getShipContent().crewData()));
     }
 
     public void ensureBatteryRemovedFrom(Point batteryCoords) {
         boolean isBatteryRemoved = shipBoard.removeBatteryFrom(batteryCoords.x, batteryCoords.y);
         if(!isBatteryRemoved) throw new IllegalArgumentException("Battery tile does not have any battery.");
+
+        dispatcher.fireEvent(new BatteriesUpdateEvent(username, getShipContent().batteriesData()));
     }
 
     public void swapCargo(int blockIndex, Point tileCoords, int containerIndex) {
@@ -271,7 +320,7 @@ public class Player {
     public void clearCargoPool() {
         this.cargoPool = null;
 
-        dispatcher.fireEvent(new CargoDoneEvent(username));
+        dispatcher.fireEvent(new DecisionEndEvent(username));
     }
 
 

@@ -12,19 +12,14 @@ import java.awt.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BatteryUseMessage implements CardActionMessage {
 
-    private String playerName;
     private Point batteryCoords;
 
     public BatteryUseMessage() {}
 
-    public BatteryUseMessage(String playerName, Point batteryCoords) {
-        this.playerName = playerName;
+    public BatteryUseMessage(Point batteryCoords) {
         this.batteryCoords = batteryCoords;
     }
 
-    public String getPlayerName() {
-        return playerName;
-    }
     public Point getBatteryCoords() {
         return batteryCoords;
     }
