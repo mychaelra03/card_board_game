@@ -4,9 +4,6 @@ import it.polimi.galaxy_trucker.server.events.EventModel;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile;
 
-import java.awt.*;
-import java.util.Set;
-
 public class BatteryDecisionEvent extends EventModel {
 
     private final Player player;

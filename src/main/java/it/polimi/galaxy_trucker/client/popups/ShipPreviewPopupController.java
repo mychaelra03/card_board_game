@@ -4,15 +4,12 @@ import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.controllers.flight.ShipHandler;
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.common.messages.endGame.PlayerScores;
 import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
-import it.polimi.galaxy_trucker.server.model.BoardType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Line;
 
 import java.util.*;
 

@@ -267,7 +267,7 @@ public class Player {
         }
         return count;
     }
-    public void applyReservedTilePenalty() {;
+    public void applyReservedTilePenalty() {
         shipBoard.addToRemovedTiles(getReservedTileCount());
         Arrays.fill(reservedTiles, null);
     }

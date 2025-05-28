@@ -9,17 +9,7 @@ import it.polimi.galaxy_trucker.server.model.cards.CargoHandlerCard;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CargoDoneMessage implements CardActionMessage {
 
-    private String playerName;
-
     public CargoDoneMessage() {}
-
-    public CargoDoneMessage(String playerName) {
-        this.playerName = playerName;
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
 
     @Override
     public String getType() {

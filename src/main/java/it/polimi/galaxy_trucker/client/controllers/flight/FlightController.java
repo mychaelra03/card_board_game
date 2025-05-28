@@ -421,188 +421,24 @@ public class FlightController implements VirtualServerAware {
         return statusLabel;
     }
 
-    public StackPane getGameBoardPane() {
-        return gameBoardPane;
-    }
-
-    public ImageView getGameBoardImage() {
-        return gameBoardImage;
-    }
-
-    public Button getSettingsButton() {
-        return settingsButton;
-    }
-
-    public Button getPickCardButton() {
-        return pickCardButton;
-    }
-
-    public StackPane getDeckPane() {
-        return deckPane;
-    }
-
-    public Region getCurrentCardRegion() {
-        return currentCardRegion;
-    }
-
     public StackPane getShipboardP1() {
         return shipboardP1;
-    }
-
-    public ImageView getShipImageP1() {
-        return shipImageP1;
-    }
-
-    public ImageView getShipImageP2() {
-        return shipImageP2;
-    }
-
-    public ImageView getShipImageP3() {
-        return shipImageP3;
-    }
-
-    public ImageView getShipImageP4() {
-        return shipImageP4;
-    }
-
-    public GridPane getShipGridP1() {
-        return shipGridP1;
-    }
-
-    public GridPane getShipGridP2() {
-        return shipGridP2;
-    }
-
-    public GridPane getShipGridP3() {
-        return shipGridP3;
-    }
-
-    public GridPane getShipGridP4() {
-        return shipGridP4;
     }
 
     public GridPane getBatteriesGridP1() {
         return batteriesGridP1;
     }
 
-    public GridPane getBatteriesGridP2() {
-        return batteriesGridP2;
-    }
-
-    public GridPane getBatteriesGridP3() {
-        return batteriesGridP3;
-    }
-
-    public GridPane getBatteriesGridP4() {
-        return batteriesGridP4;
-    }
-
     public GridPane getCrewGridP1() {
         return crewGridP1;
-    }
-
-    public GridPane getCrewGridP2() {
-        return crewGridP2;
-    }
-
-    public GridPane getCrewGridP3() {
-        return crewGridP3;
-    }
-
-    public GridPane getCrewGridP4() {
-        return crewGridP4;
     }
 
     public GridPane getCargoGridP1() {
         return cargoGridP1;
     }
 
-    public GridPane getCargoGridP2() {
-        return cargoGridP2;
-    }
-
-    public GridPane getCargoGridP3() {
-        return cargoGridP3;
-    }
-
-    public GridPane getCargoGridP4() {
-        return cargoGridP4;
-    }
-
-    public Label getCreditsLabelP1() {
-        return creditsLabelP1;
-    }
-
-    public Label getCreditsLabelP2() {
-        return creditsLabelP2;
-    }
-
-    public Label getCreditsLabelP3() {
-        return creditsLabelP3;
-    }
-
-    public Label getCreditsLabelP4() {
-        return creditsLabelP4;
-    }
-
-    public HBox getNameBoxP2() {
-        return nameBoxP2;
-    }
-
-    public HBox getNameBoxP3() {
-        return nameBoxP3;
-    }
-
-    public HBox getNameBoxP4() {
-        return nameBoxP4;
-    }
-
     public VBox getP1Box() {
         return P1Box;
-    }
-
-    public VBox getP2Box() {
-        return P2Box;
-    }
-
-    public VBox getP3Box() {
-        return P3Box;
-    }
-
-    public VBox getP4Box() {
-        return P4Box;
-    }
-
-    public Button getDoneButton() {
-        return doneButton;
-    }
-
-    public CardsHandler getCardsHandler() {
-        return cardsHandler;
-    }
-
-    public Map<String, GridPane> getTilesGridMap() {
-        return tilesGridMap;
-    }
-
-    public Map<String, GridPane> getBatteriesGridMap() {
-        return batteriesGridMap;
-    }
-
-    public Map<String, GridPane> getCrewGridMap() {
-        return crewGridMap;
-    }
-
-    public Map<String, GridPane> getCargoGridMap() {
-        return cargoGridMap;
-    }
-
-    public Map<String, VBox> getShipBoxMap() {
-        return shipBoxMap;
-    }
-
-    public Map<String, Label> getCreditsLabelMap() {
-        return creditsLabelMap;
     }
 
     public Integer getGridCellsSize(GridPane gridPane) {

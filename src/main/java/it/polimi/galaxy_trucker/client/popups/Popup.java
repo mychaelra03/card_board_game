@@ -3,11 +3,9 @@ package it.polimi.galaxy_trucker.client.popups;
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import it.polimi.galaxy_trucker.common.messages.endGame.PlayerScores;
-import it.polimi.galaxy_trucker.common.messages.endGame.PlayersScoresMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.TileInfo;
 import it.polimi.galaxy_trucker.server.model.ShipBoard;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.effect.BoxBlur;
@@ -33,7 +31,7 @@ public class Popup {
 
     private final Map<Node, Effect> originalEffects = new HashMap<>();
 
-    private Object controller = null;
+    private Object controller;
     private boolean isClosing = false;
 
 //    public Popup(Node content, double width, double height) {

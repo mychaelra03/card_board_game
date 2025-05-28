@@ -16,12 +16,12 @@
             <StackPane fx:id="profilePicturePane" prefHeight="80.0" prefWidth="80.0" />
             <ImageView fx:id="die1View" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../textures/sprites/die/1.png" />
+                  <Image url="@../../../textures/sprites/dice/die_1.png" />
                </image>
             </ImageView>
             <ImageView fx:id="die2View" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../textures/sprites/die/1.png" />
+                  <Image url="@../../../textures/sprites/dice/die_1.png" />
                </image>
             </ImageView>
          </children>

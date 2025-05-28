@@ -2,11 +2,9 @@ package it.polimi.galaxy_trucker.client.popups.cards;
 
 import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.LanguageManager;
-import it.polimi.galaxy_trucker.client.VirtualServer;
 import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.client.popups.PopupAware;
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardDecisionMessage;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;

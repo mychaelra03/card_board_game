@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.server.model;
 
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.endGame.PlayerScores;
-import it.polimi.galaxy_trucker.common.messages.flight.PickAvailableMessage;
 import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
 import it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage;
 import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
@@ -203,7 +202,7 @@ public class GameModel {
             if(p.isReady()) playersReady++;
         }
         if(players.size() > 1 && playersReady == players.size()) {
-            setGameStateAfterWait(5, BUILDING_SHIPS);
+            setGameStateAfterWait(BUILDING_SHIPS);
         } else {
             eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), null));
         }
@@ -437,25 +436,23 @@ public class GameModel {
         return gameState;
     }
 
-    private void setGameStateAfterWait(int seconds, GameState nextState) {
+    private void setGameStateAfterWait(GameState nextState) {
         setGameState(WAITING);
-        switch(nextState) {
-            case BUILDING_SHIPS -> {
-                generateDeck();
-                for (Player player : players) {
-                    player.setState(BUILDING_SHIP);
-                    player.setNewShipBoard(boardType);
-                }
-                for (int i = 1; i <= players.size(); i++) {
-                    availablePositions.add(i);
-                }
+        if (Objects.requireNonNull(nextState) == GameState.BUILDING_SHIPS) {
+            generateDeck();
+            for (Player player : players) {
+                player.setState(BUILDING_SHIP);
+                player.setNewShipBoard(boardType);
+            }
+            for (int i = 1; i <= players.size(); i++) {
+                availablePositions.add(i);
             }
         }
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.schedule(() -> {
             if(gameState == WAITING) setGameState(nextState);
             scheduler.shutdown();
-        }, seconds, TimeUnit.SECONDS);
+        }, 5, TimeUnit.SECONDS);
     }
 
     public void flipTimer(boolean hasPlayerFinished) {
@@ -493,7 +490,7 @@ public class GameModel {
                     }
                 }
                 eventDispatcher.fireEvent(new TimerFinishedEvent(true));
-                setGameStateAfterWait(5, CORRECTING_SHIP);
+                setGameStateAfterWait(CORRECTING_SHIP);
             }
         }
     }
@@ -510,7 +507,7 @@ public class GameModel {
             eventDispatcher.fireEvent(new DoneBuildingEvent(player.getName(), positionIndex));
             if(availablePositions.isEmpty()) {
                 timerHandler.reset();
-                setGameStateAfterWait(5, CORRECTING_SHIP);
+                setGameStateAfterWait(CORRECTING_SHIP);
             }
         }
     }

@@ -416,7 +416,7 @@ public class ShipBoard {
         return !hasTileOnPath(source, index, Tile.class, tile -> !(tile instanceof EmptyTile));
     }
     public enum DefendingCannonType {
-        NO_CANNON, SINGLE, DOUBLE;
+        NO_CANNON, SINGLE, DOUBLE
     }
     public DefendingCannonType getDefendingCannonType(Projectile.Source source, int index) {
         if(source == Projectile.Source.UP) {

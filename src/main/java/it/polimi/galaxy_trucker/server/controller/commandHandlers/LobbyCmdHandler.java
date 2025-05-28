@@ -96,9 +96,4 @@ public class LobbyCmdHandler extends CommandHandler {
         Logger.logError("No VirtualView found for player: " + username);
         return null;
     }
-
-
-    private void handlePlayersUpdate(PlayersUpdateEvent event) {
-        dispatcher.broadcast(new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername()));
-    }
 }

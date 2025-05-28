@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.polimi.galaxy_trucker.server.events.flight.CrewUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent;
 import it.polimi.galaxy_trucker.server.model.Player;
 

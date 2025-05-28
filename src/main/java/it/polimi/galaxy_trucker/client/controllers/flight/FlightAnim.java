@@ -88,9 +88,7 @@ public class FlightAnim {
         fadeIn.setToValue(1);
 
         SequentialTransition animation = new SequentialTransition(fadeOut, fadeIn);
-        animation.setOnFinished(_ -> {
-            pauseBeforeNextAnimation(duration);
-        });
+        animation.setOnFinished(_ -> pauseBeforeNextAnimation(duration));
         animation.play();
     }
 
