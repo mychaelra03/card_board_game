@@ -5,7 +5,7 @@
 
   <groupId>it.polimi</groupId>
   <artifactId>galaxy_trucker</artifactId>
-  <version>0.9</version>
+  <version>1.0</version>
   <name>Galaxy Trucker</name>
 
   <properties>

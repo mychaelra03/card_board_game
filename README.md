@@ -33,9 +33,8 @@ and Migliaccio Cesario.
 | Socket connection | :white_check_mark: |
 | CLI               | :x:                |
 | GUI               | :white_check_mark: |
-| Multiple games    | :x:                |
-| Resilience        | :construction:     |
 | Chat              | :white_check_mark: |
+| Learning Flight   | :white_check_mark: |
 
 (*) *For testing purposes.*
 
