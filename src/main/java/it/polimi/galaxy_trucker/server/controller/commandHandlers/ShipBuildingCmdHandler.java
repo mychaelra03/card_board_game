@@ -1,7 +1,5 @@
 package it.polimi.galaxy_trucker.server.controller.commandHandlers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.messages.SimplePlayerMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage;
 import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
@@ -15,7 +13,6 @@ import it.polimi.galaxy_trucker.server.model.cards.Card;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 public class ShipBuildingCmdHandler extends CommandHandler {
 

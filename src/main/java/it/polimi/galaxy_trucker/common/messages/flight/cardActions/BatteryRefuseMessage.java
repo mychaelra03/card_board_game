@@ -6,8 +6,6 @@ import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.BatteryHandlerCard;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 
-import java.awt.*;
-
 /**
  * A message indicating that a player has chosen to refuse using a battery
  * for a particular card effect that offers the option.

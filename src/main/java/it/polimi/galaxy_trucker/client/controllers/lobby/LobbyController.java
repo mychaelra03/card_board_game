@@ -335,12 +335,8 @@ public class LobbyController implements VirtualServerAware {
             MenuItem kick = new MenuItem(LanguageManager.get("menu_item.kick"));
             promote.setStyle("-fx-text-fill: white; -fx-background-color: transparent;");
 
-            promote.setOnAction(_ -> {
-                this.virtualServer.sendMessage(new SimplePlayerMessage("promote_player", playerInfo.getUsername()));
-            });
-            kick.setOnAction(_ -> {
-                virtualServer.sendMessage(new SimplePlayerMessage("kick_player", playerInfo.getUsername()));
-            });
+            promote.setOnAction(_ -> this.virtualServer.sendMessage(new SimplePlayerMessage("promote_player", playerInfo.getUsername())));
+            kick.setOnAction(_ -> virtualServer.sendMessage(new SimplePlayerMessage("kick_player", playerInfo.getUsername())));
 
             contextMenu.getItems().addAll(promote, kick);
 

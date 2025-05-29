@@ -5,7 +5,6 @@ import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.BatteryHandlerCard;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
-import it.polimi.galaxy_trucker.server.model.cards.CargoHandlerCard;
 
 import java.awt.*;
 

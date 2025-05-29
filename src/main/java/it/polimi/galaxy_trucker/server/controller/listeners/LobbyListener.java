@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.server.controller.listeners;
 
 import it.polimi.galaxy_trucker.common.messages.PlayersInfoMessage;
 import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
-import it.polimi.galaxy_trucker.server.events.flight.InvalidShipEvent;
 import it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 

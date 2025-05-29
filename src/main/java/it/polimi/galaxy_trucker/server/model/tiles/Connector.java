@@ -5,5 +5,5 @@ package it.polimi.galaxy_trucker.server.model.tiles;
  * Connectors determine how tiles can link together.
  */
 public enum Connector {
-    NONE, SINGLE, DOUBLE, UNIVERSAL;
+    NONE, SINGLE, DOUBLE, UNIVERSAL
 }

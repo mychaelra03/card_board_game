@@ -2,8 +2,6 @@ package it.polimi.galaxy_trucker.server.model.cards;
 
 import it.polimi.galaxy_trucker.server.model.Player;
 
-import java.awt.*;
-
 /**
  * Interface for cards that present a binary decision to the player, such as accepting or refusing a reward or challenge.
  */

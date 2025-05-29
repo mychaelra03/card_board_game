@@ -1,8 +1,5 @@
 package it.polimi.galaxy_trucker.common.messages.login;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import it.polimi.galaxy_trucker.common.messages.GameMessage;
-
 public class PlayerInfo {
 
     private String username;

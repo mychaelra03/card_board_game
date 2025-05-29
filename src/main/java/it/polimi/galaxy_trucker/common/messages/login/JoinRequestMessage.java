@@ -2,7 +2,6 @@ package it.polimi.galaxy_trucker.common.messages.login;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.polimi.galaxy_trucker.common.messages.GameMessage;
-import it.polimi.galaxy_trucker.server.model.Player;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JoinRequestMessage implements GameMessage {
