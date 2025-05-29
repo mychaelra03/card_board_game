@@ -15,11 +15,21 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents a combat zone card that imposes various challenges on players,
+ * such as comparing crew size, engine power, and cannon power to determine penalties.
+ * Penalties include flight day loss, crew loss, cargo loss, or cannon shots.
+ * <p>
+ * Implements handlers for engines, cannons, batteries, and crew decisions during combat phases.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsHandlerCard, BatteryHandlerCard, CrewHandlerCard {
-    // Compare crew, engine strength, and cannons to avoid penalties.
 
+    /**
+     * A combat rule defining a condition to evaluate players and a punishment
+     * to apply to the player with the worst result.
+     */
     public static class CombatRule {
         public enum Condition {CREW_SIZE, CANNON_POWER, ENGINE_POWER}
 
@@ -30,6 +40,15 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         private final int punishmentValue;
         private final CannonShot[] cannonShots;
 
+        /**
+         * Constructs a CombatRule with the specified condition and punishment.
+         *
+         * @param condition the condition to evaluate players by
+         * @param punishment the punishment to apply to the worst player
+         * @param punishmentValue the numeric value for the punishment (ignored for CANNON_SHOTS)
+         * @param cannonShots the array of cannon shots (used only if punishment is CANNON_SHOTS)
+         * @throws IllegalArgumentException if punishmentValue is negative for non-CANNON_SHOTS punishment
+         */
         @JsonCreator
         public CombatRule(
                 @JsonProperty("condition") Condition condition,
@@ -81,6 +100,10 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         this.combatRules = combatRules;
     }
 
+    /**
+     * Activates the card and initializes the rule processing sequence.
+     * Starts evaluating combat rules in order.
+     */
     @Override
     protected void onActivate() {
         this.ruleQueue = new LinkedList<>(Arrays.asList(combatRules));
@@ -109,7 +132,9 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
             case CREW_SIZE -> {
                 dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.RULE_CREW));
                 for(Player player : alivePlayers) {
-                    playerScores.put(player, (double)player.getCrewCount());
+                    double score = player.getCrewCount();
+                    dispatcher.fireEvent(new PlayerScoreEvent(player.getName(), "crew", score));
+                    playerScores.put(player,score);
                 }
                 applyPunishment();
             }
@@ -135,6 +160,15 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         applyRule();
     }
 
+    /**
+     * Handles a player's engine activation, records their engine strength score,
+     * and proceeds to the next player or applies the punishment.
+     *
+     * @param caller the player activating their engines
+     * @param activatedEngines number of engines activated
+     * @param batteryTiles battery tiles used for engine activation
+     * @throws IllegalArgumentException if the number of batteries doesn't match activated engines
+     */
     @Override
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);
@@ -144,6 +178,8 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         double strength = caller.getStrength(EngineTile.class, activatedEngines);
         caller.removeBatteries(batteryTiles);
         playerScores.put(caller, strength);
+        dispatcher.fireEvent(new PlayerScoreEvent(caller.getName(), "engines", strength));
+
         playerQueue.removeFirst();
 
         if (!playerQueue.isEmpty()) {
@@ -153,6 +189,16 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
             applyPunishment();
         }
     }
+    /**
+     * Handles a player's cannon activation, records their cannon power score,
+     * and proceeds to the next player or applies the punishment.
+     *
+     * @param caller the player activating their cannons
+     * @param verticalCannons number of vertical cannons
+     * @param rotatedCannons number of rotated cannons
+     * @param batteryTiles battery tiles used for cannon activation
+     * @throws IllegalArgumentException if the number of batteries doesn't match cannon use
+     */
     @Override
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
@@ -162,6 +208,8 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         double strength = caller.getStrength(CannonTile.class, verticalCannons, rotatedCannons);
         caller.removeBatteries(batteryTiles);
         playerScores.put(caller, strength);
+        dispatcher.fireEvent(new PlayerScoreEvent(caller.getName(), "cannons", strength));
+
         playerQueue.removeFirst();
 
         if (!playerQueue.isEmpty()) {
@@ -202,6 +250,13 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         }
     }
 
+    /**
+     * Handles the removal of a crew member from a specific cabin during a crew loss punishment.
+     *
+     * @param caller the player losing crew
+     * @param cabinCoords coordinates of the cabin from which to remove crew
+     * @throws RuntimeException if no more crew are required to be removed
+     */
     @Override
     public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);
@@ -242,6 +297,12 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         applyShot();
     }
 
+    /**
+     * Called when a player decides to use a battery to defend against a cannon shot.
+     *
+     * @param caller the player using a battery
+     * @param batteryCoords the coordinates of the battery tile used
+     */
     @Override
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
@@ -256,6 +317,11 @@ public class CombatZoneCard extends Card implements EnginesHandlerCard, CannonsH
         setInputState(NONE);
         handleNextShot();
     }
+    /**
+     * Called when a player refuses to use a battery to defend against a cannon shot.
+     *
+     * @param caller the player refusing battery use
+     */
     @Override
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);

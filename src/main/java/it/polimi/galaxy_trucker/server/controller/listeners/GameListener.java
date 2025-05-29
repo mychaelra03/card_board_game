@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker.server.controller.eventHandlers;
+package it.polimi.galaxy_trucker.server.controller.listeners;
 
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.BoardTypeMessage;
@@ -11,8 +11,8 @@ import it.polimi.galaxy_trucker.common.messages.flight.PickAvailableMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.PlayerPositionMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage;
 import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
-import it.polimi.galaxy_trucker.server.events.GameResetEvent;
-import it.polimi.galaxy_trucker.server.events.GameStateUpdateEvent;
+import it.polimi.galaxy_trucker.server.events.game.GameResetEvent;
+import it.polimi.galaxy_trucker.server.events.game.GameStateUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.gameOver.GameOverEvent;
 import it.polimi.galaxy_trucker.server.events.lobby.BoardTypeUpdateEvent;
 import it.polimi.galaxy_trucker.server.model.GameModel;
@@ -21,32 +21,34 @@ import it.polimi.galaxy_trucker.server.model.cards.Card;
 
 import java.util.List;
 
-public class GameEventHandler extends EventHandler {
+public class GameListener extends EventHandler {
 
-    public GameEventHandler(GameModel gameModel, MessageDispatcher dispatcher) {
+    public GameListener(GameModel gameModel, MessageDispatcher dispatcher) {
         super(gameModel, dispatcher);
-
-        gameModel.addEventListener(BoardTypeUpdateEvent.class, this::handleBoardTypeUpdate);
-        gameModel.addEventListener(GameStateUpdateEvent.class, this::handleGameStateUpdate);
-        gameModel.addEventListener(GameResetEvent.class, this::handleGameReset);
-        gameModel.addEventListener(GameOverEvent.class, this::handleGameOver);
     }
 
 
+    @Handles(GameResetEvent.class)
     private void handleGameReset(GameResetEvent event) {
         Logger.logDebug("Game resetting...");
         dispatcher.broadcast(new GameResetMessage(event.getPlayerName()));
         dispatcher.broadcast(new BoardTypeMessage(gameModel.getBoardType()));
     }
+
+    @Handles(BoardTypeUpdateEvent.class)
     private void handleBoardTypeUpdate(BoardTypeUpdateEvent event) {
-        Logger.logInfo("Updated board type: " + event.getBoardType());
+        Logger.logDebug("Updated board type: " + event.getBoardType());
         dispatcher.broadcast(new BoardTypeMessage(event.getBoardType()));
     }
+
+    @Handles(GameStateUpdateEvent.class)
     private void handleGameStateUpdate(GameStateUpdateEvent event) {
-        Logger.logInfo("Updated game state: " + event.getGameState());
+        Logger.logInfo("New Game State: " + event.getGameState().toString().toLowerCase().replace("_", " "));
         dispatcher.broadcast(new GameStateMessage(event.getGameState()));
         sendNewGameStateData(event.getPreviousGameState(), event.getGameState());
     }
+
+    @Handles(GameOverEvent.class)
     private void handleGameOver(GameOverEvent event) {
         dispatcher.broadcast(new PlayersScoresMessage(event.getPlayersScores()));
         dispatcher.broadcast(new PlayersInfoMessage(gameModel.getPlayersInfo(), null));

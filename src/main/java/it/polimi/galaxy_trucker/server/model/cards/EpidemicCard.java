@@ -9,14 +9,26 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents an Epidemic event card in the game.
+ * <p>
+ * When activated, this card causes all players to suffer from an epidemic,
+ * triggering the loss of crew from connected cabins based on individual player logic.
+ * The effect is applied immediately to all players, and no player decisions are required.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class EpidemicCard extends Card {
-    // Lose crew from connected cabins.
 
     public EpidemicCard(@JsonProperty("id") int id, @JsonProperty("level") int level) {
         super(id, level);
     }
+
+    /**
+     * Activates the epidemic effect for all players.
+     * Dispatches a global epidemic event and applies the epidemic effect to each player.
+     * Once complete, the card is marked as finished.
+     */
 
     @Override
     protected void onActivate() {

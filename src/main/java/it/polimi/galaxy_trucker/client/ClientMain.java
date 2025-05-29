@@ -11,8 +11,20 @@ import javafx.stage.Stage;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Main entry point for the Galaxy Trucker client application.
+ * <p>
+ * This class initializes the JavaFX UI, sets up fonts, icons, scenes,
+ * and handles command-line arguments such as language and debug mode.
+ */
 public class ClientMain extends Application {
 
+    /**
+     * Called by the JavaFX runtime to start the application.
+     * Sets up fonts, main stage properties, and loads the login scene.
+     *
+     * @param stage the primary stage for this application
+     */
     @Override
     public void start(Stage stage) {
 
@@ -40,10 +52,32 @@ public class ClientMain extends Application {
         stage.show();
     }
 
+    /**
+     * Main method that serves as the application entry point.
+     * <p>
+     * Supported command-line arguments:
+     * <ul>
+     *   <li><b>-l, --lang [en|it]</b>: Sets the UI language. Defaults to English if unsupported.</li>
+     *   <li><b>-d, --debug</b>: Enables debug logging mode.</li>
+     * </ul>
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
 
         Logger.logInfo("Starting Galaxy Trucker...");
 
+        CommandLineOptions options = parseCommandLine(args);
+        // Apply selected settings
+        LanguageManager.setPendingLocale(options.selectedLocale());
+        Logger.setDebugMode(options.debugMode());
+
+        launch();
+    }
+
+    private record CommandLineOptions(Locale selectedLocale, boolean debugMode) {}
+
+    private static CommandLineOptions parseCommandLine(String[] args) {
         Locale selectedLocale = Locale.ENGLISH;
         boolean debugMode = false;
 
@@ -72,10 +106,6 @@ public class ClientMain extends Application {
                 default -> Logger.logWarning("Unknown argument: " + args[i]);
             }
         }
-        // Apply selected settings
-        LanguageManager.setPendingLocale(selectedLocale);
-        Logger.setDebugMode(debugMode);
-
-        launch();
+        return new CommandLineOptions(selectedLocale, debugMode);
     }
 }

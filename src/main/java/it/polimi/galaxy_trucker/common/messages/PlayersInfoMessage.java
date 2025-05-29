@@ -1,6 +1,7 @@
 package it.polimi.galaxy_trucker.common.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import it.polimi.galaxy_trucker.common.messages.login.PlayerInfo;
 
 import java.util.List;
 

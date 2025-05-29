@@ -1,16 +1,15 @@
-package it.polimi.galaxy_trucker.common.messages;
+package it.polimi.galaxy_trucker.common.messages.login;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import it.polimi.galaxy_trucker.common.messages.GameMessage;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class PlayerInfo implements GameMessage {
+public class PlayerInfo {
 
     private String username;
     private int[] profilePicIds;
     private String color;
     private boolean admin = false;
     private boolean ready = false;
-    private String type = "player_info";
 
     public PlayerInfo() {}
 
@@ -25,28 +24,15 @@ public class PlayerInfo implements GameMessage {
     public String getUsername() {
         return username;
     }
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public int[] getProfilePicIds() {
         return profilePicIds;
-    }
-    public void setProfilePicIds(int[] profilePicIds) {
-        this.profilePicIds = profilePicIds;
     }
 
     public String getColor() {
         return color;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-    @Override
-    public String getType() {
-        return type;
-    }
 
     public boolean isAdmin() {
         return admin;

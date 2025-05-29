@@ -4,10 +4,12 @@ import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.endGame.PlayerScores;
 import it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage;
 import it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage;
-import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
+import it.polimi.galaxy_trucker.common.messages.login.PlayerInfo;
 import it.polimi.galaxy_trucker.server.events.*;
 import it.polimi.galaxy_trucker.server.events.flight.*;
 import it.polimi.galaxy_trucker.server.events.flight.cards.CardPickedEvent;
+import it.polimi.galaxy_trucker.server.events.game.GameResetEvent;
+import it.polimi.galaxy_trucker.server.events.game.GameStateUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.gameOver.GameOverEvent;
 import it.polimi.galaxy_trucker.server.events.lobby.BoardTypeUpdateEvent;
 import it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent;
@@ -25,6 +27,12 @@ import java.util.stream.Collectors;
 import static it.polimi.galaxy_trucker.server.model.GameModel.GameState.*;
 import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 
+/**
+ * The {@code GameModel} class represents the state and behavior of the game.
+ * It handles player management, tile and card pile allocation, deck generation, and game state transitions.
+ * This class is responsible for most of the server-side game logic, including score computation,
+ * board setup, and in-game player actions.
+ */
 public class GameModel {
     private BoardType boardType;
     private final List<Player> players;
@@ -45,6 +53,9 @@ public class GameModel {
     private final BuildingTimerHandler timerHandler = new BuildingTimerHandler(80, eventDispatcher, this::onTimerFinished);
     private Boolean timerFlipAvailable = false;
 
+    /**
+     * Enumeration of all possible game states.
+     */
     public enum GameState {
         LOBBY,
         BUILDING_SHIPS,
@@ -55,6 +66,9 @@ public class GameModel {
     }
     private GameState gameState = LOBBY;
 
+    /**
+     * Initializes a new {@code GameModel} with default values and an empty player list.
+     */
     public GameModel() {
         this.players = new ArrayList<>();
         this.boardType = BoardType.LEVEL_TWO;
@@ -70,6 +84,14 @@ public class GameModel {
         this.deck = new ArrayList<>();
     }
 
+    /**
+     * Returns the current state of the game.
+     *
+     * @return the current {@link GameState}.
+     */
+    public GameState getGameState() {
+        return gameState;
+    }
 
     public BoardType getBoardType() {
         return boardType;
@@ -77,6 +99,12 @@ public class GameModel {
     public void setBoardType(BoardType boardType) {
         this.boardType = boardType;
     }
+    /**
+     * Cycles the board type to the next or previous type, depending on the action.
+     * Fires a BoardTypeUpdateEvent when updated.
+     *
+     * @param action the direction to cycle (NEXT or PREVIOUS).
+     */
     public void cycleBoard(BoardSelectMessage.Action action) {
         BoardType[] cycleTypes = BoardType.values();
 
@@ -92,10 +120,17 @@ public class GameModel {
         eventDispatcher.fireEvent(new BoardTypeUpdateEvent(boardType));
     }
 
+    /**
+     * Generates a new deck based on the current board type and splits it into piles.
+     */
     public void generateDeck() {
         this.deck = CardFactory.getInstance().generateDeck(boardType);
         splitDeckIntoPiles();
     }
+    /**
+     * Shuffles the deck and ensures that the first card is level 2 if the board type is LEVEL_TWO.
+     * Resets the card piles.
+     */
     public void shuffleDeck() {
         Collections.shuffle(deck);
 
@@ -111,14 +146,33 @@ public class GameModel {
         }
         this.cardPiles = null;
     }
+    /**
+     * Returns the current full deck.
+     *
+     * @return a list representing the full deck of cards.
+     */
     public List<Card> getDeck() {
         return deck;
     }
+
+    /**
+     * Returns the list of cards in a specific pile.
+     *
+     * @param pileId the ID of the pile (0 to 3).
+     * @return a list of cards in the specified pile.
+     * @throws IllegalArgumentException if pileId is out of bounds.
+     */
     public List<Card> getPile(int pileId) {
         if(pileId < 0 || pileId >= cardPiles.size()) throw new IllegalArgumentException("pileId must be between 0 and " + (cardPiles.size() - 1));
         return cardPiles.get(pileId);
     }
 
+    /**
+     * Checks if a player can be added to the game.
+     *
+     * @param player the player to check.
+     * @return a JoinStatus indicating if the player can join.
+     */
     public JoinResponseMessage.JoinStatus canAddPlayer(Player player) {
         if(gameState != LOBBY) return JoinResponseMessage.JoinStatus.GAME_STARTED;
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
@@ -130,7 +184,14 @@ public class GameModel {
         return JoinResponseMessage.JoinStatus.SUCCESS;
     }
 
-
+    /**
+     * Adds a player to the game if possible.
+     * Assigns the first available color and sets as admin if first player.
+     * Fires a PlayersUpdateEvent.
+     *
+     * @param player the player to add.
+     * @throws IllegalStateException if the player cannot be added.
+     */
     public void addPlayer(Player player) {
         if(players.contains(player)) throw new IllegalArgumentException("Player already in the game.");
         JoinResponseMessage.JoinStatus canAddPlayer = canAddPlayer(player);
@@ -143,6 +204,12 @@ public class GameModel {
         eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), player.getName()));
     }
 
+    /**
+     * Removes a player by username.
+     *
+     * @param username the username of the player to remove.
+     * @throws IllegalArgumentException if the player is not found.
+     */
     public void removePlayer(String username) {
 
         for (Player p : players) {
@@ -154,6 +221,13 @@ public class GameModel {
         throw new IllegalArgumentException("Player " + username + " not found.");
     }
 
+    /**
+     * Removes a player from the game.
+     * Resets the game if not in lobby and all players leave.
+     *
+     * @param player the player to remove.
+     * @throws IllegalArgumentException if the player is not in the game.
+     */
     public void removePlayer(Player player) {
         if(!players.contains(player)) throw new IllegalArgumentException("Player " + player.getName() + " not found.");
 
@@ -189,6 +263,11 @@ public class GameModel {
         throw new IllegalStateException("No available colors.");
     }
 
+    /**
+     * Sets a new admin by username.
+     *
+     * @param username the username of the new admin.
+     */
     public void setNewAdmin(String username) {
         for (Player p : players) {
             p.setAdmin(username.equals(p.getName()));
@@ -196,6 +275,10 @@ public class GameModel {
         eventDispatcher.fireEvent(new PlayersUpdateEvent(getPlayersInfo(), username));
     }
 
+    /**
+     * Updates the readiness status of players and starts the game
+     * if all players are ready and there are at least 2 players.
+     */
     public void updatePlayersReady() {
         int playersReady = 0;
         for(Player p : players) {
@@ -208,7 +291,12 @@ public class GameModel {
         }
     }
 
-
+    /**
+     * Returns a sorted list of players that are not eliminated.
+     * Players are sorted by position in descending order.
+     *
+     * @return a sorted list of active players.
+     */
     public List<Player> getSortedPlayers() {
         // Returns a sorted list of the non eliminated players.
         // First is the one furthest ahead (highest position value).
@@ -217,25 +305,55 @@ public class GameModel {
                 .sorted(Comparator.comparingInt(Player::getPosition).reversed())
                 .collect(Collectors.toList());
     }
+    /**
+     * Returns the first player in the sorted active players list.
+     *
+     * @return the player furthest ahead.
+     */
     public Player getFirstPlayer() {
         return getSortedPlayers().getFirst();
     }
 
+    /**
+     * Computes modulo in a way that correctly handles negative numbers.
+     *
+     * @param x the number.
+     * @param m the modulus.
+     * @return x mod m, always non-negative.
+     */
     private int mod(int x, int m) {
-        // Had to add this method to correctly compare negative numbers.
         return ((x % m) + m) % m;
     }
+
+    /**
+     * Determines whether a specific position on the track is already occupied by another player.
+     *
+     * @param movingPlayer the player trying to move.
+     * @param position     the position to check.
+     * @return true if the position is occupied.
+     */
     private boolean isPositionOccupied(Player movingPlayer, int position) {
         int flightTrackLength = boardType.getFlightTrackLength();
         return getSortedPlayers().stream()
                 .filter(p -> p != movingPlayer)
                 .anyMatch(p -> mod(p.getPosition(), flightTrackLength) == mod(position, flightTrackLength));
     }
+    /**
+     * Returns the current card in play.
+     *
+     * @return the current card.
+     */
     public Card getCurrentCard() {
         return currentCard;
     }
 
-
+    /**
+     * Attempts to take a specific tile for a player.
+     *
+     * @param player the player attempting to take the tile.
+     * @param id     the tile ID.
+     * @return true if the tile was taken successfully.
+     */
     public boolean TryTakeTile(Player player, int id) {
         if(player.getState() != BUILDING_SHIP) return false;
 
@@ -246,21 +364,13 @@ public class GameModel {
             return true;
         }
     }
-    public Integer TakeRandomTile(Player player) {
-        if(player.getState() != BUILDING_SHIP) return null;
 
-        synchronized (availableTiles) {
-            if (availableTiles.isEmpty()) return null;
-
-            List<Integer> tileList = new ArrayList<>(availableTiles);
-            int randomIndex = new Random().nextInt(tileList.size());
-            int id = tileList.get(randomIndex);
-
-            availableTiles.remove(id);
-            eventDispatcher.fireEvent(new TileTakenEvent(player.getName(), id));
-            return id;
-        }
-    }
+    /**
+     * Returns a tile to the board.
+     *
+     * @param id the ID of the tile to return.
+     * @throws IllegalStateException if the tile is already available.
+     */
     public void returnTile(int id) {
         if(id < 0 || id >= 152) {
             Logger.logError("Tile id " + id + " is out of range.");
@@ -272,6 +382,13 @@ public class GameModel {
             eventDispatcher.fireEvent(new TileReturnedEvent(id));
         }
     }
+    /**
+     * Attempts to take a card pile for the player.
+     *
+     * @param player the player taking the pile.
+     * @param id     the pile ID.
+     * @return true if the pile was successfully taken.
+     */
     public boolean tryTakeCardPile(Player player, int id) {
         if(player.getState() != BUILDING_SHIP) return false;
 
@@ -282,6 +399,12 @@ public class GameModel {
             return true;
         }
     }
+    /**
+     * Returns a card pile to the available set.
+     *
+     * @param id the ID of the card pile.
+     * @throws IllegalStateException if the pile is already available.
+     */
     public void returnCardPile(int id) {
         if(id < 0 || id >= 3) {
             Logger.logError("Card pile id " + id + " is out of range.");
@@ -293,6 +416,11 @@ public class GameModel {
             eventDispatcher.fireEvent(new CardsReturnedEvent(id));
         }
     }
+    /**
+     * Splits the current deck into 4 even piles.
+     *
+     * @throws IllegalArgumentException if the deck size is not divisible by 4.
+     */
     public void splitDeckIntoPiles() {
         if (deck.size() % 4 != 0) {
             throw new IllegalArgumentException("Deck size must be divisible by 4");
@@ -314,13 +442,26 @@ public class GameModel {
         }
     }
 
-
+    /**
+     * Sets the position of a player.
+     *
+     * @param player   the player to move.
+     * @param position the new position to set.
+     * @throws IllegalArgumentException if position is occupied.
+     */
     public void setPlayerPosition(Player player, int position) {
         if(player.getState() == ELIMINATED) throw new IllegalStateException("Player " + player.getName() + " is eliminated.");
         if(isPositionOccupied(player, position)) throw new IllegalArgumentException("Position is occupied");
         player.setPosition(position);
     }
 
+    /**
+     * Moves a player forward or backward a specified number of unoccupied spaces.
+     *
+     * @param player  the player to move.
+     * @param steps   number of spaces to move.
+     * @param forward true to move forward, false to move backward.
+     */
     private void movePlayer(Player player, int steps, boolean forward) {
         int newPosition = player.getPosition();
         while(steps > 0) {
@@ -333,13 +474,35 @@ public class GameModel {
 
         eventDispatcher.fireEvent(new PlayerPositionUpdateEvent(player.getName(), newPosition));
     }
+
+    /**
+     * Moves a player forward by a certain number of steps.
+     * Skips over occupied spaces.
+     *
+     * @param player the player to move.
+     * @param steps  number of steps to move forward.
+     */
     public void movePlayerForward(Player player, int steps) {
         movePlayer(player, steps, true);
     }
+    /**
+     * Moves a player backward by a certain number of steps.
+     * Skips over occupied spaces.
+     *
+     * @param player the player to move.
+     * @param steps  number of steps to move backward.
+     */
     public void movePlayerBackward(Player player, int steps) {
         movePlayer(player, steps, false);
     }
 
+    /**
+     * Computes the final score for a player.
+     *
+     * @param player          the player whose score is being calculated.
+     * @param bestShipPlayers the set of players considered to have the best ships.
+     * @return a PlayerScores object with the calculated scores.
+     */
     public PlayerScores getPlayerScores(Player player, Set<Player> bestShipPlayers) {
         boolean isEliminated = player.getState() == ELIMINATED;
         boolean hasBestShip = bestShipPlayers.contains(player);
@@ -354,6 +517,11 @@ public class GameModel {
         return new PlayerScores(player.getName(), positionScore, bestShipScore, cargoScore, lostTilesScore, totaleScore);
     }
 
+    /**
+     * Returns the set of players with the least number of exposed connectors.
+     *
+     * @return a set of players with the best ships.
+     */
     public Set<Player> getPlayersWithBestShip() {
         Set<Player> playersWithBestShip = new HashSet<>();
         int minExposed = Integer.MAX_VALUE;
@@ -374,6 +542,10 @@ public class GameModel {
         return playersWithBestShip;
     }
 
+    /**
+     * Updates player statuses and eliminates players that have given up,
+     * have no crew, or are too far behind.
+     */
     public void updatePlayersStatus() {
         if(getSortedPlayers().isEmpty()) return;
 
@@ -432,10 +604,6 @@ public class GameModel {
         }
     }
 
-    public GameState getGameState() {
-        return gameState;
-    }
-
     private void setGameStateAfterWait(GameState nextState) {
         setGameState(WAITING);
         if (Objects.requireNonNull(nextState) == GameState.BUILDING_SHIPS) {
@@ -455,6 +623,14 @@ public class GameModel {
         }, 5, TimeUnit.SECONDS);
     }
 
+    /**
+     * Flips the building timer if allowed. If the player hasn't finished building and there are
+     * still flips available, starts the timer. Otherwise, does nothing.
+     * <p>
+     * This method is synchronized to prevent race conditions during timer manipulation.
+     *
+     * @param hasPlayerFinished indicates whether the player has finished building.
+     */
     public void flipTimer(boolean hasPlayerFinished) {
         synchronized (timerHandler) {
             if(!timerFlipAvailable) return;
@@ -464,6 +640,15 @@ public class GameModel {
         }
     }
 
+    /**
+     * Internal method invoked when the timer has finished.
+     * <p>
+     * If additional flips are still available, enables another flip and dispatches a partial
+     * {@link TimerFinishedEvent}. Otherwise, assigns remaining positions randomly to players
+     * who are still building and transitions the game to the CORRECTING_SHIP phase.
+     * <p>
+     * This method is synchronized to ensure correct handling of timer state and player updates.
+     */
     private void onTimerFinished() {
         synchronized (timerHandler) {
             if(timerHandler.getTimesFlipped() < boardType.getBuildingTimersCount()) {
@@ -495,6 +680,14 @@ public class GameModel {
         }
     }
 
+    /**
+     * Allows a player to claim a position once they are done building their ship.
+     * Updates their state and removes the position from the available pool.
+     * If all positions are claimed, progresses the game to the correcting phase.
+     *
+     * @param player        the player claiming a position.
+     * @param positionIndex the index of the position to claim.
+     */
     public void claimPosition(Player player, int positionIndex) {
         if(player.getState() != BUILDING_SHIP) return;
         synchronized (availablePositions) {
@@ -512,6 +705,14 @@ public class GameModel {
         }
     }
 
+    /**
+     * Removes a selected tile from the player's ship board during the correcting phase.
+     * If all invalid tiles are corrected for all players, advances to the crew assignment phase.
+     *
+     * @param player the player making the correction.
+     * @param x      the x-coordinate of the tile to remove.
+     * @param y      the y-coordinate of the tile to remove.
+     */
     public void removeSelectedTile(Player player, int x, int y) {
         if(!invalidShips.contains(player)) {
             Logger.logWarning("Player " + player.getName() + " doesn't have an invalid ship board.");
@@ -527,6 +728,13 @@ public class GameModel {
         if (invalidShips.isEmpty()) setGameState(ASSIGNING_CREW);
     }
 
+    /**
+     * Cycles the crew type at a specified tile location for a player during the crew assignment phase.
+     *
+     * @param player the player assigning crew.
+     * @param x      the x-coordinate of the tile.
+     * @param y      the y-coordinate of the tile.
+     */
     public void cycleCrewTypeAt(Player player, int x, int y) {
         if(!choosingCrewType.contains(player)) {
             Logger.logWarning("Player " + player.getName() + " isn't choosing crew type.");
@@ -534,6 +742,12 @@ public class GameModel {
         }
         player.cycleCrewTypeAt(x, y);
     }
+
+    /**
+     * Marks a player as done choosing crew. If all players have finished, transitions to card picking phase.
+     *
+     * @param player the player that finished choosing crew.
+     */
     public void doneChoosingCrew(Player player) {
         if(!choosingCrewType.contains(player)) {
             Logger.logWarning("Player " + player.getName() + " isn't choosing crew type.");
@@ -544,6 +758,12 @@ public class GameModel {
         if (choosingCrewType.isEmpty()) setGameState(PICKING_CARDS);
     }
 
+    /**
+     * Triggers the next card to be picked by the current first player.
+     * Validates the current game state and ensures the previous card (if any) is finished.
+     *
+     * @param player the player attempting to pick the next card.
+     */
     public void pickNextCard(Player player) {
         if(currentCard != null && !currentCard.isFinished()) {
             Logger.logWarning("Cannot pick new card, previous card wasn't finished."); return;
@@ -562,6 +782,10 @@ public class GameModel {
         currentCard.activate(this);
     }
 
+    /**
+     * Finalizes the game, computes the final scores for all players,
+     * and dispatches a GameOverEvent with the results.
+     */
     public void handleGameOver() {
         Set<Player> bestShipPlayers = getPlayersWithBestShip();
         List<PlayerScores> playersScores = players.stream()
@@ -572,6 +796,10 @@ public class GameModel {
         eventDispatcher.fireEvent(new GameOverEvent(playersScores));
     }
 
+    /**
+     * Resets the game state back to the lobby while preserving player information.
+     * Clears decks, available tiles, and resets timers.
+     */
     public void resetToLobby() {
         this.gameState = GameState.LOBBY;
         for (Player player : players) player.setState(IDLE);
@@ -586,24 +814,42 @@ public class GameModel {
         timerHandler.reset();
     }
 
+    /**
+     * Completely resets the game, removing all players and returning
+     * to the default board type and lobby state.
+     */
     public void resetCompletely() {
         resetToLobby();
         this.players.clear();
         this.boardType = BoardType.LEVEL_TWO;
     }
 
+    /**
+     * Returns information about all players currently in the game.
+     *
+     * @return a list of {@link PlayerInfo} objects representing each player's status.
+     */
     public List<PlayerInfo> getPlayersInfo(){
         return players.stream()
                 .map(p -> new PlayerInfo(p.getName(),p.getProfilePictureIds(),p.getColor().toString(),p.isAdmin(),p.isReady()))
                 .collect(Collectors.toList());
     }
-    private PlayerInfo getPlayerInfo(Player player) {
-        return new PlayerInfo(player.getName(),player.getProfilePictureIds(),player.getColor().toString(),player.isAdmin(),player.isReady());
-    }
 
+    /**
+     * Returns the {@link EventDispatcher} used to manage and dispatch game events.
+     *
+     * @return the event dispatcher.
+     */
     public EventDispatcher getEventDispatcher() {
         return eventDispatcher;
     }
+    /**
+     * Registers a new event listener for the specified event type.
+     *
+     * @param <T>       the type of event.
+     * @param eventType the class of the event to listen for.
+     * @param listener  the listener to register.
+     */
     public <T extends EventModel> void addEventListener(Class<T> eventType, ModelEventListener<T> listener) {
         eventDispatcher.addListener(eventType, listener);
     }

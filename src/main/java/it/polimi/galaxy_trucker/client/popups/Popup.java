@@ -22,6 +22,14 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Utility class for managing modal popup windows in a JavaFX application.
+ * <p>
+ * Popups are dynamically loaded from FXML files and support optional arguments for controller initialization.
+ * They automatically apply visual effects (e.g., blur) to background nodes and support animated opening and closing.
+ * <p>
+ * This class supports a wide range of specialized popups via static factory methods, each preconfigured with the appropriate FXML file and constructor arguments.
+ */
 public class Popup {
 
     private static final List<PopupAware> activePopups = new ArrayList<>();
@@ -31,21 +39,8 @@ public class Popup {
 
     private final Map<Node, Effect> originalEffects = new HashMap<>();
 
-    private Object controller;
+    private final Object controller;
     private boolean isClosing = false;
-
-//    public Popup(Node content, double width, double height) {
-//
-//        StackPane popup = new StackPane(content);
-//        popup.setPrefSize(width, height);
-//        popup.setMaxSize(width, height);
-//        popup.setStyle("-fx-background-color: white; -fx-background-radius: 10;");
-//        StackPane.setAlignment(popup, Pos.CENTER);
-//        this.content = popup;
-//
-//        this.overlay = new Region();
-//        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.2);");
-//    }
 
     private Popup(String fxmlFile, Object... args) {
         try {
@@ -68,6 +63,12 @@ public class Popup {
         }
     }
 
+    /**
+     * Displays the popup window with animations and background blur.
+     * Automatically binds ESC key to close the popup.
+     *
+     * @throws IllegalStateException if the root of the current scene is not a {@link StackPane}
+     */
     public void show() {
         if (controller instanceof PopupAware controllerAware) {
             if(controllerAware.isPopupVisible()) return;
@@ -105,6 +106,10 @@ public class Popup {
         else playClosingAnimation();
     }
 
+    /**
+     * Triggers the closing animation and removes the popup from the scene.
+     * Ensures the controller is notified if it implements {@link PopupAware}.
+     */
     public void playClosingAnimation() {
         StackPane rootPane = getRootPane();
         if(rootPane == null) return;
@@ -125,16 +130,42 @@ public class Popup {
         closingAnimation.play();
     }
 
+    /**
+     * Creates a new Settings popup.
+     *
+     * @param isMainMenu whether the popup is opened from the main menu
+     * @param isFlight whether the popup is opened during a flight
+     * @return a new instance of {@code Popup}
+     */
     public static Popup newSettingsPopup(boolean isMainMenu, boolean isFlight) {
         return new Popup("SettingsPopup", isMainMenu, isFlight);
     }
+    /**
+     * Creates a new Settings popup with just the main menu context.
+     *
+     * @param isMainMenu whether the popup is opened from the main menu
+     * @return a new instance of {@code Popup}
+     */
     public static Popup newSettingsPopup(boolean isMainMenu) {
         return new Popup("SettingsPopup", isMainMenu);
     }
+    /**
+     * Creates a new Settings popup with default context.
+     *
+     * @return a new instance of {@code Popup}
+     */
     public static Popup newSettingsPopup() {
         return new Popup("SettingsPopup");
     }
 
+    /**
+     * Creates an alert popup with a title, description, and optional arguments.
+     *
+     * @param title the title of the alert
+     * @param description the main message
+     * @param descriptionArgs extra arguments for formatting the description
+     * @return a new instance of {@code Popup}
+     */
     public static Popup newAlertPopup(String title, String description, String descriptionArgs) {
         return new Popup("AlertPopup", title, description, descriptionArgs);
     }
@@ -190,6 +221,10 @@ public class Popup {
         return new Popup("FinalScoresPopup", playersScores);
     }
 
+    /**
+     * Closes all active popups and resets their visibility.
+     * This also clears all visual blur and effect states.
+     */
     public static void closeAllPopups() {
         for (PopupAware controller : activePopups) {
             controller.setPopupVisible(false);

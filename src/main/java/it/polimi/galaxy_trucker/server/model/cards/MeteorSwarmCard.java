@@ -15,10 +15,13 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents a "Meteor Swarm" card that triggers a sequence of meteor strikes.
+ * Players at risk may choose to use a battery to defend against incoming meteors.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
-    // Rolling dice determines if meteors hit your ship.
 
     private final Meteor[] meteors;
 
@@ -34,6 +37,9 @@ public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
         this.meteors = meteors;
     }
 
+    /**
+     * Activates the card, initializing and applying the first meteor in the sequence.
+     */
     @Override
     protected void onActivate() {
         this.meteorQueue = new LinkedList<>(Arrays.asList(meteors));
@@ -69,6 +75,12 @@ public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
         handleNextMeteorIfReady();
     }
 
+    /**
+     * Called when a player chooses to use a battery to defend against an incoming meteor.
+     *
+     * @param caller       the player using the battery
+     * @param batteryCoords the coordinates of the battery being used
+     */
     @Override
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
@@ -83,6 +95,11 @@ public class MeteorSwarmCard extends Card implements BatteryHandlerCard {
 
         handleNextMeteorIfReady();
     }
+    /**
+     * Called when a player refuses to use a battery and instead takes the hit from the meteor.
+     *
+     * @param caller the player refusing to use a battery
+     */
     @Override
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);

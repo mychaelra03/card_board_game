@@ -3,6 +3,7 @@ package it.polimi.galaxy_trucker.client.controllers.lobby;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.common.messages.login.PlayerInfo;
 import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
@@ -335,12 +336,10 @@ public class LobbyController implements VirtualServerAware {
             promote.setStyle("-fx-text-fill: white; -fx-background-color: transparent;");
 
             promote.setOnAction(_ -> {
-                playerInfo.setType("promote_player");
-                this.virtualServer.sendMessage(playerInfo);
+                this.virtualServer.sendMessage(new SimplePlayerMessage("promote_player", playerInfo.getUsername()));
             });
             kick.setOnAction(_ -> {
-                playerInfo.setType("kick_player");
-                this.virtualServer.sendMessage(playerInfo);
+                virtualServer.sendMessage(new SimplePlayerMessage("kick_player", playerInfo.getUsername()));
             });
 
             contextMenu.getItems().addAll(promote, kick);

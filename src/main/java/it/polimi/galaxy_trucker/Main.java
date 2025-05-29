@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        String mode = "";
-        String[] args2 = new String[0];
+        String mode;
+        String[] args2;
 
         if (args.length == 0) {
             System.out.println("Welcome to \u001B[95mGalaxy Trucker\u001B[0m!");

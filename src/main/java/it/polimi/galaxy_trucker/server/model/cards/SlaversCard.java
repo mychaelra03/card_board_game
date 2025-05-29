@@ -10,6 +10,14 @@ import java.awt.*;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents a Slavers enemy encounter card.
+ * In this combat event, players must meet a required cannon power to avoid punishment.
+ * If successful, the player is rewarded with credits. If defeated, the player must
+ * give up a specified number of crew members.
+ * <p>
+ * Implements crew handling during punishment.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class SlaversCard extends AbstractEnemy implements CrewHandlerCard {
@@ -35,6 +43,11 @@ public class SlaversCard extends AbstractEnemy implements CrewHandlerCard {
         this.crewLossOnDefeat = crewLossOnDefeat;
     }
 
+    /**
+     * Grants the reward to the player who succeeded in the encounter.
+     *
+     * @param player the player who won the combat
+     */
     @Override
     protected void giveReward(Player player) {
         verifyInputState(NONE);
@@ -42,6 +55,12 @@ public class SlaversCard extends AbstractEnemy implements CrewHandlerCard {
         setInputState(FINISHED);
     }
 
+    /**
+     * Applies the punishment to a player who failed the encounter.
+     * The player is required to give up a specified number of crew members.
+     *
+     * @param player the player who failed the combat
+     */
     @Override
     protected void applyPunishment(Player player) {
         verifyInputState(NONE);
@@ -55,6 +74,14 @@ public class SlaversCard extends AbstractEnemy implements CrewHandlerCard {
         else handleNextPlayer();
     }
 
+    /**
+     * Removes a crew member from the specified cabin coordinate
+     * as part of the punishment.
+     *
+     * @param caller      the player removing crew
+     * @param cabinCoords the coordinates of the cabin where the crew is being removed
+     * @throws RuntimeException if there are no more crew required to be removed
+     */
     @Override
     public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);

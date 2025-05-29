@@ -2,6 +2,7 @@ package it.polimi.galaxy_trucker.server.controller.commandHandlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.galaxy_trucker.common.messages.SimplePlayerMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage;
 import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
 import it.polimi.galaxy_trucker.server.model.GameModel;
@@ -14,39 +15,32 @@ import it.polimi.galaxy_trucker.server.model.cards.Card;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class ShipBuildingCmdHandler extends CommandHandler {
 
     public ShipBuildingCmdHandler(GameModel gameModel, Map<VirtualView, Player> playerMap, MessageDispatcher dispatcher) {
         super(gameModel, playerMap, dispatcher);
+        registerHandlers();
     }
 
     private final Map<VirtualView, Integer> tileMap = new HashMap<>();
     private final Map<VirtualView, Integer> cardsMap = new HashMap<>();
 
     @Override
-    public void handle(VirtualView senderView, JsonNode cmd) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        String type = cmd.get("type").asText();
-        switch (type) {
-
-            case "tile_taken"        -> handleTileTaken(senderView, mapper.convertValue(cmd, TileTakenMessage.class));
-            case "tile_random"       -> handleTileRandom(senderView);
-            case "tile_returned"     -> handleTileReturned(senderView);
-            case "tile_fixed"        -> handleTileFixed(senderView, mapper.convertValue(cmd, TileFixedMessage.class));
-            case "reserve_tile"      -> handleReserveTile(senderView, mapper.convertValue(cmd, ReserveTileMessage.class));
-            case "use_reserved_tile" -> handleUseReservedTile(senderView, mapper.convertValue(cmd, UseReservedTileMessage.class));
-            case "cards_taken"       -> handleCardsTaken(senderView, mapper.convertValue(cmd, CardsTakenMessage.class));
-            case "cards_returned"    -> handleCardsReturned(senderView);
-            case "timer_flipped"     -> handleTimerFlipped(senderView);
-            case "done_building"     -> handleDoneBuilding(senderView, mapper.convertValue(cmd, DoneBuildingMessage.class));
-
-            case "ship_board"        -> handleShipBoardRequest(senderView, mapper.convertValue(cmd, ShipBoardMessage.class));
-
-            default                  -> Logger.logError("Unrecognized command: " + type);
-        }
+    protected void registerHandlers() {
+        register("tile_taken", (view, cmd) -> handleTileTaken(view, mapper.convertValue(cmd, TileTakenMessage.class)));
+        register("tile_returned", (view, cmd) -> handleTileReturned(view));
+        register("tile_fixed", (view, cmd) -> handleTileFixed(view, mapper.convertValue(cmd, TileFixedMessage.class)));
+        register("reserve_tile", (view, cmd) -> handleReserveTile(view, mapper.convertValue(cmd, ReserveTileMessage.class)));
+        register("use_reserved_tile", (view, cmd) -> handleUseReservedTile(view, mapper.convertValue(cmd, UseReservedTileMessage.class)));
+        register("cards_taken", (view, cmd) -> handleCardsTaken(view, mapper.convertValue(cmd, CardsTakenMessage.class)));
+        register("cards_returned", (view, cmd) -> handleCardsReturned(view));
+        register("timer_flipped", (view, cmd) -> handleTimerFlipped(view));
+        register("done_building", (view, cmd) -> handleDoneBuilding(view, mapper.convertValue(cmd, DoneBuildingMessage.class)));
+        register("ship_request", (view, cmd) -> handleShipBoardRequest(view, mapper.convertValue(cmd, SimplePlayerMessage.class)));
     }
+
 
     private void handleTileTaken(VirtualView senderView, TileTakenMessage message) {
         if(isPlayerHoldingItem(senderView)) return;
@@ -56,17 +50,6 @@ public class ShipBuildingCmdHandler extends CommandHandler {
 
         if(gameModel.TryTakeTile(player, id)) {
             tileMap.put(senderView, id);
-        }
-    }
-
-    private void handleTileRandom(VirtualView senderView) {
-        if(isPlayerHoldingItem(senderView)) return;
-
-        Player player = playerMap.get(senderView);
-
-        Integer takenTile = gameModel.TakeRandomTile(player);
-        if(takenTile != null) {
-            tileMap.put(senderView, takenTile);
         }
     }
 
@@ -164,7 +147,7 @@ public class ShipBuildingCmdHandler extends CommandHandler {
         gameModel.claimPosition(player, positionIndex);
     }
 
-    private void handleShipBoardRequest(VirtualView senderView, ShipBoardMessage message) {
+    private void handleShipBoardRequest(VirtualView senderView, SimplePlayerMessage message) {
         gameModel.getSortedPlayers().stream()
                 .filter(p -> p.getName().equals(message.getPlayerName()))
                 .findFirst()

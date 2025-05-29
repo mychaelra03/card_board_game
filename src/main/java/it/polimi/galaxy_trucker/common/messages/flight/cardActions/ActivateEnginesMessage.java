@@ -9,6 +9,19 @@ import it.polimi.galaxy_trucker.server.model.cards.EnginesHandlerCard;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Message class representing the action of activating engines on a card.
+ * <p>
+ * This message is sent from the client to the server to signal that
+ * a player has chosen to activate a specific number of engines, optionally consuming
+ * battery tiles in the process.
+ * </p>
+ *
+ * <p>
+ * It implements {@link CardActionMessage} and is handled specifically by
+ * {@link EnginesHandlerCard}.
+ * </p>
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivateEnginesMessage implements CardActionMessage {
 

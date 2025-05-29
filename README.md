@@ -22,8 +22,6 @@ This project is a Java-based implementation of the table game "**Galaxy Truckers
 the 2024/2025 Software Engineering course at Politecnico di Milano. The team comprises Garolini Michele, Jafari Michael
 and Migliaccio Cesario.
 
-The implementation features both a command-line interface (CLI) and a JavaFX graphical user interface.
-
 <!--Check out our project presentation [here.](https://garolini.github.io/)-->
 
 ## Status of the work

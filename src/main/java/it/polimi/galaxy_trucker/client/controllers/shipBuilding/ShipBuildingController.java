@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage;
+import it.polimi.galaxy_trucker.common.messages.login.PlayerInfo;
 import it.polimi.galaxy_trucker.server.model.BoardType;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 import it.polimi.galaxy_trucker.client.*;
@@ -12,7 +13,6 @@ import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.*;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
-import it.polimi.galaxy_trucker.server.model.ShipBoard;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -76,6 +76,14 @@ public class ShipBuildingController implements VirtualServerAware {
 
     private boolean lastTimerWasFinal = false;
 
+    @FunctionalInterface
+    interface JsonHandler<T> {
+        void handle(T message);
+    }
+
+    private final Map<String, HandlerEntry<?>> handlers = new HashMap<>();
+    private record HandlerEntry<T>(Class<T> type, JsonHandler<T> handler) {}
+
     public void initialize() {
         
         tileManager = new TileManager(mainContentPane, gridPane, focusSlot, reservedSlot0, reservedSlot1);
@@ -83,6 +91,8 @@ public class ShipBuildingController implements VirtualServerAware {
         cardsMap.put(0, cardPile0);
         cardsMap.put(1, cardPile1);
         cardsMap.put(2, cardPile2);
+
+        initHandlers();
 
         Image backTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream(TILES_PATH + "tile_back.png")));
 
@@ -175,28 +185,39 @@ public class ShipBuildingController implements VirtualServerAware {
     }
 
     ObjectMapper mapper = new ObjectMapper();
+    @SuppressWarnings("unchecked")
     private void updateView(String cmd) throws JsonProcessingException {
-
         JsonNode node = mapper.readTree(cmd);
-
         String type = node.get("type").asText();
 
-        switch (type) {
-            case "game_state"     -> handleGameState(mapper.readValue(cmd, GameStateMessage.class));
-            case "board_type"     -> handleBoardType(mapper.readValue(cmd, BoardTypeMessage.class));
-            case "players_info"   -> handlePlayersInfo(mapper.readValue(cmd, PlayersInfoMessage.class));
-            case "tile_taken"     -> handleTileTaken(mapper.readValue(cmd, TileTakenMessage.class));
-            case "tile_returned"  -> handleTileReturned(mapper.readValue(cmd, TileReturnedMessage.class));
-            case "cards_taken"    -> handleCardsTaken(mapper.readValue(cmd, CardsTakenMessage.class));
-            case "cards_returned" -> handleCardsReturned(mapper.readValue(cmd, CardsReturnedMessage.class));
-            case "cards"          -> handleCards(mapper.readValue(cmd, CardsMessage.class));
-            case "timer_start"    -> handleTimerStart(mapper.readValue(cmd, TimerStartMessage.class));
-            case "timer_finished" -> handleTimerFinished(mapper.readValue(cmd, TimerFinishedMessage.class));
-            case "done_building"  -> handleDoneBuilding(mapper.readValue(cmd, DoneBuildingMessage.class));
-            case "ship_board"     -> handleShipBoard(mapper.readValue(cmd, ShipBoardMessage.class));
+        HandlerEntry<?> entry = handlers.get(type);
 
-            default              -> Logger.logError("Unrecognized command: " + type);
+        if (entry == null) {
+            Logger.logError("Unrecognized command: " + type);
+            return;
         }
+
+        Object message = mapper.treeToValue(node, entry.type());
+        ((JsonHandler<Object>) entry.handler()).handle(message);
+    }
+
+    private void initHandlers() {
+        register("game_state", GameStateMessage.class, this::handleGameState);
+        register("board_type", BoardTypeMessage.class, this::handleBoardType);
+        register("players_info", PlayersInfoMessage.class, this::handlePlayersInfo);
+        register("tile_taken", TileTakenMessage.class, this::handleTileTaken);
+        register("tile_returned", TileReturnedMessage.class, this::handleTileReturned);
+        register("cards_taken", CardsTakenMessage.class, this::handleCardsTaken);
+        register("cards_returned", CardsReturnedMessage.class, this::handleCardsReturned);
+        register("cards", CardsMessage.class, this::handleCards);
+        register("timer_start", TimerStartMessage.class, this::handleTimerStart);
+        register("timer_finished", TimerFinishedMessage.class, this::handleTimerFinished);
+        register("done_building", DoneBuildingMessage.class, this::handleDoneBuilding);
+        register("ship_board", ShipBoardMessage.class, this::handleShipBoard);
+    }
+
+    private <T> void register(String type, Class<T> messageType, JsonHandler<T> handler) {
+        handlers.put(type, new HandlerEntry<>(messageType, handler));
     }
 
     private void handleGameState(GameStateMessage message) {
@@ -238,7 +259,7 @@ public class ShipBuildingController implements VirtualServerAware {
             shipButton.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
             shipButton.setGraphic(ClientSession.getPlayerProfilePicture(player.getUsername(), 35));
 
-            shipButton.setOnAction(_ -> virtualServer.sendMessage(new ShipBoardMessage(player.getUsername(), null)));
+            shipButton.setOnAction(_ -> virtualServer.sendMessage(new SimplePlayerMessage("ship_request", player.getUsername())));
             otherShipButtonsBox.getChildren().add(shipButton);
         }
     }

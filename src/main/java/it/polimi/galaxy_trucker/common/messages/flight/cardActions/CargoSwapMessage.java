@@ -7,6 +7,21 @@ import it.polimi.galaxy_trucker.server.model.cards.*;
 
 import java.awt.*;
 
+/**
+ * A message representing a cargo swap operation initiated by a player during a card effect
+ * handled by a {@link CargoHandlerCard}.
+ * <p>
+ * This message contains detailed information about the cargo block being moved,
+ * including its index, target coordinates on the ship, and the container it came from.
+ * </p>
+ *
+ * <p>
+ * When applied, the {@code loadCargo} method of the appropriate card is invoked to perform the swap.
+ * </p>
+ *
+ * @see CargoHandlerCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CargoSwapMessage implements CardActionMessage {
 

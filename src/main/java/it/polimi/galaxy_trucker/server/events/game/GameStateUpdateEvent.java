@@ -1,5 +1,6 @@
-package it.polimi.galaxy_trucker.server.events;
+package it.polimi.galaxy_trucker.server.events.game;
 
+import it.polimi.galaxy_trucker.server.events.EventModel;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 
 public class GameStateUpdateEvent extends EventModel {

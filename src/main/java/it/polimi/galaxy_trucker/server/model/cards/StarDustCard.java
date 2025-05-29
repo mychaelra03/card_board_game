@@ -9,6 +9,11 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents a Star Dust event card that penalizes players based on their ship's design.
+ * Each player loses flight days equal to the number of exposed connectors on their ship.
+ * Players are processed in reverse order of the current standings.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class StarDustCard extends Card {
@@ -18,6 +23,12 @@ public class StarDustCard extends Card {
         super(id, level);
     }
 
+    /**
+     * Activates the Star Dust card's effect.
+     * Each player is evaluated for the number of exposed connectors on their ship,
+     * and is moved backward accordingly on the flight track.
+     * The last player is evaluated first.
+     */
     @Override
     protected void onActivate() {
         dispatcher.fireEvent(new CardStatusEvent(CardStatusEvent.CardStatus.STARDUST));

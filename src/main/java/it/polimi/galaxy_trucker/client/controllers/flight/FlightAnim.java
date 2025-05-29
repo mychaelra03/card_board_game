@@ -599,6 +599,4 @@ public class FlightAnim {
         currentPopup = null;
         startNextAnimation();
     }
-
-
 }

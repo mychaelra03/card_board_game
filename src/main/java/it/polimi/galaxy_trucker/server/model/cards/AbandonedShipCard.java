@@ -10,10 +10,17 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents a card where players can trade crew members for credits,
+ * simulating the discovery of an abandoned ship.
+ * <p>
+ * This card gives players the option to accept a reward (credits) by
+ * giving up a certain number of crew members and moving backward on the board.
+ * Players with insufficient crew are skipped automatically.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class AbandonedShipCard extends Card implements DecisionHandlerCard, CrewHandlerCard {
-    // Exchange crew members for credits.
 
     private final int crewToGiveUp;
     private final int rewardCredits;
@@ -38,6 +45,9 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
         this.positionCost = positionCost;
     }
 
+    /**
+     * Initializes the card and starts the reward decision phase by prompting the first eligible player.
+     */
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
@@ -47,6 +57,12 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
         if(!playerQueue.isEmpty()) dispatcher.fireEvent(new CardDecisionEvent(playerQueue.getFirst().getName()));
     }
 
+    /**
+     * Called when a player accepts the reward. Transfers credits, moves the player,
+     * and transitions to crew removal phase if necessary.
+     *
+     * @param caller the player accepting the reward.
+     */
     @Override
     public void accept(Player caller) {
         verifyInputState(REWARD_DECISION);
@@ -65,6 +81,13 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
         else setInputState(FINISHED);
     }
 
+    /**
+     * Removes a crew member from the rewarded player's ship. Called repeatedly
+     * until the required number of crew are removed.
+     *
+     * @param caller      the player performing the removal (must be the rewarded player).
+     * @param cabinCoords the coordinates of the cabin from which to remove a crew member.
+     */
     @Override
     public void removeMemberFrom(Player caller, Point cabinCoords) {
         verifyInputState(CREW_DECISION);
@@ -78,6 +101,12 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
         }
     }
 
+    /**
+     * Called when a player refuses the reward. Removes the player from the queue
+     * and prompts the next eligible player.
+     *
+     * @param caller the player refusing the reward.
+     */
     @Override
     public void refuse(Player caller) {
         verifyInputState(REWARD_DECISION);
@@ -88,6 +117,9 @@ public class AbandonedShipCard extends Card implements DecisionHandlerCard, Crew
         if(!playerQueue.isEmpty()) dispatcher.fireEvent(new CardDecisionEvent(playerQueue.getFirst().getName()));
     }
 
+    /**
+     * Skips players in the queue who do not have enough crew members to claim the reward.
+     */
     private void skipIneligiblePlayers() {
         verifyInputState(REWARD_DECISION);
         while(!playerQueue.isEmpty() && playerQueue.getFirst().getCrewCount() <= crewToGiveUp) {

@@ -28,6 +28,7 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 public class FlightController implements VirtualServerAware {
@@ -66,6 +67,7 @@ public class FlightController implements VirtualServerAware {
 
     CardsHandler cardsHandler;
 
+    private final Map<String, StackPane> shipMap = new HashMap<>();
     private final Map<String, GridPane> tilesGridMap = new HashMap<>();
     private final Map<String, GridPane> batteriesGridMap = new HashMap<>();
     private final Map<String, GridPane> crewGridMap = new HashMap<>();
@@ -92,6 +94,8 @@ public class FlightController implements VirtualServerAware {
         settingsButton.setOnAction(_ -> Popup.newSettingsPopup(false, true).show());
         doneButton.setOnAction(_ -> virtualServer.sendMessage(new SimpleMessage("done")));
         pickCardButton.setOnAction(_ -> virtualServer.sendMessage(new SimpleMessage("pick_card")));
+
+        initHandlers();
     }
 
     @Override
@@ -101,10 +105,7 @@ public class FlightController implements VirtualServerAware {
             String type = mapper.readTree(cmd).get("type").asText();
             switch (type) {
 
-                case "players_scores" -> {
-                    PlayersScoresMessage message = mapper.readValue(cmd, PlayersScoresMessage.class);
-                    virtualServer.setCallBack(null);
-                }
+                case "players_scores" -> virtualServer.setCallBack(null);
 
                 case "game_reset" -> {
                     GameResetMessage message = mapper.readValue(cmd, GameResetMessage.class);
@@ -120,37 +121,51 @@ public class FlightController implements VirtualServerAware {
     }
 
     private void safeUpdateView(String cmd) {
-        Platform.runLater(() -> {
-            try {
-                updateView(cmd);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        Platform.runLater(() -> updateView(cmd));
     }
 
-    private void updateView(String cmd) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = new ObjectMapper();
+    private final Map<String, Consumer<String>> handlers = new HashMap<>();
 
-        String type = mapper.readTree(cmd).get("type").asText();
+    private void initHandlers() {
+        handlers.put("game_state",        handleAs(GameStateMessage.class, this::handleGameState));
+        handlers.put("board_type",        handleAs(BoardTypeMessage.class, this::handleBoardType));
+        handlers.put("ship_board",        handleAs(ShipBoardMessage.class, this::handleShipBoard));
+        handlers.put("player_position",   handleAs(PlayerPositionMessage.class, this::handlePlayerPosition));
+        handlers.put("batteries",         handleAs(BatteriesMessage.class, this::handleBatteries));
+        handlers.put("crew",              handleAs(CrewMessage.class, this::handleCrew));
+        handlers.put("cargo",             handleAs(CargoMessage.class, this::handleCargo));
+        handlers.put("credits",           handleAs(CreditsMessage.class, this::handleCredits));
+        handlers.put("invalid_tiles",     handleAs(TilesMessage.class, this::handleInvalidTiles));
+        handlers.put("alien_cabin_tiles", handleAs(TilesMessage.class, this::handleAlienCabinTiles));
+        handlers.put("pick_available",    handleAs(PickAvailableMessage.class, this::handlePickAvailable));
+        handlers.put("player_eliminated", handleAs(SimplePlayerMessage.class, this::handlePlayerEliminated));
+        handlers.put("players_scores",    handleAs(PlayersScoresMessage.class, this::handlePlayersScores));
+    }
 
-        switch (type) {
-            case "game_state"        -> handleGameState(mapper.readValue(cmd, GameStateMessage.class));
-            case "board_type"        -> handleBoardType(mapper.readValue(cmd, BoardTypeMessage.class));
-            case "ship_board"        -> handleShipBoard(mapper.readValue(cmd, ShipBoardMessage.class));
-            case "player_position"   -> handlePlayerPosition(mapper.readValue(cmd, PlayerPositionMessage.class));
-            case "batteries"         -> handleBatteries(mapper.readValue(cmd, BatteriesMessage.class));
-            case "crew"              -> handleCrew(mapper.readValue(cmd, CrewMessage.class));
-            case "cargo"             -> handleCargo(mapper.readValue(cmd, CargoMessage.class));
-            case "credits"           -> handleCredits(mapper.readValue(cmd, CreditsMessage.class));
-            case "invalid_tiles"     -> handleInvalidTiles(mapper.readValue(cmd, TilesMessage.class));
-            case "alien_cabin_tiles" -> handleAlienCabinTiles(mapper.readValue(cmd, TilesMessage.class));
-            case "pick_available"    -> handlePickAvailable(mapper.readValue(cmd, PickAvailableMessage.class));
-            case "player_eliminated" -> handlePlayerEliminated(mapper.readValue(cmd, SimplePlayerMessage.class));
+    private <T> Consumer<String> handleAs(Class<T> type, Consumer<T> handler) {
+        return json -> {
+            try {
+                T msg = mapper.readValue(json, type);
+                handler.accept(msg);
+            } catch (JsonProcessingException e) {
+                Logger.logError("Failed to parse " + type.getSimpleName() + ": " + e.getMessage());
+            }
+        };
+    }
 
-            case "players_scores"    -> handlePlayersScores(mapper.readValue(cmd, PlayersScoresMessage.class));
+    private void updateView(String cmd) {
+        try {
+            String type = mapper.readTree(cmd).get("type").asText();
+            Consumer<String> handler = handlers.get(type);
 
-            default                  -> cardsHandler.handleCardCommand(type, cmd);
+            if (handler != null) {
+                handler.accept(cmd);
+            } else {
+                cardsHandler.handleCardCommand(type, cmd);
+            }
+        } catch (JsonProcessingException e) {
+            Logger.logError("Failed to parse command JSON: " + e.getMessage());
         }
     }
 
@@ -365,6 +380,7 @@ public class FlightController implements VirtualServerAware {
 
         // Always assign self to shipGridP1
         String self = ClientSession.getUsername();
+
         tilesGridMap.put(self, shipGridP1);
         batteriesGridMap.put(self, batteriesGridP1);
         crewGridMap.put(self, crewGridP1);

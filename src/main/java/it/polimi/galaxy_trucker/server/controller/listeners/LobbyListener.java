@@ -1,18 +1,19 @@
-package it.polimi.galaxy_trucker.server.controller.eventHandlers;
+package it.polimi.galaxy_trucker.server.controller.listeners;
 
 import it.polimi.galaxy_trucker.common.messages.PlayersInfoMessage;
 import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
+import it.polimi.galaxy_trucker.server.events.flight.InvalidShipEvent;
 import it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 
-public class LobbyEventsHandler extends EventHandler {
+public class LobbyListener extends EventHandler {
 
-    public LobbyEventsHandler(GameModel gameModel, MessageDispatcher dispatcher) {
+    public LobbyListener(GameModel gameModel, MessageDispatcher dispatcher) {
         super(gameModel, dispatcher);
-
-        gameModel.addEventListener(PlayersUpdateEvent.class, this::handlePlayersUpdate);
     }
 
+
+    @Handles(PlayersUpdateEvent.class)
     public void handlePlayersUpdate(PlayersUpdateEvent event) {
         dispatcher.broadcast(new PlayersInfoMessage(event.getPlayerInfoList(), event.getUsername()));
     }

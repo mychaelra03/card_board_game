@@ -10,14 +10,64 @@ import java.io.InputStream;
 import java.net.*;
 import java.util.Enumeration;
 
+/**
+ * The entry point for the server application.
+ * <p>Parses command-line arguments, loads configuration, initializes the game controller,
+ * starts a server socket, and accepts client connections via {@link VirtualView}.</p>
+ */
 public class ServerMain {
-    static MainController controller = new MainController(new GameModel());
+    private static final MainController controller = new MainController(new GameModel());
+
+    private record CommandLineOptions(Integer portNumber, boolean debugMode) {}
 
     public static void main(String[] args) {
-        Integer portNumber = null;
-        boolean debugMode = false;
 
         // Parse command-line arguments
+        CommandLineOptions options = parseCommandLine(args);
+        Integer portNumber = options.portNumber;
+
+        // Load from config if no valid port provided
+        if (portNumber == null) {
+            portNumber = loadPortFromJson(portNumber);
+        }
+
+        Logger.logInfo("Initializing server...");
+        Logger.setDebugMode(options.debugMode());
+
+        try {
+            Logger.logInfo("Server running on IP: " + getLocalAddress()
+                    + " (LocalHostAddress: " + InetAddress.getLocalHost().getHostAddress() + ")");
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Start server socket
+        ServerSocket serverSocket = initializeServerSocket(portNumber, options);
+        if (serverSocket == null) return;
+
+        // Main server loop
+        handleIncomingConnections(serverSocket);
+    }
+
+    private static ServerSocket initializeServerSocket(Integer portNumber, CommandLineOptions options) {
+        ServerSocket serverSocket;
+        try {
+            serverSocket = (portNumber == null) ? new ServerSocket(0) : new ServerSocket(portNumber);
+        } catch (IOException e) {
+            Logger.logError("Could not listen on port: " + options.portNumber());
+            System.exit(1);
+            return null;
+        }
+
+        Logger.logInfo("Listening on port " + serverSocket.getLocalPort());
+        return serverSocket;
+    }
+
+    private static CommandLineOptions parseCommandLine(String[] args) {
+
+        Integer portNumber = null;
+        boolean debugMode = false;
+        
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-p", "--port" -> {
@@ -38,43 +88,24 @@ public class ServerMain {
             }
         }
 
-        // Load from config if no valid port provided
-        if (portNumber == null) {
-            try (InputStream config = ServerMain.class.getClassLoader().getResourceAsStream("public/config.json")) {
-                if (config == null) throw new IOException("Could not find config.json");
-                portNumber = new ObjectMapper().readTree(config).get("port").asInt();
-            } catch (IOException e) {
-                Logger.logError("Could not read config.json: " + e.getMessage());
-            }
-        }
+        return new CommandLineOptions(portNumber, debugMode);
+    }
 
-        Logger.logInfo("Server Started!");
-        Logger.setDebugMode(debugMode);
-
-        try {
-            Logger.logInfo("Server running on IP: " + getLocalAddress()
-                    + " (LocalHostAddress: " + InetAddress.getLocalHost().getHostAddress() + ")");
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Start server socket
-        ServerSocket serverSocket;
-        try {
-            serverSocket = (portNumber == null) ? new ServerSocket(0) : new ServerSocket(portNumber);
+    private static Integer loadPortFromJson(Integer portNumber) {
+        try (InputStream config = ServerMain.class.getClassLoader().getResourceAsStream("public/config.json")) {
+            if (config == null) throw new IOException("Could not find config.json");
+            portNumber = new ObjectMapper().readTree(config).get("port").asInt();
         } catch (IOException e) {
-            Logger.logError("Could not listen on port: " + portNumber);
-            System.exit(1);
-            return;
+            Logger.logError("Could not read config.json: " + e.getMessage());
         }
+        return portNumber;
+    }
 
-        Logger.logInfo("Listening on port " + serverSocket.getLocalPort());
-
-        // Main server loop
+    private static void handleIncomingConnections(ServerSocket serverSocket) {
         while (true) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                Logger.logInfo("New client accepted");
+                Logger.logDebug("New client accepted");
                 VirtualView virtualView = new VirtualView(clientSocket, controller);
                 virtualView.start();
             } catch (IOException e) {
@@ -84,7 +115,7 @@ public class ServerMain {
         }
     }
 
-    public static String getLocalAddress() {
+    private static String getLocalAddress() {
         try {
             Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
             while(nets.hasMoreElements()) {

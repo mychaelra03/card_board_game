@@ -13,10 +13,12 @@ import java.util.List;
 import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents an "Open Space" card where players move forward based on their engine strength.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class OpenSpaceCard extends Card implements EnginesHandlerCard {
-    // Move forward based on engine strength.
 
     private List<Player> playerQueue;
 
@@ -24,6 +26,10 @@ public class OpenSpaceCard extends Card implements EnginesHandlerCard {
         super(id, level);
     }
 
+    /**
+     * Activates the card, starting the engine activation process for all players in turn.
+     * Initiates the engine selection for the first player in the queue.
+     */
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
@@ -37,6 +43,15 @@ public class OpenSpaceCard extends Card implements EnginesHandlerCard {
         }
     }
 
+    /**
+     * Called when a player activates engines to move forward. Battery usage is validated,
+     * and player movement or elimination is processed accordingly.
+     *
+     * @param caller           the player activating engines
+     * @param activatedEngines the number of engines being activated
+     * @param batteryTiles     the battery tile coordinates used to power the engines
+     * @throws IllegalArgumentException if the number of engines doesn't match the number of batteries used
+     */
     @Override
     public void activateEngines(Player caller, int activatedEngines, List<Point> batteryTiles) {
         verifyInputState(ENGINE_SELECTION);

@@ -6,6 +6,17 @@ import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 import it.polimi.galaxy_trucker.server.model.cards.PlanetsCard;
 
+/**
+ * A message indicating that the player has refused to choose a planet
+ * during a {@link PlanetsCard} event.
+ * <p>
+ * This message triggers the {@code refusePlanet} method on the {@code PlanetsCard},
+ * allowing the game to handle the player's refusal accordingly.
+ * </p>
+ *
+ * @see PlanetsCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanetRefusedMessage implements CardActionMessage {
 

@@ -15,10 +15,13 @@ import java.util.stream.Collectors;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents a "Planets" card where players can choose to land on planets and collect cargo.
+ * After choosing, players move backward and perform cargo operations like loading and unloading.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class PlanetsCard extends Card implements CargoHandlerCard {
-    // Players can land to collect goods.
 
     private final BlockType[][] planets;
     private final int positionCost;
@@ -39,6 +42,10 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         this.positionCost = positionCost;
     }
 
+    /**
+     * Activates the card and begins the planet selection process.
+     * Players are prompted in turn to choose a planet or refuse.
+     */
     @Override
     protected void onActivate() {
         this.playerQueue = board.getSortedPlayers();
@@ -48,6 +55,14 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         dispatcher.fireEvent(new PlanetSelectionEvent(playerQueue.getFirst().getName(), planetChosenBy));
     }
 
+    /**
+     * Called when a player chooses a planet to land on.
+     * Assigns cargo from that planet and moves to the next player's turn.
+     *
+     * @param caller the player choosing the planet
+     * @param index  the index of the chosen planet
+     * @throws IllegalArgumentException if index is out of bounds
+     */
     public void choosePlanet(Player caller, int index) {
         verifyInputState(PLANET_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
@@ -68,6 +83,12 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         }
     }
 
+    /**
+     * Called when a player refuses to land on any planet.
+     * Skips their turn and proceeds to the next player.
+     *
+     * @param caller the player refusing to land
+     */
     public void refusePlanet(Player caller) {
         verifyInputState(PLANET_SELECTION);
         verifyPlayerTurn(caller, playerQueue);
@@ -99,6 +120,14 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         dispatcher.fireEvent(new CargoDecisionEvent(accepted));
     }
 
+    /**
+     * Called when a player chooses to load cargo from a chosen planet to a ship container.
+     *
+     * @param caller         the player performing the cargo operation
+     * @param blockIndex     the index of the cargo block being loaded
+     * @param tileCoords     the tile where the cargo should be placed
+     * @param containerIndex the index of the container on the ship
+     */
     @Override
     public void loadCargo(Player caller, int blockIndex, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
@@ -107,6 +136,13 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         caller.swapCargo(blockIndex, tileCoords, containerIndex);
     }
 
+    /**
+     * Called when a player chooses to unload cargo from a ship container to a tile.
+     *
+     * @param caller         the player performing the unload operation
+     * @param tileCoords     the tile where the cargo should be unloaded
+     * @param containerIndex the index of the container being unloaded
+     */
     @Override
     public void unloadCargo(Player caller, Point tileCoords, int containerIndex) {
         verifyInputState(CARGO_DECISION);
@@ -115,6 +151,12 @@ public class PlanetsCard extends Card implements CargoHandlerCard {
         caller.unloadCargo(tileCoords, containerIndex);
     }
 
+    /**
+     * Called when a player finishes their cargo operations.
+     * Removes the player from the cargo session and ends the phase if no players remain.
+     *
+     * @param caller the player finishing their turn
+     */
     @Override
     public void confirmDone(Player caller) {
         verifyInputState(CARGO_DECISION);

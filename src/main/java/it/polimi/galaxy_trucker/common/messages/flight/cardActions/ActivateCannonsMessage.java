@@ -9,6 +9,28 @@ import it.polimi.galaxy_trucker.server.model.cards.Card;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * A message representing a player's action to activate cannons during a card effect resolution.
+ * <p>
+ * This message contains data about the number of vertical and rotated cannons being activated,
+ * as well as the battery tiles used to power them. It is intended to be sent from the client
+ * to the server during cannon-related card effects.
+ * </p>
+ *
+ * <p>
+ * Upon receipt, the message's {@link #applyTo(Card, Player)} method delegates execution to a
+ * {@link CannonsHandlerCard}, which processes the actual game logic for cannon activation.
+ * </p>
+ *
+ * <p>
+ * This class is part of the game's card-action messaging system and implements
+ * {@link CardActionMessage}, allowing it to be serialized and dispatched like other
+ * gameplay messages.
+ * </p>
+ *
+ * @see CannonsHandlerCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivateCannonsMessage implements CardActionMessage {
 

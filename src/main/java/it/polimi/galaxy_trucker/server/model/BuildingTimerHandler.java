@@ -7,6 +7,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Handles a countdown timer that triggers a specific action after a delay.
+ * Used for managing timed events during the building phase of the game.
+ */
 public class BuildingTimerHandler {
     private ScheduledExecutorService executor;
     private final int delaySeconds;
@@ -15,6 +19,13 @@ public class BuildingTimerHandler {
 
     private int timesFlipped = 0;
 
+    /**
+     * Constructs a new BuildingTimerHandler.
+     *
+     * @param delaySeconds the delay duration in seconds before executing the task
+     * @param dispatcher an event dispatcher to notify listeners when the timer starts
+     * @param onFinished a callback to execute once the timer expires
+     */
     public BuildingTimerHandler(int delaySeconds, EventDispatcher dispatcher, Runnable onFinished) {
         this.delaySeconds = delaySeconds;
         this.dispatcher = dispatcher;
@@ -22,6 +33,10 @@ public class BuildingTimerHandler {
         this.executor = Executors.newSingleThreadScheduledExecutor();
     }
 
+    /**
+     * Starts the timer, increments the flip count, and dispatches the TimerStartEvent.
+     * Once the delay elapses, the provided onFinished callback is executed.
+     */
     public void start() {
         timesFlipped++;
         if (dispatcher != null)
@@ -32,10 +47,17 @@ public class BuildingTimerHandler {
         }, delaySeconds, TimeUnit.SECONDS);
     }
 
+    /**
+     * @return the number of times the timer has been started (flipped)
+     */
     public int getTimesFlipped() {
         return timesFlipped;
     }
 
+    /**
+     * Resets the timer by shutting down the current executor and creating a new one.
+     * Also resets the flip counter to zero.
+     */
     public void reset() {
         timesFlipped = 0;
         executor.shutdownNow();

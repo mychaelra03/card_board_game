@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker.server.events.lobby;
 
-import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
+import it.polimi.galaxy_trucker.common.messages.login.PlayerInfo;
 import it.polimi.galaxy_trucker.server.events.EventModel;
 
 import java.util.List;

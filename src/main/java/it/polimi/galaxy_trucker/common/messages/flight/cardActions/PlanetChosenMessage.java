@@ -6,6 +6,21 @@ import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 import it.polimi.galaxy_trucker.server.model.cards.PlanetsCard;
 
+/**
+ * A message representing the player's choice of a planet during a {@link PlanetsCard} event.
+ * <p>
+ * This message includes the index of the planet the player has selected, which is passed
+ * to the card logic when applied.
+ * </p>
+ *
+ * <p>
+ * When executed, the message invokes the {@code choosePlanet} method of the corresponding
+ * {@code PlanetsCard}, applying the player's decision to the game state.
+ * </p>
+ *
+ * @see PlanetsCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanetChosenMessage implements CardActionMessage {
 

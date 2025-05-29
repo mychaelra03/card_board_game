@@ -12,6 +12,19 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Abstract base class for enemy encounter cards. These cards challenge players
+ * to meet a required cannon power threshold. Depending on the player's cannon strength,
+ * they may receive a reward, suffer a punishment, or have to make a decision.
+ *
+ * <p>This card handles player turns sequentially and transitions between states:
+ * <ul>
+ *     <li><b>Punishment</b> if the max cannon power is insufficient</li>
+ *     <li><b>Reward decision</b> if the minimum cannon power is more than sufficient</li>
+ *     <li><b>Cannon selection</b> if power is borderline and player must choose configuration</li>
+ * </ul>
+ * Subclasses must define how rewards and punishments are applied.
+ */
 public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, DecisionHandlerCard {
 
     private final int requiredCannonPower;
@@ -27,15 +40,32 @@ public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, 
         this.positionCost = positionCost;
     }
 
+    /**
+     * Applies a subclass-defined reward to the given player.
+     *
+     * @param player the rewarded player
+     */
     protected abstract void giveReward(Player player);
+    /**
+     * Applies a subclass-defined punishment to the given player.
+     *
+     * @param player the punished player
+     */
     protected abstract void applyPunishment(Player player);
 
+    /**
+     * Activates the card and starts processing players.
+     */
     @Override
     protected void onActivate() {
         playerQueue = board.getSortedPlayers();
         handlePlayer();
     }
 
+    /**
+     * Handles the logic for the current player in the queue.
+     * Decides whether they are automatically rewarded/punished or must select cannons.
+     */
     private void handlePlayer() {
         verifyInputState(NONE);
         if(playerQueue.isEmpty()) {
@@ -59,12 +89,23 @@ public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, 
         }
     }
 
+    /**
+     * Proceeds to the next player in the queue.
+     */
     protected void handleNextPlayer() {
         playerQueue.removeFirst();
         setInputState(NONE);
         handlePlayer();
     }
 
+    /**
+     * Handles a player's cannon selection and battery usage, then evaluates the outcome.
+     *
+     * @param caller          the player making the selection
+     * @param verticalCannons count of vertical cannons used
+     * @param rotatedCannons  count of rotated cannons used
+     * @param batteryTiles    list of battery tiles used
+     */
     @Override
     public void activateCannons(Player caller, int verticalCannons, int rotatedCannons, List<Point> batteryTiles) {
         verifyInputState(CANNON_SELECTION);
@@ -88,6 +129,12 @@ public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, 
         }
     }
 
+    /**
+     * Called when the player accepts the reward.
+     * Applies the cost, gives reward, and ends the encounter.
+     *
+     * @param caller the accepting player
+     */
     @Override
     public void accept(Player caller) {
         verifyInputState(REWARD_DECISION);
@@ -97,6 +144,12 @@ public abstract class AbstractEnemy extends Card implements CannonsHandlerCard, 
         setInputState(NONE);
         giveReward(caller);
     }
+    /**
+     * Called when the player refuses the reward.
+     * Ends the card processing for all players.
+     *
+     * @param caller the refusing player
+     */
     @Override
     public void refuse(Player caller) {
         verifyInputState(REWARD_DECISION);

@@ -5,8 +5,9 @@ import it.polimi.galaxy_trucker.client.*;
 import it.polimi.galaxy_trucker.client.popups.PendingPopup;
 import it.polimi.galaxy_trucker.client.popups.Popup;
 import it.polimi.galaxy_trucker.common.Logger;
+import it.polimi.galaxy_trucker.common.messages.login.JoinRequestMessage;
 import it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage;
-import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
+import it.polimi.galaxy_trucker.common.messages.login.PlayerInfo;
 import it.polimi.galaxy_trucker.client.SceneSwitch;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -21,6 +22,13 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * Controller class for the Login scene of the application.
+ * <p>
+ * Handles user input for username and server connection details,
+ * avatar customization, and interactions with the virtual server.
+ * Also, responsible for initiating the game join process and responding to server callbacks.
+ */
 public class LoginController implements VirtualServerAware {
 
     @FXML private TextField usernameTextField;
@@ -173,11 +181,10 @@ public class LoginController implements VirtualServerAware {
         try {
             virtualServer.attemptConnection(hostName, portNumber);
         } catch (IOException e) {
-            //showError(errorServerPort, LanguageManager.get("error.invalid_connection"));
             Popup.newAlertPopup("title.no_server_found", "description.no_server_found").show();
             return;
         }
-        this.virtualServer.sendMessage(playerInfo);
+        this.virtualServer.sendMessage(new JoinRequestMessage(playerInfo));
 
         ClientSession.setUsername(username);
         ClientSession.setProfilePicture(profilePicIds);
@@ -191,18 +198,22 @@ public class LoginController implements VirtualServerAware {
 
         if (type.equals("join_response")) {
             JoinResponseMessage joinResponse = mapper.readValue(cmd, JoinResponseMessage.class);
+            handleJoinResponse(joinResponse);
 
-            switch (joinResponse.getJoinStatus()) {
-                case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
-                case LOBBY_FULL -> Popup.newAlertPopup("title.unable_to_connect", "description.full_lobby").show();
-                case NAME_TAKEN -> {
-                    String usedName = ClientSession.getUsername().toLowerCase();
-                    Popup.newAlertPopup("title.unable_to_connect", "description.username_used", usedName).show();
-                }
-                case GAME_STARTED -> Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show();
-            }
         } else {
             Logger.logError("Unrecognized command: " + type);
+        }
+    }
+
+    private static void handleJoinResponse(JoinResponseMessage joinResponse) {
+        switch (joinResponse.getJoinStatus()) {
+            case SUCCESS -> throw new IllegalStateException("Response should not be successful.");
+            case LOBBY_FULL -> Popup.newAlertPopup("title.unable_to_connect", "description.full_lobby").show();
+            case NAME_TAKEN -> {
+                String usedName = ClientSession.getUsername().toLowerCase();
+                Popup.newAlertPopup("title.unable_to_connect", "description.username_used", usedName).show();
+            }
+            case GAME_STARTED -> Popup.newAlertPopup("title.unable_to_connect", "description.game_started").show();
         }
     }
 }

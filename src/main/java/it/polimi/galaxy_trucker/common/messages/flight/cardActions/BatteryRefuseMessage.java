@@ -8,6 +8,27 @@ import it.polimi.galaxy_trucker.server.model.cards.Card;
 
 import java.awt.*;
 
+/**
+ * A message indicating that a player has chosen to refuse using a battery
+ * for a particular card effect that offers the option.
+ * <p>
+ * This message is used in the card-action phase of the game where the player
+ * can opt not to consume a battery to activate or enhance a card's ability.
+ * </p>
+ *
+ * <p>
+ * Upon being applied, this message delegates control to a {@link BatteryHandlerCard},
+ * which then executes the logic corresponding to the refusal of battery use.
+ * </p>
+ *
+ * <p>
+ * This class implements {@link CardActionMessage} and integrates into the game's
+ * message-handling infrastructure.
+ * </p>
+ *
+ * @see BatteryHandlerCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BatteryRefuseMessage implements CardActionMessage {
 

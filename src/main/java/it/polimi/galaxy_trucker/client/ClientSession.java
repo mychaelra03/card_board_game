@@ -1,7 +1,7 @@
 package it.polimi.galaxy_trucker.client;
 
 import it.polimi.galaxy_trucker.client.controllers.lobby.LobbyController;
-import it.polimi.galaxy_trucker.common.messages.PlayerInfo;
+import it.polimi.galaxy_trucker.common.messages.login.PlayerInfo;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -12,6 +12,11 @@ import javafx.scene.shape.Circle;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class to manage the current client session state during a game.
+ * Stores data such as the current username, profile picture, player information,
+ * and session status flags.
+ */
 public class ClientSession {
     private static String username = null;
     private static int[] profilePicture = null;
@@ -38,10 +43,21 @@ public class ClientSession {
     public static PlayerInfo getPlayerInfo() {
         return players.get(username);
     }
+    /**
+     * Updates the internal player list with a new set of {@link PlayerInfo} objects.
+     * Replaces all existing entries.
+     *
+     * @param playersInfo the list of updated player information
+     */
     public static void updatePlayers(List<PlayerInfo> playersInfo) {
         players = playersInfo.stream().collect(Collectors.toMap(PlayerInfo::getUsername, p -> p));
     }
-
+    /**
+     * Checks if the given username belongs to the current player.
+     *
+     * @param username the username to check
+     * @return true if the username matches the current player, false otherwise
+     */
     public static boolean isSelf(String username) {
         return username.equals(ClientSession.getUsername());
     }
@@ -49,6 +65,7 @@ public class ClientSession {
     public static boolean isGivingUp() {
         return givingUp;
     }
+
     public static void setGivingUp(boolean givingUp) {
         ClientSession.givingUp = givingUp;
     }
@@ -61,6 +78,16 @@ public class ClientSession {
         return players.size();
     }
 
+    /**
+     * Builds and returns a circular profile picture for the given player.
+     * The picture is composed of a background, character body, and accessory,
+     * clipped to a circular shape.
+     *
+     * @param username the username of the player
+     * @param size the desired size (width and height) of the profile picture
+     * @return a {@link StackPane} containing the composed profile picture,
+     *         or null if the player does not exist
+     */
     public static StackPane getPlayerProfilePicture(String username, double size) {
         PlayerInfo playerInfo = players.get(username);
         if(playerInfo == null) return null;

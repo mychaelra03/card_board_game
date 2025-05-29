@@ -1,4 +1,4 @@
-package it.polimi.galaxy_trucker.server.controller.eventHandlers;
+package it.polimi.galaxy_trucker.server.controller.listeners;
 
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.shipBuilding.*;
@@ -6,44 +6,50 @@ import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
 import it.polimi.galaxy_trucker.server.events.shipBuilding.*;
 import it.polimi.galaxy_trucker.server.model.GameModel;
 
-public class BuildingEventsHandler extends EventHandler {
+public class BuildingListener extends EventHandler {
 
-    public BuildingEventsHandler(GameModel gameModel, MessageDispatcher dispatcher) {
+    public BuildingListener(GameModel gameModel, MessageDispatcher dispatcher) {
         super(gameModel, dispatcher);
-
-        gameModel.addEventListener(TileTakenEvent.class, this::handleTileTaken);
-        gameModel.addEventListener(TileReturnedEvent.class, this::handleTileReturned);
-        gameModel.addEventListener(CardsTakenEvent.class, this::handleCardsTaken);
-        gameModel.addEventListener(CardsReturnedEvent.class, this::handleCardReturned);
-        gameModel.addEventListener(TimerStartEvent.class, this::handleTimerStart);
-        gameModel.addEventListener(TimerFinishedEvent.class, this::handleTimerFinished);
-        gameModel.addEventListener(DoneBuildingEvent.class, this::handleDoneBuilding);
     }
 
+
+    @Handles(TileTakenEvent.class)
     public void handleTileTaken(TileTakenEvent event) {
         Logger.logDebug(event.getPlayerName() + " took tile: " + event.getTileId());
         dispatcher.broadcast(new TileTakenMessage(event.getPlayerName(), event.getTileId()));
     }
+
+    @Handles(TileReturnedEvent.class)
     public void handleTileReturned(TileReturnedEvent event) {
         Logger.logDebug("Tile returned: " + event.getTileId());
         dispatcher.broadcast(new TileReturnedMessage(event.getTileId()));
     }
+
+    @Handles(CardsTakenEvent.class)
     public void handleCardsTaken(CardsTakenEvent event) {
         Logger.logDebug(event.getPlayerName() + " took cards: " + event.getPileId());
         dispatcher.broadcast(new CardsTakenMessage(event.getPlayerName(), event.getPileId()));
     }
+
+    @Handles(CardsReturnedEvent.class)
     public void handleCardReturned(CardsReturnedEvent event) {
         Logger.logDebug("Cards returned: " + event.getPileId());
         dispatcher.broadcast(new CardsReturnedMessage(event.getPileId()));
     }
+
+    @Handles(TimerStartEvent.class)
     public void handleTimerStart(TimerStartEvent event) {
         Logger.logDebug("Started timer " + event.getTimesFlipped() + " of " + event.getDuration() + " seconds");
         dispatcher.broadcast(new TimerStartMessage(event.getDuration(), event.getTimesFlipped()));
     }
+
+    @Handles(TimerFinishedEvent.class)
     public void handleTimerFinished(TimerFinishedEvent event) {
         Logger.logDebug(event.isFinalFlip()? "Final timer ended" : "Timer ended");
         dispatcher.broadcast(new TimerFinishedMessage(event.isFinalFlip()));
     }
+
+    @Handles(DoneBuildingEvent.class)
     public void handleDoneBuilding(DoneBuildingEvent event) {
         Logger.logDebug(event.getPlayerName() + " finished building and took position " + event.getPosition());
         dispatcher.broadcast(new DoneBuildingMessage(event.getPlayerName(), event.getPosition()));

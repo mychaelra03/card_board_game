@@ -6,6 +6,27 @@ import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 import it.polimi.galaxy_trucker.server.model.cards.DecisionHandlerCard;
 
+/**
+ * A message representing a player's decision to either accept or refuse an action
+ * offered by a {@link DecisionHandlerCard}.
+ * <p>
+ * This message is used to communicate the outcome of a binary decision prompt
+ * (e.g., "Do you want to take this action?") that arises during card resolution.
+ * </p>
+ *
+ * <p>
+ * The {@code accepted} flag indicates the player's response: {@code true} for acceptance,
+ * {@code false} for refusal. The {@code playerName} field identifies the responding player.
+ * </p>
+ *
+ * <p>
+ * Implements {@link CardActionMessage} and is dispatched during the resolution of
+ * card actions requiring player input.
+ * </p>
+ *
+ * @see DecisionHandlerCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CardDecisionMessage implements CardActionMessage {
 

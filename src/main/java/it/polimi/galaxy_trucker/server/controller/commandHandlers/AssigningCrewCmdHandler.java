@@ -1,8 +1,5 @@
 package it.polimi.galaxy_trucker.server.controller.commandHandlers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.flight.SelectedTileMessage;
 import it.polimi.galaxy_trucker.server.VirtualView;
 import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
@@ -11,24 +8,36 @@ import it.polimi.galaxy_trucker.server.model.Player;
 
 import java.util.Map;
 
+/**
+ * Handles commands related to assigning crew members to tiles during the game setup phase.
+ * <p>
+ * This includes selecting individual tiles to assign crew roles and confirming the end of the crew assignment process.
+ */
 public class AssigningCrewCmdHandler extends CommandHandler {
 
+    /**
+     * Constructs an {@code AssigningCrewCmdHandler} using the given game model, player mapping, and dispatcher.
+     *
+     * @param gameModel  the current game model
+     * @param playerMap  a map linking virtual views to their respective players
+     * @param dispatcher the dispatcher for sending and receiving messages
+     */
     public AssigningCrewCmdHandler(GameModel gameModel, Map<VirtualView, Player> playerMap, MessageDispatcher dispatcher) {
         super(gameModel, playerMap, dispatcher);
     }
 
+    /**
+     * Registers handlers for crew assignment-related commands.
+     * Supported command types:
+     * <ul>
+     *     <li>{@code "selected_tile"} – cycles through available crew types at a given tile</li>
+     *     <li>{@code "done"} – finalizes the crew selection for the player</li>
+     * </ul>
+     */
     @Override
-    public void handle(VirtualView senderView, JsonNode cmd) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        String type = cmd.get("type").asText();
-        switch (type) {
-
-            case "selected_tile" -> handleSelectedTile(senderView, mapper.convertValue(cmd, SelectedTileMessage.class));
-            case "done"          -> handleDone(senderView);
-
-            default              -> Logger.logError("Unrecognized command: " + type);
-        }
+    protected void registerHandlers() {
+        register("selected_tile", (view, cmd) -> handleSelectedTile(view, mapper.convertValue(cmd, SelectedTileMessage.class)));
+        register("done", (view, cmd) -> handleDone(view));
     }
 
     private void handleSelectedTile(VirtualView senderView, SelectedTileMessage message) {

@@ -6,10 +6,8 @@ import it.polimi.galaxy_trucker.client.ClientSession;
 import it.polimi.galaxy_trucker.client.LanguageManager;
 import it.polimi.galaxy_trucker.client.VirtualServer;
 import it.polimi.galaxy_trucker.common.Logger;
-import it.polimi.galaxy_trucker.common.messages.SimplePlayerMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.*;
 import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardDecisionMessage;
-import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoDoneMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoSwapMessage;
 import it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoUnloadMessage;
 import it.polimi.galaxy_trucker.server.model.ShipBoard;
@@ -31,6 +29,7 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CardsHandler {
 
@@ -68,36 +67,46 @@ public class CardsHandler {
         blockPool.setAlignment(Pos.TOP_CENTER);
     }
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    private final Map<String, Consumer<String>> handlers = Map.ofEntries(
+            Map.entry("deck_levels",      handleAs(DeckLevelsMessage.class, this::handleDeckLevels)),
+            Map.entry("card_picked",      handleAs(CardPickedMessage.class, this::handleCardPicked)),
+            Map.entry("player_status",    handleAs(StatusUpdateMessage.class, this::handlePlayerStatus)),
+            Map.entry("card_status",      handleAs(StatusUpdateMessage.class, this::handleCardStatus)),
+            Map.entry("player_score",     handleAs(PlayerScoreMessage.class, this::handlePlayerScore)),
+            Map.entry("planet_selection", handleAs(PlanetSelectionMessage.class, this::handlePlanetSelection)),
+            Map.entry("cargo_decision",   handleAs(CargoDecisionMessage.class, this::handleCargoDecision)),
+            Map.entry("swap_cargo",       handleAs(CargoSwapMessage.class, this::handleCargoSwap)),
+            Map.entry("unload_cargo",     handleAs(CargoUnloadMessage.class, this::handleCargoUnload)),
+            Map.entry("dice_throw",       handleAs(DiceThrowMessage.class, this::handleDiceThrow)),
+            Map.entry("projectile",       handleAs(ProjectileMessage.class, this::handleProjectile)),
+            Map.entry("battery_decision", handleAs(BatteryDecisionMessage.class, this::handleBatteryDecision)),
+            Map.entry("card_decision",    handleAs(CardDecisionMessage.class, this::handleCardDecision)),
+            Map.entry("crew_decision",    handleAs(CrewMessage.class, this::handleCrewDecision)),
+            Map.entry("cannon_selection", handleAs(TileSelectionMessage.class, this::handleCannonSelection)),
+            Map.entry("engine_selection", handleAs(TileSelectionMessage.class, this::handleEngineSelection)),
+            Map.entry("decision_end",     msg -> FlightAnim.closeCurrentPopup())
+    );
+
     public void handleCardCommand(String type, String cmd) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-
-        switch (type) {
-            case "deck_levels"       -> handleDeckLevels(mapper.readValue(cmd, DeckLevelsMessage.class));
-            case "card_picked"       -> handleCardPicked(mapper.readValue(cmd, CardPickedMessage.class));
-
-            case "player_status"     -> handlePlayerStatus(mapper.readValue(cmd, StatusUpdateMessage.class));
-            case "card_status"       -> handleCardStatus(mapper.readValue(cmd, StatusUpdateMessage.class));
-
-            case "planet_selection"  -> handlePlanetSelection(mapper.readValue(cmd, PlanetSelectionMessage.class));
-            case "cargo_decision"    -> handleCargoDecision(mapper.readValue(cmd, CargoDecisionMessage.class));
-            case "swap_cargo"        -> handleCargoSwap(mapper.readValue(cmd, CargoSwapMessage.class));
-            case "unload_cargo"      -> handleCargoUnload(mapper.readValue(cmd, CargoUnloadMessage.class));
-
-            case "dice_throw"        -> handleDiceThrow(mapper.readValue(cmd, DiceThrowMessage.class));
-            case "projectile"        -> handleProjectile(mapper.readValue(cmd, ProjectileMessage.class));
-            case "battery_decision"  -> handleBatteryDecision(mapper.readValue(cmd, BatteryDecisionMessage.class));
-
-            case "card_decision"     -> handleCardDecision(mapper.readValue(cmd, CardDecisionMessage.class));
-
-            case "crew_decision"     -> handleCrewDecision(mapper.readValue(cmd, CrewMessage.class));
-
-            case "cannon_selection"  -> handleCannonSelection(mapper.readValue(cmd, TileSelectionMessage.class));
-            case "engine_selection"  -> handleEngineSelection(mapper.readValue(cmd, TileSelectionMessage.class));
-
-            case "decision_end"      -> FlightAnim.closeCurrentPopup();
-
-            default                  -> Logger.logError("Unrecognized command: " + type);
+        Consumer<String> handler = handlers.get(type);
+        if (handler != null) {
+            handler.accept(cmd);
+        } else {
+            Logger.logError("Unrecognized command: " + type);
         }
+    }
+
+    private <T> Consumer<String> handleAs(Class<T> clazz, Consumer<T> handler) {
+        return json -> {
+            try {
+                T message = mapper.readValue(json, clazz);
+                handler.accept(message);
+            } catch (JsonProcessingException e) {
+                Logger.logError("Failed to parse " + clazz.getSimpleName() + ": " + e.getMessage());
+            }
+        };
     }
 
     private void handleDeckLevels(DeckLevelsMessage message) {
@@ -432,14 +441,24 @@ public class CardsHandler {
     private void handlePlayerStatus(StatusUpdateMessage message) {
         String status = message.getStatus().toLowerCase();
         if(ClientSession.isSelf(message.getPlayerName())) {
-            FlightAnim.queueUpdateStatus(LanguageManager.get("status." + status), 1500);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status." + status), 2000);
         } else {
-            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_" + status, message.getPlayerName()), 1500);
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_" + status, message.getPlayerName()), 2000);
         }
     }
     private void handleCardStatus(StatusUpdateMessage message) {
         String status = message.getStatus().toLowerCase();
-        FlightAnim.queueUpdateStatus(LanguageManager.get("status." + status), 1500);
+        FlightAnim.queueUpdateStatus(LanguageManager.get("status." + status), 2000);
+    }
+
+    private void handlePlayerScore(PlayerScoreMessage message) {
+        double score = message.getScore();
+        String scoreString = (score % 1 == 0) ? String.format("%.0f", score) : String.format("%.1f", score);
+        if(ClientSession.isSelf(message.getPlayerName())) {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.score_" + message.getScoreType(), scoreString), 2000);
+        } else {
+            FlightAnim.queueUpdateStatus(LanguageManager.get("status.player_score_" + message.getScoreType(), message.getPlayerName(), scoreString), 2000);
+        }
     }
 
     private void handleCrewDecision(CrewMessage message) {

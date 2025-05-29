@@ -8,6 +8,18 @@ import it.polimi.galaxy_trucker.server.model.cards.CrewHandlerCard;
 
 import java.awt.*;
 
+/**
+ * A message indicating that a crew member should be removed from a specified cabin
+ * during a {@link CrewHandlerCard} event.
+ * <p>
+ * This message is typically sent by a client to inform the server that a crew member
+ * was removed from the provided cabin coordinates on the player's ship.
+ * It triggers the {@code removeMemberFrom} method on the {@code CrewHandlerCard}.
+ * </p>
+ *
+ * @see CrewHandlerCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RemoveMemberMessage implements CardActionMessage {
 

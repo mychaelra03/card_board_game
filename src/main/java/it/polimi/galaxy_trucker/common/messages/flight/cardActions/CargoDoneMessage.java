@@ -6,6 +6,22 @@ import it.polimi.galaxy_trucker.server.model.Player;
 import it.polimi.galaxy_trucker.server.model.cards.Card;
 import it.polimi.galaxy_trucker.server.model.cards.CargoHandlerCard;
 
+/**
+ * A message indicating that a player has completed their cargo selection or manipulation phase
+ * for a card handled by a {@link CargoHandlerCard}.
+ * <p>
+ * This message is typically sent from the client to confirm that the player is done interacting
+ * with a cargo-related UI and is ready to proceed with the game logic.
+ * </p>
+ *
+ * <p>
+ * Implements {@link CardActionMessage} and is dispatched to the associated card's logic
+ * through the {@code applyTo} method.
+ * </p>
+ *
+ * @see CargoHandlerCard
+ * @see CardActionMessage
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CargoDoneMessage implements CardActionMessage {
 

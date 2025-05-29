@@ -14,6 +14,10 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.Player.PlayerState.*;
 
+/**
+ * Represents a player in the game, managing their state, ship, cargo, and interactions.
+ * Handles state changes, cargo operations, tile reservations, and event dispatching.
+ */
 public class Player {
 
     public enum Color {
@@ -43,6 +47,13 @@ public class Player {
 
     protected EventDispatcher dispatcher = new EventDispatcher();
 
+    /**
+     * Constructs a Player with a given username and profile picture IDs.
+     * ShipBoard and other properties are initialized with default values.
+     *
+     * @param username the player's name
+     * @param profilePictureIds an array of profile picture IDs
+     */
     public Player(String username, int[] profilePictureIds) {
         this.username = username;
         this.profilePictureIds = profilePictureIds;
@@ -54,8 +65,14 @@ public class Player {
         Arrays.fill(reservedTiles, null);
         this.admin = false;
     }
+    /**
+     * Constructs a Player with a pre-assigned ShipBoard, used primarily for testing.
+     *
+     * @param username the player's name
+     * @param profilePictureIds an array of profile picture IDs
+     * @param shipBoard the ship board to assign to the player
+     */
     public Player(String username, int[] profilePictureIds, ShipBoard shipBoard) {
-        // used in tests to assign an already made shipboard
         this(username, profilePictureIds);
         this.shipBoard = shipBoard;
     }
@@ -240,6 +257,12 @@ public class Player {
     public boolean isReady() {
         return playerState == READY_TO_PLAY;
     }
+    /**
+     * Toggles the player's state between IDLE and READY_TO_PLAY.
+     * Throws an exception if the current state is not toggleable.
+     *
+     * @throws IllegalStateException if state is not IDLE or READY_TO_PLAY
+     */
     public void toggleReady() {
         switch (playerState) {
             case IDLE -> setState(READY_TO_PLAY);
@@ -248,11 +271,25 @@ public class Player {
         }
     }
 
+    /**
+     * Reserves a tile at the given index (0 or 1).
+     *
+     * @param tileId the ID of the tile to reserve
+     * @param index the index of the reserved slot (0 or 1)
+     * @throws IllegalArgumentException if the index is invalid or slot is occupied
+     */
     public void reserveTile(int tileId, int index) {
         if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: " + index + ".");
         if(reservedTiles[index] != null) throw new IllegalArgumentException("Slot occupied.");
         reservedTiles[index] = tileId;
     }
+    /**
+     * Uses a previously reserved tile and clears the reserved slot.
+     *
+     * @param index the index of the reserved slot (0 or 1)
+     * @return the ID of the reserved tile
+     * @throws IllegalArgumentException if index is invalid or slot is empty
+     */
     public int useReservedTile(int index) {
         if(index < 0 || index > 1) throw new IllegalArgumentException("Invalid index: " + index + ".");
         if(reservedTiles[index] == null) throw new IllegalArgumentException("Slot is empty.");
@@ -267,11 +304,21 @@ public class Player {
         }
         return count;
     }
+    /**
+     * Applies a penalty for holding onto reserved tiles by increasing the removed tile count.
+     * Clears all reserved tiles.
+     */
     public void applyReservedTilePenalty() {
         shipBoard.addToRemovedTiles(getReservedTileCount());
         Arrays.fill(reservedTiles, null);
     }
 
+    /**
+     * Ensures a crew member is removed from a specified cabin tile.
+     *
+     * @param cabinCoords coordinates of the cabin tile
+     * @throws IllegalArgumentException if no crew member is present at the specified tile
+     */
     public void ensureCrewRemovedAt(Point cabinCoords) {
         CrewType removedMember = shipBoard.removeCrewMemberAt(cabinCoords.x, cabinCoords.y);
         if(removedMember == null) throw new IllegalArgumentException("Cabin tile does not have any crew members.");
@@ -279,6 +326,12 @@ public class Player {
         dispatcher.fireEvent(new CrewUpdateEvent(username, getShipContent().crewData()));
     }
 
+    /**
+     * Ensures a battery is removed from a tile at the specified coordinates.
+     *
+     * @param batteryCoords coordinates of the battery tile
+     * @throws IllegalArgumentException if the tile doesn't contain a battery
+     */
     public void ensureBatteryRemovedFrom(Point batteryCoords) {
         boolean isBatteryRemoved = shipBoard.removeBatteryFrom(batteryCoords.x, batteryCoords.y);
         if(!isBatteryRemoved) throw new IllegalArgumentException("Battery tile does not have any battery.");
@@ -286,6 +339,16 @@ public class Player {
         dispatcher.fireEvent(new BatteriesUpdateEvent(username, getShipContent().batteriesData()));
     }
 
+    /**
+     * Swaps a block from the cargo pool into a cargo container on the ship.
+     * Handles red block restrictions and potential block replacement.
+     *
+     * @param blockIndex the index of the block in the cargo pool
+     * @param tileCoords coordinates of the cargo tile
+     * @param containerIndex the index within the tile’s container
+     * @throws IllegalArgumentException if the block index is invalid
+     * @throws RuntimeException if cargo pool is not initialized
+     */
     public void swapCargo(int blockIndex, Point tileCoords, int containerIndex) {
         if(cargoPool == null) throw new RuntimeException("cargoPool has not been initialized.");
         if(blockIndex < 0 || blockIndex >= cargoPool.size()) throw new IllegalArgumentException("Invalid block index.");
@@ -307,6 +370,13 @@ public class Player {
         dispatcher.fireEvent(new CargoSwappedEvent(this, blockIndex, tileCoords,containerIndex));
     }
 
+    /**
+     * Unloads cargo from the ship to the player's cargo pool.
+     *
+     * @param tileCoords coordinates of the cargo tile
+     * @param containerIndex the index within the tile’s container
+     * @throws RuntimeException if cargo pool is not initialized
+     */
     public void unloadCargo(Point tileCoords, int containerIndex) {
         if(cargoPool == null) throw new RuntimeException("cargoPool has not been initialized.");
 
@@ -317,13 +387,21 @@ public class Player {
         dispatcher.fireEvent(new CargoUnloadedEvent(this, tileCoords,containerIndex));
     }
 
+    /**
+     * Clears the player's cargo pool and signals the end of a decision-making phase.
+     */
     public void clearCargoPool() {
         this.cargoPool = null;
 
         dispatcher.fireEvent(new DecisionEndEvent(username));
     }
 
-
+    /**
+     * Returns a simplified representation of the player's ship board.
+     * Only non-empty and are included.
+     *
+     * @return a set of TileInfo representing placed tiles
+     */
     public Set<TileInfo> getSimplifiedShipBoard() {
         Set<TileInfo> simplifiedShipBoard = new HashSet<>();
         Tile[][] tiles = shipBoard.getTiles();
@@ -337,5 +415,4 @@ public class Player {
         }
         return simplifiedShipBoard;
     }
-
 }

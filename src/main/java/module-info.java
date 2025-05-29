@@ -48,4 +48,5 @@ module it.polimi.galaxy_trucker {
     opens it.polimi.galaxy_trucker.client.popups.cards to javafx.fxml;
     exports it.polimi.galaxy_trucker.common.messages.endGame;
     opens it.polimi.galaxy_trucker.common.messages.endGame to com.fasterxml.jackson.databind;
+    exports it.polimi.galaxy_trucker.server.events.game;
 }

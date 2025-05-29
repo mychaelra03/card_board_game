@@ -10,17 +10,31 @@ import it.polimi.galaxy_trucker.server.controller.MainController;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class VirtualView extends Thread {
+/**
+ * Handles communication between the server and a single connected client.
+ * This class manages input/output streams, message parsing, heartbeat pings,
+ * and forwards messages to the main game controller.
+ *
+ * <p>Each client is handled in its own thread.</p>
+ */
+public class VirtualView implements Runnable {
     private final BufferedReader in;
     private final PrintWriter out;
     private final Socket clientSocket;
     private final MainController controller;
     private Timer pingTimer;
 
+    /**
+     * Constructs a VirtualView with the given socket and controller.
+     * Initializes input and output streams.
+     *
+     * @param clientSocket the socket connected to the client
+     * @param controller the controller handling game logic
+     * @throws RuntimeException if the I/O streams fail to initialize
+     */
     public VirtualView(Socket clientSocket, MainController controller) {
         this.clientSocket = clientSocket;
         this.controller = controller;
@@ -33,20 +47,36 @@ public class VirtualView extends Thread {
         }
     }
 
-    public void sendMessage(Object object) {
-        if(!(object instanceof GameMessage)) Logger.logWarning("Sending a non message class.");
+    public void start() {
+        new Thread(this).start();
+    }
+
+    /**
+     * Sends a message object to the client after converting it to JSON.
+     * Logs a warning if the message is not of expected type {@code GameMessage}.
+     *
+     * @param message the message to send
+     */
+    public void sendMessage(GameMessage message) {
 
         ObjectMapper mapper = new ObjectMapper();
         String json;
         try {
-            json = mapper.writeValueAsString(object);
+            json = mapper.writeValueAsString(message);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
         this.out.println(json);
     }
 
+    /**
+     * Starts listening for incoming messages from the client.
+     * Forwards them to the {@link MainController} for processing.
+     * Sends heartbeat pings periodically.
+     */
+    @Override
     public void run() {
+        Logger.logInfo("Client connected: " + clientSocket.getRemoteSocketAddress());
         startPingLoop();
 
         try {
@@ -83,7 +113,15 @@ public class VirtualView extends Thread {
         }, 3000, 3000);  // send every 3s
     }
 
+    private volatile boolean closed = false;
+
+    /**
+     * Closes all resources associated with this client and notifies the controller.
+     * This method is safe to call multiple times.
+     */
     public void close() {
+        if (closed) return;
+        closed = true;
 
         this.controller.removeClient(this);
 

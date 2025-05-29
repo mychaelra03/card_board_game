@@ -15,10 +15,13 @@ import java.util.List;
 
 import static it.polimi.galaxy_trucker.server.model.cards.Card.InputState.*;
 
+/**
+ * Represents a "Pirates" enemy card, where players must meet cannon power requirements to avoid damage.
+ * Players who win gain credits; those who fail must endure cannon shots and may defend using batteries.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
-    // Combat encounter, win to gain credits, lose to get shot.
 
     private final int rewardCredits;
     private final CannonShot[] cannonShots;
@@ -40,6 +43,11 @@ public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
         this.cannonShots = cannonShots;
     }
 
+    /**
+     * Grants the reward credits to the specified player upon successful defense.
+     *
+     * @param player the player receiving the reward
+     */
     @Override
     protected void giveReward(Player player) {
         verifyInputState(NONE);
@@ -47,6 +55,11 @@ public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
         setInputState(FINISHED);
     }
 
+    /**
+     * Applies punishment to a player who failed the combat by initiating cannon shots against them.
+     *
+     * @param player the player being punished
+     */
     @Override
     protected void applyPunishment(Player player) {
         verifyInputState(NONE);
@@ -80,6 +93,12 @@ public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
         applyShot();
     }
 
+    /**
+     * Called when the punished player chooses to use a battery to defend against the current cannon shot.
+     *
+     * @param caller        the player using the battery (must be the punished player)
+     * @param batteryCoords the coordinates of the battery tile being used
+     */
     @Override
     public void useBattery(Player caller, Point batteryCoords) {
         verifyInputState(BATTERY_DECISION);
@@ -94,6 +113,11 @@ public class PiratesCard extends AbstractEnemy implements BatteryHandlerCard {
         setInputState(NONE);
         handleNextShot();
     }
+    /**
+     * Called when the punished player refuses to use a battery and takes the hit from the current cannon shot.
+     *
+     * @param caller the player refusing to use a battery (must be the punished player)
+     */
     @Override
     public void refuseBattery(Player caller) {
         verifyInputState(BATTERY_DECISION);

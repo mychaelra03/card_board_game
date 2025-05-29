@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.galaxy_trucker.common.Logger;
 import it.polimi.galaxy_trucker.common.messages.flight.cardActions.*;
+import it.polimi.galaxy_trucker.common.messages.shipBuilding.TileTakenMessage;
 import it.polimi.galaxy_trucker.server.VirtualView;
 import it.polimi.galaxy_trucker.server.controller.MessageDispatcher;
 import it.polimi.galaxy_trucker.server.model.GameModel;
@@ -16,6 +17,41 @@ public class PickingCardsCmdHandler extends CommandHandler {
 
     public PickingCardsCmdHandler(GameModel gameModel, Map<VirtualView, Player> playerMap, MessageDispatcher dispatcher) {
         super(gameModel, playerMap, dispatcher);
+    }
+
+    @Override
+    protected void registerHandlers() {
+        register("pick_card", (view, cmd) -> handlePickCard(view));
+        register("give_up", (view, cmd) -> handleGiveUp(view));
+    }
+
+
+    private void handleGiveUp(VirtualView senderView) {
+        Player player = playerMap.get(senderView);
+        player.setState(Player.PlayerState.GIVING_UP);
+    }
+
+    private void handlePickCard(VirtualView senderView) {
+        Player player = playerMap.get(senderView);
+
+        gameModel.pickNextCard(player);
+    }
+
+
+    @Override
+    protected void handleUnrecognizedCommand(VirtualView senderView, JsonNode cmd) {
+        String type = cmd.get("type").asText();
+        Card currentCard = gameModel.getCurrentCard();
+        Player sender = playerMap.get(senderView);
+
+        Class<? extends CardActionMessage> messageClass = messageTypeMap.get(type);
+
+        if (messageClass != null) {
+            CardActionMessage message = mapper.convertValue(cmd, messageClass);
+            message.applyTo(currentCard, sender);
+        } else {
+            Logger.logWarning("Unrecognized command: " + type);
+        }
     }
 
     private static final Map<String, Class<? extends CardActionMessage>> messageTypeMap = Map.ofEntries(
@@ -31,40 +67,4 @@ public class PickingCardsCmdHandler extends CommandHandler {
             Map.entry("refuse_planet", PlanetRefusedMessage.class),
             Map.entry("remove_member", RemoveMemberMessage.class)
             );
-
-    @Override
-    public void handle(VirtualView senderView, JsonNode cmd) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        String type = cmd.get("type").asText();
-        switch (type) {
-
-            case "pick_card" -> {
-
-                Player player = playerMap.get(senderView);
-
-                gameModel.pickNextCard(player);
-            }
-
-            case "give_up" -> {
-                Player player = playerMap.get(senderView);
-                player.setState(Player.PlayerState.GIVING_UP);
-            }
-
-            default -> {
-                Card currentCard = gameModel.getCurrentCard();
-                Player sender = playerMap.get(senderView);
-
-                Class<? extends CardActionMessage> messageClass = messageTypeMap.get(type);
-
-                if (messageClass != null) {
-                    CardActionMessage message = mapper.convertValue(cmd, messageClass);
-                    message.applyTo(currentCard, sender);
-                } else {
-                    Logger.logError("Unknown command type: " + type);
-                }
-            }
-        }
-
-    }
 }
