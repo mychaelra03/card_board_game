@@ -63,6 +63,10 @@ public class BatteriesTile extends Tile {
         return true;
     }
 
+    public boolean isFull() {
+        return storedBatteries == capacity;
+    }
+
     @Override
     public String getTileType() {
         return "Battery Container";
