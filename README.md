@@ -22,35 +22,30 @@ This project is a Java-based implementation of the table game "**Galaxy Truckers
 the 2024/2025 Software Engineering course at Politecnico di Milano. The team comprises Garolini Michele, Jafari Michael
 and Migliaccio Cesario.
 
-The implementation features both a command-line interface (CLI) and a JavaFX graphical user interface.
-
 <!--Check out our project presentation [here.](https://garolini.github.io/)-->
 
 ## Status of the work
 
-| Functionality     | Status                  | 
-|-------------------|-------------------------|
-| Basic rules       | :construction:      |
-| Complete rules    | :ballot_box_with_check:      |
-| Socket connection | :ballot_box_with_check:      |
-| RMI connection    | :ballot_box_with_check:      |
-| CLI               | :construction:      |
-| GUI               | :construction:      |
-| Multiple games    | :ballot_box_with_check:      |
-| Persistence (*)   | :construction:      |
-| Resilience        | :construction:      |
-| Chat              | :ballot_box_with_check:      |
+| Functionality     | Status             | 
+|-------------------|--------------------|
+| Basic rules       | :white_check_mark: |
+| Complete rules    | :white_check_mark: |
+| Socket connection | :white_check_mark: |
+| CLI               | :x:                |
+| GUI               | :white_check_mark: |
+| Chat              | :white_check_mark: |
+| Learning Flight   | :white_check_mark: |
 
 (*) *For testing purposes.*
 
 **Legend**
 
-| Symbol | Functionality status |
-| --- | --- |
-| :white_check_mark: | Completed |
-| :ballot_box_with_check: | Planned, not started yet |
-| :construction: | Work in progress |
-| :x: | Not planned to be implemented |
+| Symbol                  | Functionality status          |
+|-------------------------|-------------------------------|
+| :white_check_mark:      | Completed                     |
+| :ballot_box_with_check: | Planned, not started yet      |
+| :construction:          | Work in progress              |
+| :x:                     | Not planned to be implemented |
 
 ### Game Description
 
@@ -58,7 +53,7 @@ The implementation features both a command-line interface (CLI) and a JavaFX gra
 through space hazards. The game features a real-time shipbuilding phase and exciting space travel challenges.
 Learn more about the game [here](https://www.craniocreations.it/prodotto/galaxy-trucker).
 Rules of the game [here](https://www.craniocreations.it/storage/media/product_downloads/179/2052/Galaxy-Trucker_ITA_Rules_compressed.pdf).
-<!--
+
 ## How to Compile with Maven
 
 To compile the project using Maven, follow these steps:
@@ -68,23 +63,22 @@ To compile the project using Maven, follow these steps:
 2. Navigate to the root directory of the project where the `pom.xml` file is located.
 3. Run the following command to compile the project and package it into a JAR file:
 
-   ```bash
-   mvn clean package
+```bash
+    mvn clean package
    ```
 
-This command will generate two jars: one for the client and one for the server in the `target/jars` folder
+This command will generate a main jar inside the `target` folder
 
 ## How to Run the Program
 
-You can run the program using the JAR files found in the release section of the repository. Download the JAR files for
-the server and client from the [releases](https://github.com/PiervitoCreanza/IS24-AM02/releases) page.
+You can run the program using the JAR file found in the [releases](https://github.com/Garolini/IS25-LL14/releases) section of the repository.
 
 ### Running the Server
 
 To run the server, use the following command:
 
 ```bash
-java -jar server.jar [options]
+    java -jar galaxy_trucker-x.x.jar server [options]
 ```
 
 ### Running the Client
@@ -92,39 +86,22 @@ java -jar server.jar [options]
 To run the client, use the following command:
 
 ```bash
-java -jar client.jar [options]
+    java -jar galaxy_trucker-x.x.jar client [options]
 ```
 
 ## Server CLI Arguments
 
-| Argument        | Description                                     | Default Value |
-|-----------------|-------------------------------------------------|---------------|
-| -tp, --tcp_port | TCP ServerApp Port number (default is 12345).   | 12345         |
-| -rp, --rmi_port | RMI ServerApp Port number (default is 1099).    | 1099          |
-| -ip             | Start the server with the specified IP address. |               |
-| -l, --localhost | Start the server with his localhost IP address. |               |
-| --lan           | Start the server with his LAN IP address.       |               |
-| --debug         | Start the Server in DEBUG mode.                 |               |
-| -h, --help      | Print the help message.                         |               |
+| Argument        | Description                              | Accepted Values          | Default Value |
+|-----------------|------------------------------------------|--------------------------|---------------|
+| `--port`, `-p`  | TCP port the server listens on.          | Any valid port (0–65535) | 8080          |
+| `--debug`, `-d` | Enables debug mode with verbose logging. | (flag only)              | Off           |
 
 ## Client CLI Arguments
 
-| Argument           | Description                                                     | Default Value |
-|--------------------|-----------------------------------------------------------------|---------------|
-| --l                | Start the client using a localhost connection.                  |               |
-| --rmi, --rmi_mode  | Start the client using an RMI connection.                       |               |
-| -s, --server_ip    | Server IP address.                                              | 161.35.162.219|
-| -ip, --client_ip   | Client IP address.                                              |               |
-| -sp, --server_port | Server port number (default is 12345 for TCP and 1099 for RMI). |               |
-| -cp                | Client port number (default is server port number + 1).         |               |
-| --lan              | Start the client in LAN mode.                                   |               |
-| --tui, --tui_mode  | Start the client in TUI mode.                                   |               |
-| --debug            | Start the client in debug mode.                                 |               |
-| -h, --help         | Print the help message.                                         |               |
-
--->
-## Future Scope
-
+| Argument        | Description                              | Accepted Values | Default Value |
+|-----------------|------------------------------------------|-----------------|---------------|
+| `--lang`, `-l`  | Sets the client UI language.             | `en`, `it`      | `en`          |
+| `--debug`, `-d` | Enables debug mode with verbose logging. | (flag only)     | Off           |
 
 
 ## Legal 🇬🇧

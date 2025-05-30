@@ -1,0 +1,1577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>C:/Users/garol/IdeaProjects/IS25-LL14/src/main/java</OriginalElement>
+  <nodes>
+    <node x="395.0" y="5508.5">it.polimi.galaxy_trucker.server.model.cards.CannonsHandlerCard</node>
+    <node x="-234.5" y="10539.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.TimerFinishedMessage</node>
+    <node x="7403.5" y="11468.5">it.polimi.galaxy_trucker.server.controller.listeners.Handles</node>
+    <node x="-119.5" y="11084.0">it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage.Action</node>
+    <node x="6923.5" y="11444.0">it.polimi.galaxy_trucker.server.events.EventDispatcher</node>
+    <node x="1498.0" y="10515.5">it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage</node>
+    <node x="135.5" y="9023.5">it.polimi.galaxy_trucker.server.events.flight.PlayerEliminatedEvent</node>
+    <node x="2021.5" y="9995.5">it.polimi.galaxy_trucker.common.messages.flight.CreditsMessage</node>
+    <node x="5100.5" y="9564.0">it.polimi.galaxy_trucker.server.events.flight.cards.PlayerStatusEvent.Status</node>
+    <node x="1675.0" y="1288.5">it.polimi.galaxy_trucker.client.VirtualServerAware</node>
+    <node x="4478.0" y="5780.0">it.polimi.galaxy_trucker.server.controller.commandHandlers.CommandHandler</node>
+    <node x="269.0" y="9239.5">it.polimi.galaxy_trucker.server.events.flight.CreditsUpdateEvent</node>
+    <node x="5303.0" y="9971.5">it.polimi.galaxy_trucker.common.messages.flight.CargoDecisionMessage</node>
+    <node x="5014.5" y="9971.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.TileFixedMessage</node>
+    <node x="5178.5" y="6952.0">it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.Source</node>
+    <node x="5586.0" y="7244.0">it.polimi.galaxy_trucker.server.model.cards.projectile.CannonShot</node>
+    <node x="1269.5" y="2324.0">it.polimi.galaxy_trucker.client.controllers.flight.CardsHandler</node>
+    <node x="1002.5" y="10515.5">it.polimi.galaxy_trucker.common.messages.flight.BatteriesMessage</node>
+    <node x="3600.0" y="9995.5">it.polimi.galaxy_trucker.common.messages.flight.PlayerPositionMessage</node>
+    <node x="6905.0" y="10515.5">it.polimi.galaxy_trucker.common.messages.flight.PlanetSelectionMessage</node>
+    <node x="6791.5" y="11083.5">it.polimi.galaxy_trucker.client.SceneSwitch</node>
+    <node x="6464.5" y="11047.0">it.polimi.galaxy_trucker.server.model.TileFactory</node>
+    <node x="-41.0" y="8003.5">it.polimi.galaxy_trucker.client.popups.FinalScoresPopupController</node>
+    <node x="3293.5" y="8999.5">it.polimi.galaxy_trucker.server.events.shipBuilding.DoneBuildingEvent</node>
+    <node x="6851.0" y="9239.5">it.polimi.galaxy_trucker.server.events.flight.cards.PlanetChosenEvent</node>
+    <node x="5154.0" y="10515.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.TileTakenMessage</node>
+    <node x="-243.0" y="1468.0">it.polimi.galaxy_trucker.server.controller.listeners.CardsListener</node>
+    <node x="2956.5" y="9959.5">it.polimi.galaxy_trucker.common.messages.lobby.ChatMessage</node>
+    <node x="5657.5" y="10539.5">it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage</node>
+    <node x="2722.0" y="6523.0">it.polimi.galaxy_trucker.server.model.tiles.BatteriesTile</node>
+    <node x="2425.5" y="9564.0">it.polimi.galaxy_trucker.client.ClientMain.CommandLineOptions</node>
+    <node x="1992.5" y="5339.0">it.polimi.galaxy_trucker.server.model.cards.Card</node>
+    <node x="768.5" y="2455.5">it.polimi.galaxy_trucker.client.controllers.shipBuilding.TileManager</node>
+    <node x="5991.0" y="10371.5">it.polimi.galaxy_trucker.common.messages.flight.ProjectileMessage</node>
+    <node x="6129.5" y="11456.0">it.polimi.galaxy_trucker.server.controller.listeners.EventScanner</node>
+    <node x="5366.0" y="6487.0">it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile</node>
+    <node x="1475.0" y="7171.5">it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule</node>
+    <node x="2246.5" y="2384.0">it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController</node>
+    <node x="2862.0" y="6951.5">it.polimi.galaxy_trucker.server.model.tiles.StartingCabinTile</node>
+    <node x="3651.5" y="6196.0">it.polimi.galaxy_trucker.server.model.tiles.StructuralTile</node>
+    <node x="3437.5" y="9239.5">it.polimi.galaxy_trucker.server.events.shipBuilding.CardsTakenEvent</node>
+    <node x="240.5" y="4912.0">it.polimi.galaxy_trucker.server.model.ShipBoard.ShipContent</node>
+    <node x="23.0" y="6535.5">it.polimi.galaxy_trucker.server.model.cards.AbandonedShipCard</node>
+    <node x="1592.0" y="3944.0">it.polimi.galaxy_trucker.client.controllers.lobby.LobbyController</node>
+    <node x="4129.0" y="7243.5">it.polimi.galaxy_trucker.server.model.tiles.CannonTile</node>
+    <node x="5459.5" y="11443.5">it.polimi.galaxy_trucker.common.messages.flight.cardActions.BatteryRefuseMessage</node>
+    <node x="1036.0" y="11084.0">it.polimi.galaxy_trucker.common.messages.flight.ProjectileMessage.ProjectileType</node>
+    <node x="1614.5" y="8027.5">it.polimi.galaxy_trucker.client.popups.ConfirmationPopupController</node>
+    <node x="-154.5" y="7219.5">it.polimi.galaxy_trucker.server.model.cards.SlaversCard</node>
+    <node x="3434.0" y="10527.5">it.polimi.galaxy_trucker.common.messages.SimplePlayerMessage</node>
+    <node x="5852.0" y="11432.0">it.polimi.galaxy_trucker.client.popups.PendingPopup</node>
+    <node x="1066.0" y="8999.5">it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent</node>
+    <node x="7134.5" y="9288.5">it.polimi.galaxy_trucker.server.events.ModelEventListener</node>
+    <node x="3881.5" y="11359.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.ActivateCannonsMessage</node>
+    <node x="467.5" y="11444.0">it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage.JoinStatus</node>
+    <node x="5601.0" y="10975.0">it.polimi.galaxy_trucker.server.model.BoardType</node>
+    <node x="-240.5" y="-777.0">it.polimi.galaxy_trucker.server.model.Player</node>
+    <node x="1705.5" y="10019.5">it.polimi.galaxy_trucker.common.messages.GameStateMessage</node>
+    <node x="1603.5" y="7544.0">it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule.Punishment</node>
+    <node x="2276.0" y="4924.0">it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController.HandlerEntry</node>
+    <node x="120.0" y="8455.5">it.polimi.galaxy_trucker.client.popups.CountdownPopupController</node>
+    <node x="657.0" y="9263.5">it.polimi.galaxy_trucker.server.events.shipBuilding.TileReturnedEvent</node>
+    <node x="3348.0" y="11083.5">it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoDoneMessage</node>
+    <node x="2127.0" y="8039.5">it.polimi.galaxy_trucker.client.popups.AlertPopupController</node>
+    <node x="6996.0" y="9023.5">it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent</node>
+    <node x="5426.0" y="6964.0">it.polimi.galaxy_trucker.server.model.cards.projectile.Meteor</node>
+    <node x="4658.5" y="11083.5">it.polimi.galaxy_trucker.common.messages.flight.cardActions.PlanetRefusedMessage</node>
+    <node x="609.5" y="5828.5">it.polimi.galaxy_trucker.server.model.cards.EnginesHandlerCard</node>
+    <node x="1901.5" y="6583.5">it.polimi.galaxy_trucker.server.model.cards.StarDustCard</node>
+    <node x="1796.0" y="2251.0">it.polimi.galaxy_trucker.client.controllers.flight.FlightController</node>
+    <node x="2825.5" y="10539.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.TileReturnedMessage</node>
+    <node x="2680.0" y="10019.5">it.polimi.galaxy_trucker.common.messages.GameResetMessage</node>
+    <node x="5045.0" y="11012.0">it.polimi.galaxy_trucker.client.controllers.flight.ShipHandler</node>
+    <node x="4803.0" y="11420.0">it.polimi.galaxy_trucker.server.controller.MainController</node>
+    <node x="591.5" y="7931.0">it.polimi.galaxy_trucker.client.ClientSession</node>
+    <node x="1205.0" y="9863.5">it.polimi.galaxy_trucker.common.messages.flight.TileSelectionMessage</node>
+    <node x="847.0" y="9995.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.CardsTakenMessage</node>
+    <node x="4370.0" y="10019.5">it.polimi.galaxy_trucker.common.messages.endGame.PlayersScoresMessage</node>
+    <node x="7183.5" y="10999.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoUnloadMessage</node>
+    <node x="5411.5" y="9023.5">it.polimi.galaxy_trucker.server.events.gameOver.GameOverEvent</node>
+    <node x="7536.5" y="10975.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoSwapMessage</node>
+    <node x="5.5" y="2095.0">it.polimi.galaxy_trucker.server.model.GameModel</node>
+    <node x="2504.5" y="10539.5">it.polimi.galaxy_trucker.common.messages.login.JoinRequestMessage</node>
+    <node x="2443.5" y="6903.5">it.polimi.galaxy_trucker.server.model.cards.PiratesCard</node>
+    <node x="4278.0" y="11456.0">it.polimi.galaxy_trucker.server.controller.CommandRouter</node>
+    <node x="2234.0" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.InvalidShipEvent</node>
+    <node x="4148.5" y="11059.0">it.polimi.galaxy_trucker.server.model.tiles.BlockType</node>
+    <node x="5002.0" y="6172.0">it.polimi.galaxy_trucker.server.controller.commandHandlers.AssigningCrewCmdHandler</node>
+    <node x="2867.5" y="11407.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.RemoveMemberMessage</node>
+    <node x="3747.5" y="11084.0">it.polimi.galaxy_trucker.server.model.tiles.Connector</node>
+    <node x="685.5" y="10515.5">it.polimi.galaxy_trucker.common.messages.flight.DiceThrowMessage</node>
+    <node x="4867.5" y="9239.5">it.polimi.galaxy_trucker.server.events.flight.PlayerPositionUpdateEvent</node>
+    <node x="443.5" y="8455.5">it.polimi.galaxy_trucker.client.popups.cards.DiceThrowPopupController</node>
+    <node x="785.5" y="9023.5">it.polimi.galaxy_trucker.server.events.flight.cards.CardDecisionEvent</node>
+    <node x="2713.5" y="7219.0">it.polimi.galaxy_trucker.common.Logger.LogType</node>
+    <node x="3405.5" y="6584.0">it.polimi.galaxy_trucker.server.model.tiles.AlienSupportTile</node>
+    <node x="3846.5" y="7244.0">it.polimi.galaxy_trucker.server.model.tiles.CargoTile.CargoType</node>
+    <node x="3471.5" y="11408.0">it.polimi.galaxy_trucker.client.controllers.shipBuilding.TileEffectManager</node>
+    <node x="1877.0" y="10539.5">it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage</node>
+    <node x="1536.0" y="11383.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.ActivateEnginesMessage</node>
+    <node x="4493.0" y="9239.5">it.polimi.galaxy_trucker.server.events.flight.CrewUpdateEvent</node>
+    <node x="3226.5" y="11468.5">it.polimi.galaxy_trucker.client.UICallBack</node>
+    <node x="2162.0" y="5168.5">it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController.JsonHandler</node>
+    <node x="5063.5" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.cards.PlayerStatusEvent</node>
+    <node x="-234.5" y="5828.5">it.polimi.galaxy_trucker.server.model.cards.CrewHandlerCard</node>
+    <node x="3153.0" y="9263.5">it.polimi.galaxy_trucker.server.events.flight.cards.CannonSelectionEvent</node>
+    <node x="5988.0" y="9263.5">it.polimi.galaxy_trucker.server.events.flight.cards.DecisionEndEvent</node>
+    <node x="106.0" y="5144.0">it.polimi.galaxy_trucker.server.model.GameModel.GameState</node>
+    <node x="998.5" y="8015.5">it.polimi.galaxy_trucker.client.popups.cards.ShipPopupController</node>
+    <node x="1773.5" y="8347.5">it.polimi.galaxy_trucker.client.popups.cards.TileSelectionPopupController</node>
+    <node x="3016.0" y="11048.0">it.polimi.galaxy_trucker.server.VirtualView</node>
+    <node x="529.5" y="10019.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.UseReservedTileMessage</node>
+    <node x="6476.0" y="10539.5">it.polimi.galaxy_trucker.common.messages.flight.PickAvailableMessage</node>
+    <node x="1105.5" y="4888.0">it.polimi.galaxy_trucker.server.model.ShipBoard.CargoData</node>
+    <node x="5811.0" y="9971.5">it.polimi.galaxy_trucker.common.messages.flight.PlayerScoreMessage</node>
+    <node x="29.0" y="1216.0">it.polimi.galaxy_trucker.server.controller.listeners.ShipListener</node>
+    <node x="6732.5" y="8999.5">it.polimi.galaxy_trucker.server.events.shipBuilding.TimerStartEvent</node>
+    <node x="7328.0" y="10588.5">it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage</node>
+    <node x="-236.0" y="8371.5">it.polimi.galaxy_trucker.common.messages.endGame.PlayerScores</node>
+    <node x="3862.5" y="8828.5">it.polimi.galaxy_trucker.server.events.EventModel</node>
+    <node x="4876.0" y="10539.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.CardsReturnedMessage</node>
+    <node x="503.5" y="3571.5">it.polimi.galaxy_trucker.client.controllers.flight.FlightAnim</node>
+    <node x="1458.0" y="8443.5">it.polimi.galaxy_trucker.client.popups.ShipPreviewPopupController</node>
+    <node x="796.5" y="4912.0">it.polimi.galaxy_trucker.server.model.ShipBoard.CrewData</node>
+    <node x="2032.5" y="3920.0">it.polimi.galaxy_trucker.client.controllers.login.LoginController</node>
+    <node x="2043.5" y="9239.5">it.polimi.galaxy_trucker.server.events.flight.ShipUpdateEvent</node>
+    <node x="1449.0" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.CargoUpdateEvent</node>
+    <node x="658.5" y="6915.5">it.polimi.galaxy_trucker.server.model.cards.SmugglersCard</node>
+    <node x="2619.5" y="11035.0">it.polimi.galaxy_trucker.server.model.CardFactory</node>
+    <node x="265.5" y="6111.5">it.polimi.galaxy_trucker.server.model.cards.AbandonedStationCard</node>
+    <node x="124.0" y="884.0">it.polimi.galaxy_trucker.server.model.Player.Color</node>
+    <node x="6259.5" y="9983.5">it.polimi.galaxy_trucker.common.messages.flight.TilesMessage</node>
+    <node x="2380.0" y="11419.0">it.polimi.galaxy_trucker.server.model.BuildingTimerHandler</node>
+    <node x="6044.5" y="6160.0">it.polimi.galaxy_trucker.server.controller.commandHandlers.PickingCardsCmdHandler</node>
+    <node x="76.5" y="10539.5">it.polimi.galaxy_trucker.common.messages.flight.DeckLevelsMessage</node>
+    <node x="3766.5" y="10515.5">it.polimi.galaxy_trucker.common.messages.PlayersInfoMessage</node>
+    <node x="429.5" y="1204.0">it.polimi.galaxy_trucker.server.controller.listeners.BuildingListener</node>
+    <node x="2014.5" y="6111.0">it.polimi.galaxy_trucker.common.Logger</node>
+    <node x="2212.5" y="6535.5">it.polimi.galaxy_trucker.server.model.cards.MeteorSwarmCard</node>
+    <node x="3127.5" y="10539.5">it.polimi.galaxy_trucker.common.messages.BoardTypeMessage</node>
+    <node x="3263.0" y="6196.0">it.polimi.galaxy_trucker.server.model.tiles.ShieldTile</node>
+    <node x="2626.5" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.cards.EngineSelectionEvent</node>
+    <node x="3971.5" y="6963.5">it.polimi.galaxy_trucker.server.model.tiles.EngineTile</node>
+    <node x="2301.5" y="9995.5">it.polimi.galaxy_trucker.common.messages.flight.CargoMessage</node>
+    <node x="4064.5" y="6196.0">it.polimi.galaxy_trucker.server.model.tiles.EmptyTile</node>
+    <node x="4324.0" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.cards.BatteryDecisionEvent</node>
+    <node x="1290.0" y="9239.5">it.polimi.galaxy_trucker.server.events.flight.cards.PlanetSelectionEvent</node>
+    <node x="1350.5" y="7544.0">it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule.Condition</node>
+    <node x="5520.0" y="6124.0">it.polimi.galaxy_trucker.server.controller.commandHandlers.LobbyCmdHandler</node>
+    <node x="4475.0" y="6064.0">it.polimi.galaxy_trucker.server.controller.commandHandlers.ShipBuildingCmdHandler</node>
+    <node x="-3.5" y="7712.0">it.polimi.galaxy_trucker.client.popups.PopupAware</node>
+    <node x="2108.0" y="11359.0">it.polimi.galaxy_trucker.client.LanguageManager</node>
+    <node x="3030.5" y="9023.5">it.polimi.galaxy_trucker.server.events.game.GameResetEvent</node>
+    <node x="1140.5" y="8419.5">it.polimi.galaxy_trucker.client.popups.CardsPopupController</node>
+    <node x="3838.5" y="5411.0">it.polimi.galaxy_trucker.server.model.tiles.Tile</node>
+    <node x="6621.5" y="9971.5">it.polimi.galaxy_trucker.common.messages.flight.BatteryDecisionMessage</node>
+    <node x="3575.0" y="9023.5">it.polimi.galaxy_trucker.server.events.lobby.BoardTypeUpdateEvent</node>
+    <node x="4298.5" y="6583.5">it.polimi.galaxy_trucker.server.model.tiles.ActivatableTile</node>
+    <node x="-60.5" y="9995.5">it.polimi.galaxy_trucker.common.messages.flight.CardPickedMessage</node>
+    <node x="4745.5" y="6584.0">it.polimi.galaxy_trucker.server.controller.commandHandlers.CorrectingShipCmdHandler</node>
+    <node x="1229.5" y="6171.5">it.polimi.galaxy_trucker.server.model.cards.OpenSpaceCard</node>
+    <node x="1723.5" y="11072.0">it.polimi.galaxy_trucker.server.model.tiles.StrengthCalculator</node>
+    <node x="3741.5" y="9215.5">it.polimi.galaxy_trucker.server.events.flight.cards.PlayerScoreEvent</node>
+    <node x="5966.0" y="11023.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardDecisionMessage</node>
+    <node x="5836.0" y="9023.5">it.polimi.galaxy_trucker.server.events.shipBuilding.TimerFinishedEvent</node>
+    <node x="5307.5" y="7244.0">it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.Size</node>
+    <node x="-248.5" y="3775.5">it.polimi.galaxy_trucker.client.popups.Popup</node>
+    <node x="3371.5" y="9728.5">it.polimi.galaxy_trucker.common.messages.GameMessage</node>
+    <node x="2317.0" y="5816.5">it.polimi.galaxy_trucker.server.model.cards.BatteryHandlerCard</node>
+    <node x="587.5" y="6511.5">it.polimi.galaxy_trucker.server.model.cards.PlanetsCard</node>
+    <node x="1495.0" y="6451.5">it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard</node>
+    <node x="588.5" y="5144.0">it.polimi.galaxy_trucker.server.model.ShipBoard.DefendingCannonType</node>
+    <node x="6454.5" y="9048.5">it.polimi.galaxy_trucker.server.events.flight.cards.CardFinishedEvent</node>
+    <node x="7006.0" y="9564.0">it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent.CardStatus</node>
+    <node x="4163.0" y="10503.5">it.polimi.galaxy_trucker.common.messages.flight.CrewMessage</node>
+    <node x="945.0" y="5108.0">it.polimi.galaxy_trucker.server.model.ShipBoard.BatteriesData</node>
+    <node x="1810.0" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.BatteriesUpdateEvent</node>
+    <node x="1634.5" y="9191.5">it.polimi.galaxy_trucker.server.events.flight.cards.CargoSwappedEvent</node>
+    <node x="2448.0" y="6184.0">it.polimi.galaxy_trucker.server.model.cards.Card.InputState</node>
+    <node x="2389.5" y="9252.0">it.polimi.galaxy_trucker.client.ClientMain</node>
+    <node x="299.5" y="7955.5">it.polimi.galaxy_trucker.client.popups.SettingsController</node>
+    <node x="7143.0" y="9995.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.DoneBuildingMessage</node>
+    <node x="1318.5" y="11060.0">it.polimi.galaxy_trucker.server.controller.MessageDispatcher</node>
+    <node x="3968.0" y="9983.5">it.polimi.galaxy_trucker.common.messages.flight.StatusUpdateMessage</node>
+    <node x="6135.5" y="9023.5">it.polimi.galaxy_trucker.server.events.flight.cards.CardPickedEvent</node>
+    <node x="1780.5" y="6183.5">it.polimi.galaxy_trucker.server.model.cards.EpidemicCard</node>
+    <node x="4716.0" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.cards.DiceThrowEvent</node>
+    <node x="2243.5" y="11047.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.BatteryUseMessage</node>
+    <node x="275.5" y="10043.5">it.polimi.galaxy_trucker.common.messages.SimpleMessage</node>
+    <node x="6639.5" y="11407.0">it.polimi.galaxy_trucker.common.messages.flight.cardActions.PlanetChosenMessage</node>
+    <node x="2162.0" y="10515.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.TimerStartMessage</node>
+    <node x="3964.5" y="8999.5">it.polimi.galaxy_trucker.server.events.shipBuilding.TileTakenEvent</node>
+    <node x="4603.5" y="10576.0">it.polimi.galaxy_trucker.common.messages.shipBuilding.TimerFlippedMessage</node>
+    <node x="1188.5" y="11407.5">it.polimi.galaxy_trucker.server.model.tiles.CrewType</node>
+    <node x="-135.0" y="884.0">it.polimi.galaxy_trucker.server.model.Player.PlayerState</node>
+    <node x="4095.0" y="9191.5">it.polimi.galaxy_trucker.server.events.flight.cards.ProjectileEvent</node>
+    <node x="935.0" y="6512.0">it.polimi.galaxy_trucker.server.model.cards.AbstractEnemy</node>
+    <node x="5783.0" y="6584.0">it.polimi.galaxy_trucker.server.controller.commandHandlers.WaitingCmdHandler</node>
+    <node x="2799.5" y="9239.5">it.polimi.galaxy_trucker.server.events.flight.AlienCabinTilesEvent</node>
+    <node x="-241.0" y="9215.5">it.polimi.galaxy_trucker.server.ServerMain</node>
+    <node x="1311.5" y="8015.5">it.polimi.galaxy_trucker.client.popups.cards.DecisionPopupController</node>
+    <node x="776.0" y="11335.5">it.polimi.galaxy_trucker.common.messages.login.PlayerInfo</node>
+    <node x="-157.0" y="9564.0">it.polimi.galaxy_trucker.server.ServerMain.CommandLineOptions</node>
+    <node x="856.5" y="8467.5">it.polimi.galaxy_trucker.client.popups.cards.PlanetsPopupController</node>
+    <node x="406.5" y="10515.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.CardsMessage</node>
+    <node x="636.0" y="1648.0">it.polimi.galaxy_trucker.server.controller.listeners.GameListener</node>
+    <node x="6588.5" y="9263.5">it.polimi.galaxy_trucker.server.events.shipBuilding.CardsReturnedEvent</node>
+    <node x="605.5" y="10987.0">it.polimi.galaxy_trucker.client.VirtualServer</node>
+    <node x="-203.0" y="1048.5">it.polimi.galaxy_trucker.server.controller.listeners.EventHandler</node>
+    <node x="115.0" y="10988.0">it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipAnim</node>
+    <node x="921.0" y="9263.5">it.polimi.galaxy_trucker.server.events.flight.cards.PlanetRefusedEvent</node>
+    <node x="3039.0" y="6463.0">it.polimi.galaxy_trucker.server.model.tiles.CabinTile</node>
+    <node x="6261.5" y="9263.5">it.polimi.galaxy_trucker.server.events.flight.cards.CargoDecisionEvent</node>
+    <node x="5225.5" y="9215.5">it.polimi.galaxy_trucker.server.events.flight.cards.CargoUnloadedEvent</node>
+    <node x="409.5" y="8999.5">it.polimi.galaxy_trucker.server.events.flight.cards.CrewDecisionEvent</node>
+    <node x="3793.5" y="6487.0">it.polimi.galaxy_trucker.server.model.tiles.CargoTile</node>
+    <node x="12.0" y="11456.0">it.polimi.galaxy_trucker.Main</node>
+    <node x="-244.0" y="11359.5">it.polimi.galaxy_trucker.common.messages.flight.TileInfo</node>
+    <node x="215.5" y="5804.5">it.polimi.galaxy_trucker.server.model.cards.CargoHandlerCard</node>
+    <node x="5574.5" y="9239.5">it.polimi.galaxy_trucker.server.events.game.GameStateUpdateEvent</node>
+    <node x="235.0" y="1696.0">it.polimi.galaxy_trucker.server.controller.listeners.LobbyListener</node>
+    <node x="3296.0" y="9995.5">it.polimi.galaxy_trucker.common.messages.flight.SelectedTileMessage</node>
+    <node x="4749.5" y="10019.5">it.polimi.galaxy_trucker.common.messages.shipBuilding.ReserveTileMessage</node>
+    <node x="-14.0" y="5496.5">it.polimi.galaxy_trucker.server.model.cards.DecisionHandlerCard</node>
+    <node x="1025.0" y="3427.0">it.polimi.galaxy_trucker.server.model.ShipBoard</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.DoneBuildingMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="7274.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard" target="it.polimi.galaxy_trucker.server.model.cards.BatteryHandlerCard" relationship="REALIZATION">
+      <point x="-89.5" y="-188.5" />
+      <point x="1584.5" y="6160.0" />
+      <point x="734.0" y="6160.0" />
+      <point x="734.0" y="6000.0" />
+      <point x="2434.0" y="6000.0" />
+      <point x="0.0" y="43.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.SettingsController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-164.5" />
+      <point x="414.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.OpenSpaceCard" target="it.polimi.galaxy_trucker.server.model.cards.EnginesHandlerCard" relationship="REALIZATION">
+      <point x="-82.25" y="-68.5" />
+      <point x="1311.75" y="6020.0" />
+      <point x="774.0" y="6020.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.ClientMain.CommandLineOptions" target="it.polimi.galaxy_trucker.client.ClientMain" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.OpenSpaceCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="82.25" y="-68.5" />
+      <point x="1476.25" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule.Condition" target="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="1454.0" y="7140.0" />
+      <point x="1674.0" y="7140.0" />
+      <point x="0.0" y="-128.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.TilesMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-116.5" />
+      <point x="6414.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.CargoUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="1614.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.ConfirmationPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-92.5" />
+      <point x="1754.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.ShieldTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="3374.0" y="6160.0" />
+      <point x="3954.0" y="6160.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.commandHandlers.ShipBuildingCmdHandler" target="it.polimi.galaxy_trucker.server.controller.commandHandlers.CommandHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-176.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.DecisionEndEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="6094.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CargoDecisionEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="6394.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.listeners.LobbyListener" target="it.polimi.galaxy_trucker.server.controller.listeners.EventHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="414.0" y="1180.0" />
+      <point x="-26.0" y="1180.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.EngineSelectionEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2774.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.DeckLevelsMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="214.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.BatteriesTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-117.0" />
+      <point x="2854.0" y="6160.0" />
+      <point x="3954.0" y="6160.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.game.GameResetEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="3134.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.ShipBoard.CrewData" target="it.polimi.galaxy_trucker.server.model.ShipBoard" relationship="INNER_CLASS">
+      <point x="0.0" y="-68.0" />
+      <point x="914.0" y="4860.0" />
+      <point x="1254.0" y="4860.0" />
+      <point x="0.0" y="693.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.EmptyTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="4134.0" y="6160.0" />
+      <point x="3954.0" y="6160.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.Source" target="it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile" relationship="INNER_CLASS">
+      <point x="0.0" y="-68.0" />
+      <point x="5274.0" y="6920.0" />
+      <point x="5394.0" y="6920.0" />
+      <point x="5394.0" y="6820.0" />
+      <point x="5430.0" y="6820.0" />
+      <point x="-64.0" y="153.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.ShipBoardMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="1654.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.CargoTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-153.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard" target="it.polimi.galaxy_trucker.server.model.cards.CannonsHandlerCard" relationship="REALIZATION">
+      <point x="-89.5" y="-188.5" />
+      <point x="1584.5" y="6160.0" />
+      <point x="734.0" y="6160.0" />
+      <point x="734.0" y="5940.0" />
+      <point x="694.0" y="5940.0" />
+      <point x="694.0" y="5920.0" />
+      <point x="574.0" y="5920.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.projectile.Meteor" target="it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.0" />
+      <point x="5554.0" y="6820.0" />
+      <point x="5558.0" y="6820.0" />
+      <point x="64.0" y="153.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.ShipBoard.ShipContent" target="it.polimi.galaxy_trucker.server.model.ShipBoard" relationship="INNER_CLASS">
+      <point x="0.0" y="-68.0" />
+      <point x="474.0" y="4860.0" />
+      <point x="1254.0" y="4860.0" />
+      <point x="0.0" y="693.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.CreditsMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="2134.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CargoUnloadedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="5374.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.AlienCabinTilesEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2954.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.SlaversCard" target="it.polimi.galaxy_trucker.server.model.cards.AbstractEnemy" relationship="GENERALIZATION">
+      <point x="74.25" y="-80.5" />
+      <point x="68.25" y="6880.0" />
+      <point x="914.0" y="6880.0" />
+      <point x="914.0" y="6480.0" />
+      <point x="1203.5" y="6480.0" />
+      <point x="89.5" y="-128.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.shipBuilding.TileTakenEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="4074.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.ActivatableTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="4454.0" y="6160.0" />
+      <point x="3954.0" y="6160.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.PlayerPositionMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="3734.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.PlayersInfoMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="3934.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile.Size" target="it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="5394.0" y="6820.0" />
+      <point x="5430.0" y="6820.0" />
+      <point x="-64.0" y="153.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.lobby.PlayersUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="1234.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController.JsonHandler" target="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController" relationship="INNER_CLASS">
+      <point x="0.0" y="-31.5" />
+      <point x="2254.0" y="4900.0" />
+      <point x="2434.0" y="4900.0" />
+      <point x="0.0" y="356.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.controllers.login.LoginController" target="it.polimi.galaxy_trucker.client.VirtualServerAware" relationship="REALIZATION">
+      <point x="0.0" y="-200.0" />
+      <point x="2214.0" y="2220.0" />
+      <point x="1774.0" y="2220.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.controllers.lobby.LobbyController" target="it.polimi.galaxy_trucker.client.VirtualServerAware" relationship="REALIZATION">
+      <point x="0.0" y="-176.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.GameStateMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="1834.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.CannonTile" target="it.polimi.galaxy_trucker.server.model.tiles.ActivatableTile" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="4274.0" y="6560.0" />
+      <point x="4454.0" y="6560.0" />
+      <point x="0.0" y="-56.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.cards.DecisionPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="1434.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.ActivateCannonsMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-141.0" />
+      <point x="4054.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="5794.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.BoardTypeMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="3254.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.CreditsUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="394.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbstractEnemy" target="it.polimi.galaxy_trucker.server.model.cards.CannonsHandlerCard" relationship="REALIZATION">
+      <point x="-89.5" y="-128.0" />
+      <point x="1024.5" y="6460.0" />
+      <point x="694.0" y="6460.0" />
+      <point x="694.0" y="5920.0" />
+      <point x="574.0" y="5920.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.login.JoinRequestMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2634.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.PlanetsCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="73.25" y="-128.5" />
+      <point x="807.25" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.StartingCabinTile" target="it.polimi.galaxy_trucker.server.model.tiles.CabinTile" relationship="GENERALIZATION">
+      <point x="0.0" y="-68.5" />
+      <point x="3014.0" y="6440.0" />
+      <point x="3194.0" y="6440.0" />
+      <point x="0.0" y="-177.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CardDecisionEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="894.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoDoneMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="3454.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.CardsReturnedMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="4994.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.PlanetChosenEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="6974.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.StarDustCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="1994.0" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.listeners.CardsListener" target="it.polimi.galaxy_trucker.server.controller.listeners.EventHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-272.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.PlayerPositionUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="5014.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.BatteryDecisionMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-128.5" />
+      <point x="6834.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent.CardStatus" target="it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="56.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.Logger.LogType" target="it.polimi.galaxy_trucker.common.Logger" relationship="INNER_CLASS">
+      <point x="0.0" y="-81.0" />
+      <point x="2814.0" y="6860.0" />
+      <point x="2134.0" y="6860.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.TimerStartMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="2274.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.InvalidShipEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2374.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.Card.InputState" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="2554.0" y="6140.0" />
+      <point x="2294.75" y="6140.0" />
+      <point x="100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard" target="it.polimi.galaxy_trucker.server.model.cards.EnginesHandlerCard" relationship="REALIZATION">
+      <point x="-89.5" y="-188.5" />
+      <point x="1584.5" y="6160.0" />
+      <point x="734.0" y="6160.0" />
+      <point x="734.0" y="5960.0" />
+      <point x="774.0" y="5960.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.BatteryRefuseMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="5574.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule" target="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard" relationship="INNER_CLASS">
+      <point x="0.0" y="-128.5" />
+      <point x="0.0" y="188.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.SmugglersCard" target="it.polimi.galaxy_trucker.server.model.cards.CargoHandlerCard" relationship="REALIZATION">
+      <point x="-87.75" y="-104.5" />
+      <point x="746.25" y="6860.0" />
+      <point x="-6.0" y="6860.0" />
+      <point x="-6.0" y="6060.0" />
+      <point x="354.0" y="6060.0" />
+      <point x="0.0" y="55.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.CrewMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-116.5" />
+      <point x="4334.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.TimerFinishedMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="-106.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.ShipUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2194.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.CargoTile.CargoType" target="it.polimi.galaxy_trucker.server.model.tiles.CargoTile" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="153.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CardFinishedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="6554.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.commandHandlers.CorrectingShipCmdHandler" target="it.polimi.galaxy_trucker.server.controller.commandHandlers.CommandHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.0" />
+      <point x="4974.0" y="6040.0" />
+      <point x="4714.0" y="6040.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.listeners.ShipListener" target="it.polimi.galaxy_trucker.server.controller.listeners.EventHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-104.0" />
+      <point x="214.0" y="1180.0" />
+      <point x="-26.0" y="1180.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.MeteorSwarmCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="-70.75" y="-104.5" />
+      <point x="2283.25" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.SelectedTileMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.ReserveTileMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="4854.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.CardsTakenMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="974.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbstractEnemy" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="89.5" y="-128.0" />
+      <point x="1203.5" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbstractEnemy" target="it.polimi.galaxy_trucker.server.model.cards.DecisionHandlerCard" relationship="REALIZATION">
+      <point x="-89.5" y="-128.0" />
+      <point x="1024.5" y="6460.0" />
+      <point x="694.0" y="6460.0" />
+      <point x="694.0" y="5960.0" />
+      <point x="94.0" y="5960.0" />
+      <point x="0.0" y="43.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.TimerFlippedMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="4714.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.GameResetMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2794.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.StatusUpdateMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-116.5" />
+      <point x="4134.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CannonSelectionEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="3274.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbandonedStationCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="94.25" y="-128.5" />
+      <point x="548.25" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.lobby.ChatMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-140.5" />
+      <point x="3094.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbandonedStationCard" target="it.polimi.galaxy_trucker.server.model.cards.DecisionHandlerCard" relationship="REALIZATION">
+      <point x="-94.25" y="-128.5" />
+      <point x="359.75" y="6080.0" />
+      <point x="354.0" y="6080.0" />
+      <point x="354.0" y="6020.0" />
+      <point x="94.0" y="6020.0" />
+      <point x="0.0" y="43.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.SimplePlayerMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-92.5" />
+      <point x="3574.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.PlanetsCard" target="it.polimi.galaxy_trucker.server.model.cards.CargoHandlerCard" relationship="REALIZATION">
+      <point x="-73.25" y="-128.5" />
+      <point x="660.75" y="6060.0" />
+      <point x="354.0" y="6060.0" />
+      <point x="0.0" y="55.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CardStatusEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="7114.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.StructuralTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="3774.0" y="6160.0" />
+      <point x="3954.0" y="6160.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.FinalScoresPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-116.5" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.CardPickedMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="54.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CardPickedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="6234.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.PlanetSelectionEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="1434.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.DiceThrowMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="814.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.PlanetRefusedMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="4774.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.CardsMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="514.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.AlertPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2234.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.PlayerScoreEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardDecisionMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-117.0" />
+      <point x="6114.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.PlanetChosenMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-93.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.PlayerStatusEvent.Status" target="it.polimi.galaxy_trucker.server.events.flight.cards.PlayerStatusEvent" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="80.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.CountdownPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="254.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.ShipBoard.BatteriesData" target="it.polimi.galaxy_trucker.server.model.ShipBoard" relationship="INNER_CLASS">
+      <point x="0.0" y="-92.0" />
+      <point x="1074.0" y="4860.0" />
+      <point x="1254.0" y="4860.0" />
+      <point x="0.0" y="693.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.shipBuilding.CardsTakenEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="3554.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.DiceThrowEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="4834.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.SimpleMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="374.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.MeteorSwarmCard" target="it.polimi.galaxy_trucker.server.model.cards.BatteryHandlerCard" relationship="REALIZATION">
+      <point x="70.75" y="-104.5" />
+      <point x="2424.75" y="6160.0" />
+      <point x="2434.0" y="6160.0" />
+      <point x="0.0" y="43.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.Player.PlayerState" target="it.polimi.galaxy_trucker.server.model.Player" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="777.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoUnloadMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-141.0" />
+      <point x="7334.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.ShipBoard.DefendingCannonType" target="it.polimi.galaxy_trucker.server.model.ShipBoard" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="734.0" y="4860.0" />
+      <point x="1254.0" y="4860.0" />
+      <point x="0.0" y="693.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.shipBuilding.TimerStartEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="6834.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.cards.PlanetsPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-92.5" />
+      <point x="974.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbandonedStationCard" target="it.polimi.galaxy_trucker.server.model.cards.CargoHandlerCard" relationship="REALIZATION">
+      <point x="-94.25" y="-128.5" />
+      <point x="359.75" y="6080.0" />
+      <point x="354.0" y="6080.0" />
+      <point x="0.0" y="55.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.PlayerEliminatedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="254.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.TileFixedMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-128.5" />
+      <point x="5134.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.PlanetSelectionMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="7074.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CrewDecisionEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="574.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.CargoSwappedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-128.5" />
+      <point x="1794.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.commandHandlers.AssigningCrewCmdHandler" target="it.polimi.galaxy_trucker.server.controller.commandHandlers.CommandHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-68.0" />
+      <point x="5234.0" y="6040.0" />
+      <point x="4714.0" y="6040.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule.Punishment" target="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard.CombatRule" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="1714.0" y="7520.0" />
+      <point x="1454.0" y="7520.0" />
+      <point x="1454.0" y="7140.0" />
+      <point x="1674.0" y="7140.0" />
+      <point x="0.0" y="-128.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.lobby.BoardTypeUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="3714.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.endGame.PlayersScoresMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="4534.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.AlienSupportTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.0" />
+      <point x="3574.0" y="6160.0" />
+      <point x="3954.0" y="6160.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController.HandlerEntry" target="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="356.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.projectile.CannonShot" target="it.polimi.galaxy_trucker.server.model.cards.projectile.Projectile" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.0" />
+      <point x="5714.0" y="6940.0" />
+      <point x="5554.0" y="6940.0" />
+      <point x="5554.0" y="6820.0" />
+      <point x="5558.0" y="6820.0" />
+      <point x="64.0" y="153.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.commandHandlers.WaitingCmdHandler" target="it.polimi.galaxy_trucker.server.controller.commandHandlers.CommandHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.0" />
+      <point x="6014.0" y="6040.0" />
+      <point x="4714.0" y="6040.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.listeners.GameListener" target="it.polimi.galaxy_trucker.server.controller.listeners.EventHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-92.0" />
+      <point x="834.0" y="1180.0" />
+      <point x="-26.0" y="1180.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="89.5" y="-188.5" />
+      <point x="1763.5" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.TileReturnedMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="2934.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.cards.DiceThrowPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="574.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.EngineTile" target="it.polimi.galaxy_trucker.server.model.tiles.ActivatableTile" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="4114.0" y="6940.0" />
+      <point x="4274.0" y="6940.0" />
+      <point x="4274.0" y="6560.0" />
+      <point x="4454.0" y="6560.0" />
+      <point x="0.0" y="-56.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.commandHandlers.PickingCardsCmdHandler" target="it.polimi.galaxy_trucker.server.controller.commandHandlers.CommandHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.0" />
+      <point x="6274.0" y="6040.0" />
+      <point x="4714.0" y="6040.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CargoSwapMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-165.0" />
+      <point x="7694.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.ProjectileEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-128.5" />
+      <point x="4274.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.PiratesCard" target="it.polimi.galaxy_trucker.server.model.cards.BatteryHandlerCard" relationship="REALIZATION">
+      <point x="85.25" y="-116.5" />
+      <point x="2699.25" y="6880.0" />
+      <point x="2694.0" y="6880.0" />
+      <point x="2694.0" y="6160.0" />
+      <point x="2434.0" y="6160.0" />
+      <point x="0.0" y="43.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.CargoDecisionMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-128.5" />
+      <point x="5534.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.PlayerScoreMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-128.5" />
+      <point x="5974.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.BatteriesMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="1174.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.ServerMain.CommandLineOptions" target="it.polimi.galaxy_trucker.server.ServerMain" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="104.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.TileSelectionMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-236.5" />
+      <point x="1414.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.cards.ShipPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="1114.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.listeners.BuildingListener" target="it.polimi.galaxy_trucker.server.controller.listeners.EventHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-116.0" />
+      <point x="614.0" y="1180.0" />
+      <point x="-26.0" y="1180.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.shipBuilding.CardsReturnedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="6694.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.cards.TileSelectionPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-212.5" />
+      <point x="1994.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.gameOver.GameOverEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="5554.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.BatteriesUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="1994.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbandonedShipCard" target="it.polimi.galaxy_trucker.server.model.cards.CrewHandlerCard" relationship="REALIZATION">
+      <point x="-75.5" y="-104.5" />
+      <point x="98.5" y="6500.0" />
+      <point x="94.0" y="6500.0" />
+      <point x="94.0" y="6040.0" />
+      <point x="-86.0" y="6040.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.GameModel.GameState" target="it.polimi.galaxy_trucker.server.model.GameModel" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="0.0" y="645.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.shipBuilding.TimerFinishedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="5954.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.shipBuilding.TileReturnedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="754.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.PlanetRefusedEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="1034.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.CrewUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="4654.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.ProjectileMessage.ProjectileType" target="it.polimi.galaxy_trucker.common.messages.flight.ProjectileMessage" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="1154.0" y="10920.0" />
+      <point x="6194.0" y="10920.0" />
+      <point x="0.0" y="248.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.controller.commandHandlers.LobbyCmdHandler" target="it.polimi.galaxy_trucker.server.controller.commandHandlers.CommandHandler" relationship="GENERALIZATION">
+      <point x="0.0" y="-116.0" />
+      <point x="5754.0" y="6040.0" />
+      <point x="4714.0" y="6040.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.PlayerStatusEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="5194.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.controllers.flight.FlightController" target="it.polimi.galaxy_trucker.client.VirtualServerAware" relationship="REALIZATION">
+      <point x="0.0" y="-489.0" />
+      <point x="1994.0" y="2220.0" />
+      <point x="1774.0" y="2220.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.flight.cards.BatteryDecisionEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="4474.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="1994.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.CombatZoneCard" target="it.polimi.galaxy_trucker.server.model.cards.CrewHandlerCard" relationship="REALIZATION">
+      <point x="-89.5" y="-188.5" />
+      <point x="1584.5" y="6160.0" />
+      <point x="734.0" y="6160.0" />
+      <point x="734.0" y="5980.0" />
+      <point x="-86.0" y="5980.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage.Action" target="it.polimi.galaxy_trucker.common.messages.lobby.BoardSelectMessage" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="-26.0" y="10740.0" />
+      <point x="1994.0" y="10740.0" />
+      <point x="0.0" y="80.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.ShipPreviewPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-116.5" />
+      <point x="1594.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbandonedShipCard" target="it.polimi.galaxy_trucker.server.model.cards.DecisionHandlerCard" relationship="REALIZATION">
+      <point x="-75.5" y="-104.5" />
+      <point x="98.5" y="6500.0" />
+      <point x="94.0" y="6500.0" />
+      <point x="0.0" y="43.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.BatteryUseMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-93.0" />
+      <point x="2354.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.SmugglersCard" target="it.polimi.galaxy_trucker.server.model.cards.AbstractEnemy" relationship="GENERALIZATION">
+      <point x="87.75" y="-104.5" />
+      <point x="921.75" y="6880.0" />
+      <point x="914.0" y="6880.0" />
+      <point x="914.0" y="6480.0" />
+      <point x="1203.5" y="6480.0" />
+      <point x="89.5" y="-128.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.game.GameStateUpdateEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="5754.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="7434.0" y="9820.0" />
+      <point x="3495.25" y="9820.0" />
+      <point x="41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.AbandonedShipCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="75.5" y="-104.5" />
+      <point x="249.5" y="6040.0" />
+      <point x="1874.0" y="6040.0" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.EpidemicCard" target="it.polimi.galaxy_trucker.server.model.cards.Card" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.5" />
+      <point x="1874.0" y="5780.0" />
+      <point x="2093.25" y="5780.0" />
+      <point x="-100.75" y="201.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.PiratesCard" target="it.polimi.galaxy_trucker.server.model.cards.AbstractEnemy" relationship="GENERALIZATION">
+      <point x="-85.25" y="-116.5" />
+      <point x="2528.75" y="6880.0" />
+      <point x="914.0" y="6880.0" />
+      <point x="914.0" y="6480.0" />
+      <point x="1203.5" y="6480.0" />
+      <point x="89.5" y="-128.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.cards.SlaversCard" target="it.polimi.galaxy_trucker.server.model.cards.CrewHandlerCard" relationship="REALIZATION">
+      <point x="-74.25" y="-80.5" />
+      <point x="-80.25" y="7180.0" />
+      <point x="-86.0" y="7180.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.popups.CardsPopupController" target="it.polimi.galaxy_trucker.client.popups.PopupAware" relationship="REALIZATION">
+      <point x="0.0" y="-140.5" />
+      <point x="1274.0" y="7920.0" />
+      <point x="94.0" y="7920.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.shipBuilding.DoneBuildingEvent" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="3414.0" y="8960.0" />
+      <point x="3894.0" y="8960.0" />
+      <point x="3894.0" y="8920.0" />
+      <point x="3898.25" y="8920.0" />
+      <point x="-35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.tiles.CabinTile" target="it.polimi.galaxy_trucker.server.model.tiles.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-177.0" />
+      <point x="3194.0" y="6160.0" />
+      <point x="3954.0" y="6160.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.client.controllers.shipBuilding.ShipBuildingController" target="it.polimi.galaxy_trucker.client.VirtualServerAware" relationship="REALIZATION">
+      <point x="0.0" y="-356.0" />
+      <point x="2434.0" y="2220.0" />
+      <point x="1774.0" y="2220.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.Player.Color" target="it.polimi.galaxy_trucker.server.model.Player" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="214.0" y="860.0" />
+      <point x="-26.0" y="860.0" />
+      <point x="0.0" y="777.0" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.RemoveMemberMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-93.0" />
+      <point x="2994.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.CargoMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="2454.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.events.ModelEventListener" target="it.polimi.galaxy_trucker.server.events.EventModel" relationship="DEPENDENCY">
+      <point x="0.0" y="-31.5" />
+      <point x="7254.0" y="8940.0" />
+      <point x="3969.75" y="8940.0" />
+      <point x="35.75" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage.JoinStatus" target="it.polimi.galaxy_trucker.common.messages.login.JoinResponseMessage" relationship="INNER_CLASS">
+      <point x="0.0" y="-56.0" />
+      <point x="574.0" y="10900.0" />
+      <point x="5794.0" y="10900.0" />
+      <point x="0.0" y="80.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.ProjectileMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-248.5" />
+      <point x="6194.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.TileTakenMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="5274.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.PickAvailableMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="6594.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.flight.cardActions.ActivateEnginesMessage" target="it.polimi.galaxy_trucker.common.messages.flight.cardActions.CardActionMessage" relationship="REALIZATION">
+      <point x="0.0" y="-117.0" />
+      <point x="1694.0" y="10940.0" />
+      <point x="6754.0" y="10940.0" />
+      <point x="6754.0" y="10740.0" />
+      <point x="7434.0" y="10740.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.common.messages.shipBuilding.UseReservedTileMessage" target="it.polimi.galaxy_trucker.common.messages.GameMessage" relationship="REALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="654.0" y="9840.0" />
+      <point x="3414.0" y="9840.0" />
+      <point x="3414.0" y="9820.0" />
+      <point x="3412.75" y="9820.0" />
+      <point x="-41.25" y="31.5" />
+    </edge>
+    <edge source="it.polimi.galaxy_trucker.server.model.ShipBoard.CargoData" target="it.polimi.galaxy_trucker.server.model.ShipBoard" relationship="INNER_CLASS">
+      <point x="0.0" y="-92.0" />
+      <point x="0.0" y="693.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Compact" zoom="0.04460534416943726" showDependencies="false" x="3196.19136484099" y="6949.200806095405" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
