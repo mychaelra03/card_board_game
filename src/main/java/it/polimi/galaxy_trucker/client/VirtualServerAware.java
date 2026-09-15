@@ -2,7 +2,7 @@ package it.polimi.galaxy_trucker.client;
 
 /**
  * Interface for components that require awareness or reinitialization when the virtual server is updated.
- * <p>
+ * 
  * This is commonly used for GUI components or other observers that must rebind or refresh themselves
  * when a new virtual server or context becomes available.
  */

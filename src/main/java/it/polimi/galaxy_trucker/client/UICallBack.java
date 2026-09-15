@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Functional interface for handling UI-originated string commands, typically in JSON format.
- * <p>
+ * 
  * Implementations of this interface are responsible for parsing and processing commands from the UI layer.
  */
 public interface UICallBack {

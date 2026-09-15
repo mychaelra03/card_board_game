@@ -16,8 +16,8 @@ import java.util.Queue;
 /**
  * Handles the client-side network connection to a remote server.
  *
- * <p>This singleton class manages socket communication, background threads for message listening and
- * connection health monitoring (via ping), and delegates received messages to the UI layer via a callback interface.</p>
+ * This singleton class manages socket communication, background threads for message listening and
+ * connection health monitoring (via ping), and delegates received messages to the UI layer via a callback interface.
  */
 public class VirtualServer {
     private Socket clientSocket;

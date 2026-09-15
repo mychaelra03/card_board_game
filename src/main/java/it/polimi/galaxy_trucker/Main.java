@@ -1,6 +1,6 @@
 package it.polimi.galaxy_trucker;
 
-import it.polimi.galaxy_trucker.client.ClientMain;
+import it.polimi.galaxy_trucker.Main;
 import it.polimi.galaxy_trucker.server.ServerMain;
 
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class Main {
         }
 
         switch (mode) {
-            case "client" -> ClientMain.main(args2);
+            case "client" -> Main.main(args2);
             case "server" -> ServerMain.main(args2);
         }
     }

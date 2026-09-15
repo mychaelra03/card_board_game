@@ -35,14 +35,14 @@ public class SceneSwitch {
      * Switches the current scene to the one specified by the FXML filename.
      * Prevents reloading if the requested scene is already active.
      *
-     * <p>This method performs the following steps:
-     * <ul>
-     *   <li>Closes any open popups</li>
-     *   <li>Loads the specified FXML file from the <code>/fxml/scenes/</code> directory</li>
-     *   <li>Applies the pending locale</li>
-     *   <li>Initializes the scene and sets it on the primary stage</li>
-     *   <li>Invokes {@code updateCallBack()} on controllers implementing {@link VirtualServerAware}</li>
-     * </ul>
+     * This method performs the following steps:
+     * 
+     *   Closes any open popups
+     *   Loads the specified FXML file from the <code>/fxml/scenes/</code> directory
+     *   Applies the pending locale
+     *   Initializes the scene and sets it on the primary stage
+     *   Invokes {@code updateCallBack()} on controllers implementing {@link VirtualServerAware}
+     * 
      *
      * @param fxmlFile the name of the FXML file (without the ".fxml" extension)
      */
